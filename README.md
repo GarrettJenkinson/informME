@@ -513,6 +513,7 @@ All code in informME is licensed under a GPLv3 license, except for the
 files contained in the following directory:
 
 informME/Modeling/private
+informME/SingleAnalysis/private
 
 These files have their own licensing information in their header. 
 Specifically, the authors' of these files have provided Garrett
