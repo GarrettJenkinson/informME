@@ -19,51 +19,32 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
-%%%%%%%%                   objFnToMinimize.m                       %%%%%%%%
+%%%%%%%%                        h_func.m                           %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
+%%%%%%%%               Last Modified: 11/30/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function evaluates the objective function that must be minimized in 
-% order to obtain maximum-likelihood estimates for the alpha, beta, and 
-% gamma parameters of the Ising model. 
+% This function computes the (log2-based) entropies of a collection 
+% X(q,r), q = 1,2,...,Q, r = 1,2,...,R of QxR binary random variables 
+% with corresponding probabilities p(q,r) and 1-p(q,r). 
 %
-% USAGE:
-%
-% objFn = objFnToMinimize(theta)
+% USAGE: ENTR = h_func(P)
 %
 % INPUT:
 %
-% theta
-%       Parameter vector containing the alpha, beta, and gamma parameters 
-%       of the Ising model.
+% P
+%         A QxR matrix of the probabilities p(q,r), q = 1,2,...,Q, 
+%         r = 1,2,...,R. 
 %
 % OUTPUT:
 %
-% objFn
-%       The negative of the average "marginalized" log-likelihood of 
-%       the input parameters given observations of the methylation 
-%       state within a genomic region used for estimation. 
-%
+% ENTR    
+%         A QxR matrix with its (q,r) element being the entropy of 
+%         the binary random variable X(q,r).
+%       
 
-function objFn = objFnToMinimize(theta)
+function ENTR = h_func(P)
 
-% Set global variables.
-
-global CpGstart CpGend density Dist newMatrix 
-
-% Compute model from parameters.
-
-[An,Cn] = computeAnCn(density,Dist,theta);
-
-% Compute average "marginalized" log-likelihood.
-
-tempMat   = int32(newMatrix');
-tempStart = int32(CpGstart);
-tempEnd   = int32(CpGend);
-
-aveLogLikelihood = computeAveLogLikelihood(An,Cn,tempMat,tempStart,tempEnd);
-
-% Objective function to be minimized for maximum-likelihood estimation.
-
-objFn = -aveLogLikelihood;
+ENTR          = zeros(size(P));
+ENTR(P>0&P<1) = -P(P>0&P<1).*log2(P(P>0&P<1))...
+                -(1-P(P>0&P<1)).*log2(1-P(P>0&P<1));

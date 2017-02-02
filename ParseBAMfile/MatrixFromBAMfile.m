@@ -17,111 +17,128 @@
 %   or see <http://www.gnu.org/licenses/>.
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%  Statistical Model for DNA Methylation Patterns    %%%%%%%%%%%%
-%%%%%%%%%%%  Code by: Garrett Jenkinson                        %%%%%%%%%%%%
-%%%%%%%%%%%             Last Modified: 05/24/2015              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
+%%%%%%%%                   MatrixFromBAMfile.m                     %%%%%%%%
+%%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
+%%%%%%%%               Last Modified: 11/30/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function processes a .bam file with aligned reads to a reference 
-% genome and produces methylation information for nonoverlapping regions 
-% of 3000 base pairs long in a given chromosome. The final output for each 
-% region is a matrix with -1,0,1 values. Each row of the matrix is a 
-% read and each column represents a CpG site within the region. 
-% -1 indicates no methylation information is available for the CPG site, 
-% 0 indicates that the CpG site is unmethylated, and 1 indicates that the 
-% CpG site is methylated. THIS FUNCTION DEPENDS ON A WORKING INSTALLATION
-% OF "SAMTOOLS" THAT IS ON THE SYSTEM $PATH.
+% This function processes a BAM file with aligned reads to a reference 
+% genome and produces methylation information for nonoverlapping genomic 
+% regions (containing the same number of base pairs) in a given chromosome. 
+% The final output for each genomic region is a matrix with -1,0,1 values. 
+% Each row of the matrix is a methylation read, whereas each column 
+% represents a CpG site within the genomic region. A value of -1 indicates 
+% no methylation information is available for the CPG site, 0 indicates 
+% that the CpG site is unmethylated, and 1 indicates that the CpG site 
+% is methylated. 
+% 
+% This function depends on a working instalation of SAMtools that is on  
+% the system path $PATH.
 %
-% WARNING: Before running this function, you must run FastaToCpGloc.m ONCE!
+% Before running this function, FastaToCpG.m must be run ONCE. 
 %
-% Example Default Usage:
+% USAGE (default):
+%
 % MatrixFromBAMfile(bamFilename,chr_num)
 %
-% Example Usage Modifying optional parameter "species" as name-value pair:
+% USAGE (optional): 
+%
+% Example of optional usage with additional input parameters.
 % MatrixFromBAMfile(bamFilename,chr_num,'species','Mouse')
 %
-% This file takes as mandatroy inputs (which must appear first and in the 
-% following order):
+% MADATORY INPUTS:
 %
-% bamFilename     - Name of the .bam file (without the .bam extension). 
-%                   This file must be sorted from least to greatest 
-%                   base pair position along the reference seqeunce 
-%                   and must be indexed (i.e., the associated .bai file 
-%                   must be available). File name must not contain
-%                   unnecessary "." characters, but can contain "_"
-%                   instead. File name should end in a character and not a
-%                   number, and should be unique from other files. 
+% bamFilename
+%                Name of the BAM file (without the .bam extension). This 
+%                file must be sorted from the least to the greatest base 
+%                pair position along the reference sequence and must be 
+%                indexed (i.e., the associated BAI file must be available). 
+%                The file name must not contain "." characters, but can 
+%                contain "_" instead. Moreover, the file name should be 
+%                unique and end with a letter (not a number). 
 %
-% chr_num         - Number representing the chromosome to be processed. 
+% chr_num
+%                Number representing the chromosome to be processed. 
 %
-% This file takes as optional inputs, specified in any order after the 
-% mandatory inputs as name-value pairs; i.e.,
-% MergeMatrices(...,'inputName',inputValue):
-%
-% pairedEnds        Flag for paired end read support. A value of 1 
-%                   indicates that the sequencer employed paired end reads, 
-%                   whereas a value of 0 indicates that the seqeuncer 
-%                   employed single end reads. Default value: 1.
-%
-% totalProcessors
-%               An integer that specifies the number of processors on a
-%               computing cluster that will be devoted to the task of
-%               statistical estimation of this phenotype on this
-%               chromosome. Default value: 1.
-%
-% processorNum
-%               An integer from 1 to totalProcessors which labels which
-%               processor of the totalProcessors is being called here. Each
-%               processor is assigned a disntinct location of regions
-%               within the chromosome to perform estimation on. Default
-%               value: 1.
+% OPTIONAL INPUTS:
 %
 % species
-%               A string detailing the species from which the data is
-%               obtained. e.g. 'Human' or 'Mouse'. Default value: 'Human'.
+%                A string that specifies the species from which the data is 
+%                obtained (e.g., 'Human' or 'Mouse'). 
+%                Default value: 'Human'
 %
-% includeChrInRef
-%               A flag telling how the reference chromosomes are named
-%                   if 1, then chromosomes are named chr1, chr2, etc. 
-%                   if 0, then chromosomes are named 1, 2, etc. 
-%               Default value: 0.
+% totalProcessors
+%                An integer that specifies the number of processors on a
+%                computing cluster that will be devoted to the task of
+%                building data matrices for this choromosome. 
+%                Default value: 1
 %
-% numBasesToTrim
-%               An vector with integer telling how many bases should be 
-%               trimmed from the begining of each read. If the vector is of
-%               length 2, then the first number tells how many bases to 
-%               trim from the first read in a read pair and the second 
-%               number tells how many bases should be trimmed from the 
-%               second read in the pair. If the vector is of lenght 1 then
-%               all reads will have that number of bases trimmed from the 
-%               beginning of the read. If no bases should be trimmed, then
-%               this should be set equal to 0. Default value: 0.
+% processorNum
+%                An integer from 1 to totalProcessors that labels which
+%                processor is being called. Each processor is assigned 
+%                distinct locations of genomic regions within the 
+%                chromosome that are used to generate data matrices. 
+%                Default value: 1
 %
 % CpGlocationPathRoot 
-%               Parent path to the files of CpG locations indexed  
-%               according to the reference genome in FastaToCpGloc.m.
-%               Default Value: './genome/'.
+%                Path to the root subdirectory where the outputs of this 
+%                function are stored.
+%                Default value: './genome/'
 %
 % bamFilePathRoot   
-%               Parent path to the .bam file. Default value:
-%               '../indexedBAMfiles/'.
+%                Path to the subdirectory where the BAM file is located.
+%                Default value: './indexedBAMfiles/'
 %
 % matricesPathRoot
-%               Parent path to write out matrix results. Default value:
-%               './matrices/'.
+%                Path to the subdirectory where the output of this function 
+%                is stored. 
+%                Default value: './matrices/'
 %
-% Any other optional parameters should only be modified by professionals
-% with a detailed understanding of the code.
+% pairedEnds     
+%                Flag for paired end read support. A value of 1 indicates 
+%                that the sequencer employed paired end reads, whereas a 
+%                value of 0 indicates that the sequencer employed single 
+%                end reads. 
+%                Default value: 1
+%
+% numBasesToTrim
+%                A vector of integers specifying how many bases should be 
+%                trimmed from the begining of each read. If the vector 
+%                contains two integers, then the first integer specifies 
+%                how many bases to trim from the first read in a read pair, 
+%                whereas the second integer specifies how many bases should 
+%                be trimmed from the second read in the pair. If the 
+%                vector contains one integer, then all reads will have 
+%                that number of bases trimmed from the beginning of the 
+%                read. If no bases are to be trimmed, then this input 
+%                must be set to 0. 
+%                Default value: 0
+%
+% includeChrInRef
+%                A flag specifying how the reference chromosomes are named
+%                   if 1, then chromosomes are named chr1, chr2, etc. 
+%                   if 0, then chromosomes are named 1, 2, etc. 
+%                Default value: 0
+%
+% regionSize     
+%                The size of the genomic regions for which methylation 
+%                information is produced (in number of base pairs).
+%                Default value: 3000
+%
+% minCpGsReqToModel
+%                The minimum number of CpG sites within a genomic region 
+%                required to perform statistical estimation.
+%                Default value: 10
+%
+% The default values of regionSize and minCpGsReqToModel should only be 
+% changed by an expert with a detailed understanding of the code and the 
+% methods used. 
 
 function MatrixFromBAMfile(bamFilename,chr_num,varargin)
-                       
-                       
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Parse values passed as inputs to the fuction and validate them
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+                                           
+% Parse values passed as inputs to the fuction and validate them.
 
 p = inputParser;
 
@@ -130,52 +147,55 @@ addRequired(p,'chr_num')
 addParameter(p,'species','Human',...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'totalProcessors',1,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
+               @(x)validateattributes(x,{'numeric'},...
+               {'nonempty','integer','positive','scalar'}))
 addParameter(p,'processorNum',1,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
+               @(x)validateattributes(x,{'numeric'},...
+               {'nonempty','integer','positive','scalar'}))    
+addParameter(p,'CpGlocationPathRoot',['.' filesep 'genome' filesep],...
+               @(x)validateattributes(x,{'char'},{'nonempty'}))     
+addParameter(p,'bamFilePathRoot',['..' filesep 'indexedBAMfiles' filesep],...
+               @(x)validateattributes(x,{'char'},{'nonempty'}))                
 addParameter(p,'matricesPathRoot',['.' filesep 'matrices' filesep],...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
-addParameter(p,'includeChrInRef',0,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','scalar'}))
 addParameter(p,'pairedEnds',1,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','scalar'}))
-addParameter(p,'CpGlocationPathRoot',['.' filesep 'genome' filesep],...
-               @(x)validateattributes(x,{'char'},{'nonempty'}))
-addParameter(p,'bamFilePathRoot',['..' filesep 'indexedBAMfiles' filesep],...
-               @(x)validateattributes(x,{'char'},{'nonempty'}))
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','scalar'}))         
 addParameter(p,'numBasesToTrim',0,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer'}))
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer'}))              
+addParameter(p,'includeChrInRef',0,...
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','scalar'}))              
 addParameter(p,'regionSize',int64(3000),...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))     
 addParameter(p,'minCpGsReqToModel',10,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))           
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))           
           
 parse(p,bamFilename,chr_num,varargin{:})
 
 species             = p.Results.species;
 totalProcessors     = p.Results.totalProcessors;
 processorNum        = p.Results.processorNum;
-matricesPathRoot    = p.Results.matricesPathRoot;
-includeChrInRef     = p.Results.includeChrInRef;
-pairedEnds          = p.Results.pairedEnds;
 CpGlocationPathRoot = p.Results.CpGlocationPathRoot;
 bamFilePathRoot     = p.Results.bamFilePathRoot;
+matricesPathRoot    = p.Results.matricesPathRoot;
+pairedEnds          = p.Results.pairedEnds;
 numBasesToTrim      = p.Results.numBasesToTrim;
-regionSize          = p.Results.regionSize; % base pairs in each region being modeled
-minCpGsReqToModel   = p.Results.minCpGsReqToModel; % minimum number of CpG sites in 
-                                                   % a region for which methylation 
-                                                   % data will be collected
+includeChrInRef     = p.Results.includeChrInRef;
+regionSize          = p.Results.regionSize;       
+minCpGsReqToModel   = p.Results.minCpGsReqToModel;
                                                    
-%
-% Manual checks/corrections of inputs
-%
+% Manual checks/corrections of inputs. 
 
 if ~isempty(strfind(bamFilename,'.'))
-    disp('ERROR: Input bam file name has period characters.')
+    disp('ERROR: Input BAM file name contains period characters.')
     disp('Please rename file without periods. Underscore is allowed.')
     return;
 elseif isstrprop(bamFilename(end),'digit')
-    disp('ERROR: Input bam file name ends with a number.')
+    disp('ERROR: Input BAM file name ends with a number.')
     disp('Please rename file to end with a letter.')
     return;
 end
@@ -191,158 +211,132 @@ end
 if CpGlocationPathRoot(end)~=filesep
     CpGlocationPathRoot=[CpGlocationPathRoot filesep];
 end
-
-             
-%                                     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initialize
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+           
+% Initialize. 
 
 bamFile           = [bamFilePathRoot species filesep bamFilename '.bam'];
-CpGfileNameRoot   = 'CpGlocationChr'; % root file name of .mat files
-newLineChar       = sprintf('\n');    % constant used for text processing
+CpGfileNameRoot   = 'CpGlocationChr';
+newLineChar       = sprintf('\n');     % Constant used for text processing. 
 
-%
-% get name of chromsome as a string
-%
-chr_str = num2str(chr_num);
+% Get name of chromsome as a string.
 
+chr_num_str = num2str(chr_num);
 
-%
-% Check if the final output already exists, and exit with error if so
-%
+% Check if final output already exists, and exit with error if so.
 
-if exist([matricesPathRoot species filesep 'chr' chr_str filesep bamFilename ...
-           num2str(processorNum) '.mat'],'file')
+if exist([matricesPathRoot species filesep 'chr' chr_num_str filesep ...
+        bamFilename num2str(processorNum) '.mat'],'file')
     disp('Exiting. Final output file already exists:');
-    disp([matricesPathRoot species filesep 'chr' chr_str filesep bamFilename ...
-      num2str(processorNum) '.mat']);
+    disp([matricesPathRoot species filesep 'chr' chr_num_str filesep ...
+        bamFilename num2str(processorNum) '.mat']);
     return;
-elseif exist([matricesPathRoot species filesep 'chr' chr_str filesep  ...
+elseif exist([matricesPathRoot species filesep 'chr' chr_num_str filesep ...
               bamFilename '.mat'],'file')
     disp('Exiting. Final merged output file already exists:');
-    disp([matricesPathRoot species filesep 'chr' chr_str filesep  ...
+    disp([matricesPathRoot species filesep 'chr' chr_num_str filesep ...
               bamFilename '.mat']);
     return;
 end
 
+% Load chromosome CpG location information.
 
-%
-% load chromosome CpG location information
-%
-load([CpGlocationPathRoot species filesep CpGfileNameRoot chr_str '.mat'],'CpGlocation');
+load([CpGlocationPathRoot species filesep CpGfileNameRoot chr_num_str ...
+    '.mat'],'CpGlocation');
 
 numCpGs = int64(length(CpGlocation));
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Find which regions are assigned to this processor
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Find which regions are assigned to this processor. 
 
 finalCpGloc=int64(CpGlocation(numCpGs));
 
-% find all start base-pairs for regions to be modeled on this chromsome
-allStartBPs           = int64(1):regionSize:int64(finalCpGloc); % only need to go to the last CpG site, not last BP
+% Find all start base pairs for regions to be modeled on this chromsome.
 
-% break up the indices of allStartBPs to those relevant to this processor
-indexOfProcessor      = processorNum:totalProcessors:length(allStartBPs);
+allStartBPs = int64(1):regionSize:int64(finalCpGloc); 
+                % Only need to go to the last CpG site, not last base pair.
 
-% find all start base-pairs for regions to be modeled on this chromosome by
-% this processor
+% Break up the indices of allStartBPs to those relevant to this processor.
+
+indexOfProcessor = processorNum:totalProcessors:length(allStartBPs);
+
+% Find all start base pairs for regions to be modeled on this chromosome by
+% this processor.
+
 thisProcessorStartBPs = allStartBPs(indexOfProcessor);
 
-
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initialize hashtable
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Initialize hashtable.
 
 mapObjDataTemp = containers.Map('KeyType','char','ValueType','any');
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Proceed through all regions in a chromosome
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Proceed through all regions in a chromosome. 
 
 for startBP = thisProcessorStartBPs 
     try
-        %                                only need to go to the last CpG site, 
-        %                                not last base pair
+                                    % Only need to go to the last CpG site, 
+                                    % not last base pair. 
         endBP = int64(startBP+regionSize-int64(1)); 
-        %                                last region might be too large in 
-        %                                base pairs but this does not matter
-
-        %
-        % find all CpG sites in the region 
-        %
+                                    % Last region might be too large in 
+                                    % base pairs but this does not matter. 
+                                    
         [lower_CpGindex,upper_CpGindex] = findSortedIndices(CpGlocation,...
                                                             startBP,endBP);
-        CpGlocInRegion  = CpGlocation(lower_CpGindex:upper_CpGindex);
+                                    % Find all CpG sites in the region.                                          
+        CpGlocInRegion = CpGlocation(lower_CpGindex:upper_CpGindex);
 
-        %
-        % check if there is a sufficient number of CpG sites in region 
-        %
+        % Check if there is a sufficient number of CpG sites in region. 
+        
         if length(CpGlocInRegion) < minCpGsReqToModel 
-            % skip region since there are not enough CpG sites to model
+            % Skip region since there are not enough CpG sites to model. 
             continue;
         end
 
-        %
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Gather all reads relevant to the current region using samtools
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        % Define the (possibly smaller than 3000 bp) subregion where reads 
-        % will be collected. Reads with overlap to this region may contain 
-        % observations of CpG sites within the current 3000 bp genomic region. 
-        % We only care about the region having CpG sites (this is why not using
-        % startBP & endBP). +1 is assigned to the last CpG site so we do not 
+        % Gather all reads relevant to the current genomic region using 
+        % SAMtools. Determine the subregion where reads will be collected. 
+        % Reads with overlap to this subregion may contain observations of 
+        % CpG sites within the current genomic region. We only care about 
+        % the subregion having CpG sites (this is why not using startBP 
+        % & endBP). +1 is assigned to the last CpG site so we do not 
         % miss a read on the reverse complementary strand.
-        %
+        
         if includeChrInRef
-            region_str = ['chr' chr_str ':' num2str(CpGlocInRegion(1)) '-'...
+            region_str = ['chr' chr_num_str ':' num2str(CpGlocInRegion(1)) '-'...
                           num2str(CpGlocInRegion(end)+1)];
         else
-            region_str = [chr_str ':' num2str(CpGlocInRegion(1)) '-' ...
+            region_str = [chr_num_str ':' num2str(CpGlocInRegion(1)) '-' ...
                           num2str(CpGlocInRegion(end)+1)]; 
         end
 
-        %
-        % Make the samtools view command with the following options
+        % Make the SAMtools view command with the following options: 
         % -f 3    makes sure only reads that have both paired ends mapped 
-        %         are counted [3 = (2^0)+(2^1)]
+        %         are counted [3 = (2^0)+(2^1)].
         % -q 30   keeps reads with Phred mapping alignment score >= 30 
-        %         (i.e., error probability <= 1/1000)
+        %         (i.e., error probability <= 1/1000).
         % -F 3328 excludes PCR duplicates, secondary alignments, and 
-        %         chimeric alignments [3328 = (2^8)+(2^10)+(2^11)]
-        %
+        %         chimeric alignments [3328 = (2^8)+(2^10)+(2^11)].
+        
         if pairedEnds 
-            command      = ['samtools view -q 30 -F 3328 -f 3 ' bamFile ' ' region_str];
-            commandCount = ['samtools view -c -q 30 -F 3328 -f 3 ' bamFile ' ' region_str]; 
+            command      = ['samtools view -q 30 -F 3328 -f 3 ' ...
+                             bamFile ' ' region_str];
+            commandCount = ['samtools view -c -q 30 -F 3328 -f 3 ' ...
+                             bamFile ' ' region_str]; 
         else 
-            command      = ['samtools view -q 30 -F 3329 ' bamFile ' ' region_str];
-            commandCount = ['samtools view -q 30 -F 3329 ' bamFile ' ' region_str];
-            % ignore -f since no paired ends
-            % add (2^0) to -F to exclude a paired end read
+            command      = ['samtools view -q 30 -F 3329 ' ...
+                             bamFile ' ' region_str];
+            commandCount = ['samtools view -q 30 -F 3329 ' ...
+                             bamFile ' ' region_str];
+                            % Ignore -f since no paired ends.
+                            % Add (2^0) to -F to exclude a paired end read.
         end
 
-        %
-        % Before running command, check that region is not a overly highly
-        % mapped region. If too many reads are mapped to this region, then this
-        % indicates that the mapping is unreliable (e.g., due to repeating
-        % elements that cannot be uniquely mapped to a reference genome)
-        %
+        % Before running SAMtools view command, check whether too many 
+        % reads are mapped to the genomic region. This will indicate 
+        % that the mapping is unreliable (e.g., due to repetitive 
+        % elements that cannot be uniquely mapped to a reference genome).
 
         [status,countedNumReadsStr] = system(commandCount);
-
-
-        if status~=0    % skip this region because something went wrong 
-                        % with samtools
-            disp(['Error in samtools read at ' region_str]);
+        
+        if status~=0      % Skip this region because something went wrong  
+                          % with SAMtools.
+            disp(['Error in SAMtools read at ' region_str]);
             continue;
         else
             countedNumReads=str2double(countedNumReadsStr);
@@ -354,46 +348,35 @@ for startBP = thisProcessorStartBPs
             continue;
         end
 
-        %
-        % Now run actual command, given that the number of reads is normal
-        %
+        % Now run actual SAMtools view command, given that the number of 
+        % reads is normal.
 
-        [status,SAMreads] = system(command); % run samtools command
+        [status,SAMreads] = system(command);
 
-        if status~=0    % skip this region because something went wrong 
-                        % with samtools
-            disp(['Error in samtools read at ' region_str]);
+        if status~=0       % Skip this region because something went wrong 
+                           % with SAMtools.
+            disp(['Error in SAMtools read at ' region_str]);
             continue;
         elseif isempty(SAMreads)
             continue;
         end
 
-        %
-        % parse the output of samtools (where each read is separated by a
+        % Parse the output of SAMtools (where each read is separated by a
         % newline character) to have each read as its own cell element.
         % SAMreadsCell will be a 1x1 cell. 
-        % SAMreadsCell{1} is column cell with each read in a cell element
-        %
+        % SAMreadsCell{1} is column cell with each read in a cell element.
+      
         SAMreadsCell = textscan(SAMreads,'%s','delimiter',newLineChar); 
 
-        %
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Process the reads relevant to the current region
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
+        
+        % Process the reads relevant to the current region.
+        observedMatrix = MatrixFromReads(SAMreadsCell{1},...
+                              CpGlocInRegion,pairedEnds,numBasesToTrim); 
 
-        observedMatrix = MatrixFromReads(SAMreadsCell{1},CpGlocInRegion,pairedEnds,numBasesToTrim); 
-
-        %
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        % Write output hashtable 
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        keyStr = ['chr' chr_str '/bp' num2str(startBP) '-' num2str(endBP)];
-
+        % Write output hashtable. 
+        keyStr = ['chr' chr_num_str '/bp' num2str(startBP) '-' num2str(endBP)];
         dataStruct = struct('observedMatrix',observedMatrix,...
                             'CpGlocInRegion',CpGlocInRegion);
-
         mapObjDataTemp(keyStr) = dataStruct;                
     
     catch exception
@@ -402,17 +385,13 @@ for startBP = thisProcessorStartBPs
     end
 end
 
-%                                     
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Save output to file
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Check that output directory exists, create if not.
 
-% check that output directory exists, create if not
-if ~exist([matricesPathRoot species filesep 'chr' chr_str],'dir')
-    mkdir([matricesPathRoot species filesep 'chr' chr_str]);
+if ~exist([matricesPathRoot species filesep 'chr' chr_num_str],'dir')
+    mkdir([matricesPathRoot species filesep 'chr' chr_num_str]);
 end
 
-% write out to file
-save([matricesPathRoot species filesep 'chr' chr_str filesep bamFilename ...
+% Write output to file.
+
+save([matricesPathRoot species filesep 'chr' chr_num_str filesep bamFilename ...
       num2str(processorNum) '.mat'],'mapObjDataTemp','-v7.3');

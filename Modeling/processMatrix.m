@@ -17,142 +17,148 @@
 %   or see <http://www.gnu.org/licenses/>.
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%  Statistical Model for DNA Methylation Patterns    %%%%%%%%%%%%
-%%%%%%%%%%%  Code by: Garrett Jenkinson                        %%%%%%%%%%%%
-%%%%%%%%%%%             Last Modified: 05/15/2015              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
+%%%%%%%%                    processMatrix.m                        %%%%%%%%
+%%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
+%%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% This function takes a data matrix and breaks non-contiguous 
+% observations of CpG sites into independent reads. It also provides 
+% the start and end indices of each read, allowing the data matrix 
+% to be parsed more quickly in downstream applications. 
 %
-% This function takes a data matrix and breaks apart non-contiguous
-% observations of CpG sites into independent reads. It also provides the
-% start and end index of each read, allowing the data matrix to be parsed
-% more quickly in downstream applications. 
+% USAGE:
 %
-% [newMatrix, CpGstart, CpGend] = processMatrix( dataMat );
+% [newMatrix,CpGstart,CpGend] = processMatrix(dataMat)
 %
-% Takes as input:
+% INPUT:
 %
 % dataMat
-%           A matrix with each row corresponding to a read and each column
-%           corresponding to a CpG site. It takes values of -1, 0, 1
-%           which indicate that a given read does not observe a CpG site,
-%           observes a lack of methylation at a CpG site, or observes
-%           methylation at a CpG site, respectively.
+%           A matrix with each row corresponding to a methylation read 
+%           and each column corresponding to a CpG site. The elements 
+%           of this matrix take values -1, 0, or 1 which indicate that 
+%           a given read does not observe a CpG site (-1), it observes 
+%           lack of methylation at a CpG site (0), or it observes 
+%           methylation at a CpG site (1). 
 %
-% Produces as outputs:
+% OUTPUTS:
 %
 % newMatrix
 %           A matrix with each row having only contiguous observations of
 %           CpG sites. The resulting matrix has the same number of
 %           observations as dataMat, but with the new requirement that
-%           reads only have contiguous CpG sites observed (and thus a read
-%           in dataMat that had a gap in the observations will be broken up
-%           into multiple reads in newMatrix).
+%           reads have only contiguous CpG sites observed (and thus a 
+%           read in dataMat that has a gap in the observations will be 
+%           broken into multiple reads in newMatrix).
 %
 % CpGstart
-%           A vector with as many elements as rows of newMatrix. Each
-%           element contains the index of the first observation in the
-%           corresponding row of newMatrix.
+%           A vector with as many elements as the number of rows in 
+%           newMatrix. Each element of this vector contains the index 
+%           of the first observation in the corresponding row of 
+%           newMatrix.
 %
 % CpGend
-%           A vector with as many elements as rows of newMatrix. Each
-%           element contains the index of the last observation in the
-%           corresponding row of newMatrix.
-
-function  [newMatrix, CpGstart, CpGend] = processMatrix( dataMat )
-
-
-
+%           A vector with as many elements as the number of rows in 
+%           newMatrix. Each element of this vector contains the index 
+%           of the last observation in the corresponding row of 
+%           newMatrix.
 %
-% First remove any empty rows of data (should not be any, defensive programming)
-%
+
+function  [newMatrix,CpGstart,CpGend] = processMatrix(dataMat)
+
+% Remove empty rows of data. 
+
 numEmptyRows = sum(sum(dataMat>-1,2)==0);
 if numEmptyRows>0
     dataMat = dataMat(sum(dataMat>-1,2)>0,:);
-    display(['WARNING: Data matrix contains ' num2str(numEmptyRows) ' empty rows'])
+    disp(['WARNING: Data matrix contains ' num2str(numEmptyRows) ' empty rows'])
 end
 
-%
-% Now get number of reads in data matrix and initialize output vars
-%
-origNumReads = size(dataMat,1); % original number of reads
+% Get number of reads in data matrix and initialize output variables.
 
+origNumReads = size(dataMat,1); % Original number of reads.
 
-% preallocate space...if more space is needed it is handled in a try-catch
-% block in the loop below
+% Preallocate space. If more space is needed it is handled in a try-catch
+% block in the loop below.
+
 newMatrix = -1*ones(2*origNumReads,size(dataMat,2)); 
 CpGstart  = zeros(2*origNumReads,1);
 CpGend    = zeros(2*origNumReads,1);
 
+% Preprocess read data to deal with gaps in the middle of a read.
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Preprocess read data to deal with gaps in the middle of a read
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+readCountNew = 0; % Count for the number of reads in newMatrix.
 
-readCountNew = 0; % the count for the number of reads in newMatrix
-
-for readNum = 1:origNumReads %process each of the reads in dataMat individually
+for readNum = 1:origNumReads % Process each read in dataMat individually.
     
-    % location of previously observed CpG site...set to -2 since we have no valid previous observations
+    % Location of previously observed CpG site. Set to -2 since 
+    % we have no valid previous observations.
     prevObservation = -2; 
     
-    % flag to determine if we are at the first observation on the current dataMat read
+    % Flag to determine if we are at the first observation on the 
+    % current dataMat read.
     firstObservationOnRead = 1;
     
-    for observation = find(dataMat(readNum,:)>-1) % loop through each relevant observation on this dataMat read
-        if (observation-prevObservation)==1 % still in same contiguous portion
-            
-            % take observation from dataMat and put it in newMatrix
-            newMatrix(readCountNew,observation) = dataMat(readNum,observation); 
-            
-            prevObservation = observation; % set up for next iteration of loop
-            
-        else % new contiguous portion
-            
-            readCountNew = readCountNew+1; % new contiguous portion means another count for newMatrix
-            
+    for observation = find(dataMat(readNum,:)>-1) 
+              % Loop through each relevant observation on this dataMat
+              % read.
+        if (observation-prevObservation)==1 % Still in same contiguous portion.
+
+            newMatrix(readCountNew,observation) = dataMat(readNum,observation);
+              % Take observation from dataMat and put it in newMatrix.
+            prevObservation = observation; % Set up for next iteration of loop.
+
+        else % New contiguous portion.
+
+            readCountNew = readCountNew+1; 
+                 % New contiguous portion means another count for
+                 % newMatrix.
             try
-                % store observation in newMatrix and record start of new CpG observation
+                % Store observation in newMatrix and record start of 
+                % new CpG observation.
                 newMatrix(readCountNew,observation) = dataMat(readNum,observation);
                 CpGstart(readCountNew)              = observation; 
-                
-            catch % exceed newMatrix dimension, increase matrix size first and try again
-                
-                newMatrix = [newMatrix;-1*ones(2*origNumReads,size(dataMat,2))]; %#ok<AGROW>
+
+            catch % Exceed newMatrix dimension, increase matrix size first 
+                  % and try again.
+
+                newMatrix = [newMatrix;-1*ones(2*origNumReads,...
+                                             size(dataMat,2))]; %#ok<AGROW>
                 CpGstart  = [CpGstart;zeros(2*origNumReads,1)]; %#ok<AGROW>
-                CpGend    = [CpGend;zeros(2*origNumReads,1)]; %#ok<AGROW>
+                CpGend    = [CpGend;zeros(2*origNumReads,1)];   %#ok<AGROW>
                 
                 newMatrix(readCountNew,observation) = dataMat(readNum,observation);
-                CpGstart(readCountNew)              = observation;
-                
-            end %end try catch
+                CpGstart(readCountNew)              = observation; 
+
+            end % End try catch.
             
             if ~firstObservationOnRead
-                CpGend(readCountNew-1) = prevObservation; % record the end of the previous read
+                CpGend(readCountNew-1) = prevObservation; 
+                                          % Record the end of previous
+                                          % read.
             else
-                firstObservationOnRead=0; % next iteration of loop will no longer be the first observation on the read
+                firstObservationOnRead=0; % Next iteration of loop will 
+                                          % no longer be the first 
+                                          % observation on the read.
             end
 
-            prevObservation = observation; % set up for next iteration of loop
-            
-        end %end test for contiguous portion
+            prevObservation = observation; % Set up for next iteration of loop.
+         
+        end % End test for contiguous portion.
         
-    end %end loop through observed CpGs in current read
+    end % End loop through observed CpGs in current read.
     
-    CpGend(readCountNew)=observation; % the last observation's index will be the end of the current read
+    CpGend(readCountNew)=observation; % The index of the last observation
+                                      % will be the end of the current
+                                      % read.
         
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Resize final output to only have relevant information (i.e., deal with
-% the unused preallocated space)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% the unused preallocated space).
+
 newMatrix = newMatrix(1:readCountNew,:);
 CpGstart  = CpGstart(1:readCountNew);
 CpGend    = CpGend(1:readCountNew);
-

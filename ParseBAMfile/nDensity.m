@@ -17,56 +17,60 @@
 %   or see <http://www.gnu.org/licenses/>.
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%  Statistical Model for DNA Methylation Patterns    %%%%%%%%%%%%
-%%%%%%%%%%%  Code by: Garrett Jenkinson                        %%%%%%%%%%%%
-%%%%%%%%%%%             Last Modified: 05/24/2015              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
+%%%%%%%%                       nDensity.m                          %%%%%%%%
+%%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
+%%%%%%%%               Last Modified: 11/30/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function computes the density of the n-th CpG site using the sorted 
-% CpGlocation vector. 
+% This function computes the density of the n-th CpG site within a given 
+% chromosome. 
 %
-% Usage:
-% density = nDensity(CpGlocation,n,L)
+% USAGE:
 %
-% INPUT: 
+% density = nDensity(CpGlocation,n,wsize)
 %
-% CpGlocation - Sorted vector of CpG locations on the current chromosome.
+% INPUTS: 
 %
-% n           - Index of CpG site.
+% CpGlocation
+%             Sorted vector of CpG locations within a given chromosome.
 %
-% L           - Window size for density calculation.
+% n
+%             Index of the CpG site within the chromosome.
+%
+% wsize
+%             Window size used in density calculation.
 %
 % OUTPUT:
 %
-% density     - Computed density of n-th CpG site.
+% density
+%             Computed density of CpG site.
 %
 
-function density = nDensity(CpGlocation,n,L)
+function density = nDensity(CpGlocation,n,wsize)
 
-%
-% compute upper and lower bounds of CpG sites which are included in 
-% density calculation
-%
-UpperBound = CpGlocation(n)+floor(L/2);
-LowerBound = CpGlocation(n)-floor(L/2);
+% Compute boundaries of the genomic region used in density calculation.
 
-%
-% find the smallest and largest indices of the CpG sites between the
-% upper and lower boundary (inclusive the boundary)
-%
+UpperBound = CpGlocation(n)+floor(wsize/2);
+LowerBound = CpGlocation(n)-floor(wsize/2);
+
+% Determine locations of the CpG sites between the upper and lower 
+% boundaries (inclusive). 
+
 [lower_index,upper_index] = findSortedIndices(CpGlocation,LowerBound,...
                                               UpperBound);
-                                   % CpGlocation must be sorted low to high
+                                   % CpGlocation must be sorted low to
+                                   % high.
 
-if isempty(lower_index)            % should not happen since current CpG 
-                                   % always inside window 
-    NumberOfCpGsBetweenBounds = 1; % current CpG always inside window
+if isempty(lower_index)            % Should not happen since current CpG 
+                                   % always inside window. 
+    NumberOfCpGsBetweenBounds = 1; % Current CpG always inside window.
     disp('Warning: No CpGs found in density window.')
 else
     NumberOfCpGsBetweenBounds = 1 + upper_index - lower_index; 
-                        % +1 because inclusive at boundaries
+                                   % +1 because inclusive at boundaries.
 end
 
-density = double(NumberOfCpGsBetweenBounds)/double(L); 
-                        % use double precision to represent density
+density = double(NumberOfCpGsBetweenBounds)/double(wsize); 
+                               % Use double precision to represent density.

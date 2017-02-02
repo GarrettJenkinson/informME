@@ -17,186 +17,175 @@
 %   or see <http://www.gnu.org/licenses/>.
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%  Statistical Model for DNA Methylation Patterns    %%%%%%%%%%%%
-%%%%%%%%%%%  Code by: Garrett Jenkinson                        %%%%%%%%%%%%
-%%%%%%%%%%%             Last Modified: 05/22/2015              %%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+%%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
+%%%%%%%%                   MergeEstParams.m                        %%%%%%%%
+%%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
+%%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function merges the output of EstParamsForChr.m into a single
 % hashtable.
 %
-% Example Default Usage:
-% MergeEstParams(chr_num,phenoName,bamFileNames)
+% USAGE (default):
 %
-% Example Usage Modifying optional parameter "species" as name-value pair:
-% MergeEstParams(chr_num,phenoName,bamFileNames,'species','Mouse')
+% MergeEstParams(bamFileNames,chr_num,phenoName)
 %
-% This file takes as mandatroy inputs (which must appear first and in the 
-% following order):
+% USAGE (optional):
 %
-% chr_num
-%               The chromosome number 1 to 22 (in humans) which
-%               details the chromosome for which statistical estimation
-%               should be performed.
+% Example of optional usage with additional input parameters:
+% MergeEstParams(bamFileNames,chr_num,phenoName,'species','Mouse')
 %
-% phenoName
-%               A string which details the name of the phenotype that is
-%               represented by the BAM files specified in bamFileNames
+% MADATORY INPUTS:
 %
 % bamFileNames
 %               A cell array of strings of BAM file names. These BAM files
-%               should have already been processed by MatrixFromBAMfile.m
-%               to produce matrices. e.g. {'bamFilenameWithoutExtension'}
+%               must be processed first by the MatrixFromBAMfile.m function
+%               in the ParseBAMfile subdirectory.
 %
-% This file takes as optional inputs, specified in any order after the 
-% mandatory inputs as name-value pairs; i.e.,
-% MergeEstParams(...,'inputName',inputValue):
+% chr_num
+%               Chromosome number 1 to 22 (in humans) specifying the 
+%               chromosome for which statistical estimation must be 
+%               performed.
+%
+% phenoName
+%               A string that specifies the name of the phenotype.
+%
+% OPTIONAL INPUTS: 
 %
 % species
-%               A string detailing the species from which the data is
-%               obtained. e.g. 'Human' or 'Mouse'
+%               A string that specifies the species from which the data is
+%               obtained (e.g., 'Human' or 'Mouse'). 
+%               Default value: 'Human'
 %
 % totalProcessors
 %               An integer that specifies the number of processors on a
 %               computing cluster that will be devoted to the task of
-%               statistical estimation of this phenotype on this chromosome
+%               statistical estimation of this phenotype on this
+%               chromosome.
+%               Default value: 1
 %
-% resultsPathRoot
-%               A string with the path to the results directory where the
-%               estimation and analysis results are written in its
-%               subdirectories. Default value './results/'
+% estResultsPathRoot
+%               A string that specifies the path to the directory in which  
+%               the estimation and analysis results are written. 
+%               Default value './results/'
 %
 % genomePathRoot
-%               A string with the path to the results directory where the
-%               genome analysis results are written in its subdirectories.
+%               A string that specifies the path to the directory that 
+%               contains the results of genome analysis performed by 
+%               MatrixFromBamfile.m. 
 %               Default value: '../ParseBAMfile/'
-
-function MergeEstParams(chr_num,phenoName,bamFileNames,varargin)
-
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Parse values passed as inputs to the fuction and validate them
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% regionSize
+%               The size of the genomic region used for parameter 
+%               estimation (in number of base-pairs).
+%               Default value: 3000 
 %
+% The dafault value of regionSize should only be changed by an expert with 
+% a detailed understanding of the code and the methods used. 
+%
+
+function MergeEstParams(bamFileNames,chr_num,phenoName,varargin)
+
+% Parse values passed as inputs to the fuction and validate them.
 
 p = inputParser;
 
+addRequired(p,'bamFileNames')
 addRequired(p,'chr_num')
 addRequired(p,'phenoName')
-addRequired(p,'bamFileNames')
 addParameter(p,'species','Human',...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'totalProcessors',1,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
-addParameter(p,'resultsPathRoot',['.' filesep 'results' filesep],...
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))
+addParameter(p,'estResultsPathRoot',['.' filesep 'results' filesep],...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'genomePathRoot',['..' filesep 'ParseBAMfile' filesep],...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'regionSize',int64(3000),...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))
           
-          
-parse(p,chr_num,phenoName,bamFileNames,varargin{:})
+parse(p,bamFileNames,chr_num,phenoName,varargin{:})
 
-species         = p.Results.species;
-totalProcessors = p.Results.totalProcessors;
-resultsPathRoot = p.Results.resultsPathRoot;
-genomePathRoot  = p.Results.genomePathRoot;
-regionSize      = p.Results.regionSize;
+species            = p.Results.species;
+totalProcessors    = p.Results.totalProcessors;
+estResultsPathRoot = p.Results.estResultsPathRoot;
+genomePathRoot     = p.Results.genomePathRoot;
+regionSize         = p.Results.regionSize;
 
-%
 % Manual checks/corrections of inputs
-%
 
 if genomePathRoot(end)~=filesep
     genomePathRoot=[genomePathRoot filesep];
 end
-if resultsPathRoot(end)~=filesep
-    resultsPathRoot=[resultsPathRoot filesep];
+
+if estResultsPathRoot(end)~=filesep
+    estResultsPathRoot=[estResultsPathRoot filesep];
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+chr_num_str = num2str(chr_num);
+
 % Loop through all files to verify they exist, create them if not
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 
-chr_num_str=num2str(chr_num);
+% First check if final result exists. This is done because, if accidentally
+% invoked twice, this function will serially do all estimation work that 
+% was supposed to be done in parallel.
 
-%
-% First check if final result exists. We do this because if accidentally
-% invoked twice, this code will serially do all the estimation work that
-% was supposed to be done in parallel
-%
-
-if exist([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
+if exist([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
           phenoName '.mat'],'file')
     disp('Final merged file already exists.');
     disp('This program will not overwrite an existing file.');
     disp(['In order to recreate this file, first delete existing file: ' ...
-          resultsPathRoot species filesep 'chr' chr_num_str filesep ...
+          estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
           phenoName '.mat']);
     return;
 end
 
-%
 % Check if any of the parallel jobs failed, and if they did, redo the
-% computations here
-%
+% computations here.
 
-for processorNum=1:totalProcessors
-    if ~exist([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
-               phenoName '_chr' chr_num_str '_file' num2str(processorNum) '.mat'],'file')
-        %
-        % File does not exist, redo the computation. Include all optional
+for processorNum = 1:totalProcessors
+    if ~exist([estResultsPathRoot species filesep 'chr' ... 
+            chr_num_str filesep phenoName '_chr' chr_num_str ...
+            '_file' num2str(processorNum) '.mat'],'file')
+    
+        % File does not exist - redo the computation. Include all optional
         % input values in case user has changed one of the default values.
-        %
+    
         EstParamsForChr(bamFileNames,chr_num,phenoName,'species',species,...
-                       'totalProcessors',totalProcessors,'processorNum',processorNum,...
-                       'resultsPathRoot',resultsPathRoot,'genomePathRoot',genomePathRoot,...
-                       'regionSize',regionSize);
+                       'totalProcessors',totalProcessors,'processorNum',...
+                       processorNum,'estResultsPathRoot',...
+                       estResultsPathRoot,'genomePathRoot',...
+                       genomePathRoot,'regionSize',regionSize);
     end
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Initialize hashtable
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Initialize hashtable.
+
 mapObjData = containers.Map('KeyType','char','ValueType','any');
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Loop through all files appending results to mapObjData
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Loop through all files appending results to mapObjData.
 
-for processorNum=1:totalProcessors
-    load([resultsPathRoot species filesep 'chr' chr_num_str filesep phenoName ...
-          '_chr' chr_num_str '_file' num2str(processorNum) '.mat'],'mapObjTemp');
+for processorNum = 1:totalProcessors
+    load([estResultsPathRoot species filesep 'chr' chr_num_str filesep ... 
+        phenoName '_chr' chr_num_str '_file' num2str(processorNum) ...
+        '.mat'],'mapObjTemp');
     mapObjData = [mapObjData;mapObjTemp]; %#ok<AGROW>
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Save output to file
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Save output to file.
 
-save([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
+save([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
       phenoName '.mat'],'mapObjData','-v7.3')
   
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Delete all temporary files
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Delete all temporary files.
 
 for processorNum=1:totalProcessors
-    delete([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
-            phenoName '_chr' chr_num_str '_file' num2str(processorNum) '.mat']);
-end  
+    delete([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
+        phenoName '_chr' chr_num_str '_file' num2str(processorNum) ...
+        '.mat']);
+end
 
 end

@@ -17,104 +17,108 @@
 %   or see <http://www.gnu.org/licenses/>.
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%  Statistical Model for DNA Methylation Patterns    %%%%%%%%%%%%
-%%%%%%%%%%%  Code by: Garrett Jenkinson                        %%%%%%%%%%%%
-%%%%%%%%%%%             Last Modified: 05/24/2015              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
+%%%%%%%%                  findSortedIndices.m                      %%%%%%%%
+%%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
+%%%%%%%%               Last Modified: 11/30/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function uses binary search to rapidly find the smallest and the 
-% largest index of the elements of a vector x of sorted values (from 
-% low to high) within a closed numerical region.
+% largest indices of the elements of a vector of sorted values (low to 
+% high) that are between a lower and an upper bound.
 %
-% Usage:
-% [lower_index,upper_index] = findSortedIndices(x,LowerBound,UpperBound)
+% USAGE:
 %
-% INPUT:
+% [lower_index,upper_index] = findSortedIndices(xvec,LowerBound,UpperBound)
 %
-% x           - Vector of sorted values from low to high.
+% INPUTS:
 %
-% LowerBound  - Lower bound on the values of x in the search.
+% xvec
+%            Vector of sorted values (low to high).
 %
-% UpperBound  - Upper bound on the values of x in the search.
+% LowerBound
+%            Lower bound on xvec values.
 %
-% OUTPUT:
+% UpperBound
+%            Upper bound on xvec values.
 %
-% lower_index - int64 of the smallest index such that
-%               LowerBound <= x(index) <= UpperBound.
+% OUTPUTS:
 %
-% upper_index - int64 of the largest index such that
-%               LowerBound <= x(index) <= UpperBound.
+% lower_index
+%            Smallest index such that LowerBound <= xvec(index) <= UpperBound.
+%
+% upper_index
+%            Largest index such that LowerBound <= xvec(index) <= UpperBound.
 %
 
-function [lower_index,upper_index] = findSortedIndices(x,LowerBound,UpperBound)
+function [lower_index,upper_index] = findSortedIndices(xvec,LowerBound,UpperBound)
 
-if LowerBound>x(end) || UpperBound<x(1) || UpperBound<LowerBound
-    % no indices satify bounding condition
+if LowerBound > xvec(end) || UpperBound < xvec(1) || UpperBound < LowerBound
+    % No indices satify bounding condition. 
     lower_index = [];
     upper_index = [];
     return;  
 end
 
-lower_index_a=int64(1);         
-lower_index_b=int64(length(x)); % x(lower_index_b) will always satisfy lowerbound
-upper_index_a=int64(1);         % x(upper_index_a) will always satisfy upperbound
-upper_index_b=int64(length(x)); 
+lower_index_a = int64(1);         
+lower_index_b = int64(length(xvec)); 
+                         % xvec(lower_index_b) satisfies lowerbound.
+upper_index_a = int64(1);         
+                         % xvec(upper_index_a) satisfies upperbound.
+upper_index_b = int64(length(xvec)); 
 
-%
 % The following loop increases lower_index_a and upper_index_a and 
 % decreases lower_index_b and upper_index_b until they differ by at 
 % most 1. Because one of these index variables always satisfies the 
-% appropriate bound, this means the loop will terminate with either 
-% lower_index_a or lower_index_b having the minimum possible index 
-% that satifies the lower bound, or upper_index_a or upper_index_b 
+% appropriate bound, this means that the loop will terminate with 
+% either lower_index_a or lower_index_b having the minimum possible 
+% index that satifies the lower bound, or upper_index_a or upper_index_b 
 % having the largest possible index that satisfies the upper bound. 
-%
-while (lower_index_a+1<lower_index_b) || (upper_index_a+1<upper_index_b)
 
-    lw=(lower_index_a+lower_index_b)/int64(2);% split the lower index
-
-    if x(lw) >= LowerBound
-        lower_index_b=lw; % decrease lower_index_b (whose x value 
-                          % remains >= to lower bound)   
+while (lower_index_a+1 < lower_index_b) || (upper_index_a+1 < upper_index_b)
+    lw = (lower_index_a+lower_index_b)/int64(2); % Split the lower index.
+    
+    if xvec(lw) >= LowerBound
+        lower_index_b=lw; % Decrease lower_index_b (whose xvec value 
+                          % remains >= to lower bound).   
     else
-        lower_index_a=lw; % increase lower_index_a
+        lower_index_a=lw; % Increase lower_index_a.
         if (lw>upper_index_a) && (lw<upper_index_b)
-            upper_index_a=lw; % increase upper_index_a (whose x value 
+            upper_index_a=lw; % Increase upper_index_a (whose xve  value 
                               % remains < to lower bound and thus to 
-                              % the upper bound)
+                              % the upper bound).
         end
     end
 
     up = (upper_index_a+upper_index_b)/int64(2); % split the lower index
-    if x(up) <= UpperBound
-        upper_index_a=up;     % increase upper_index_a (whose x value  
-                              % remains <= to upper bound) 
+    if xvec(up) <= UpperBound
+        upper_index_a=up;     % Increase upper_index_a (whose xvec value  
+                              % remains <= to upper bound). 
     else
-        upper_index_b=up;     % decrease upper_index_b
+        upper_index_b=up;     % Decrease upper_index_b.
         if (up<lower_index_b) && (up>lower_index_a)
-            lower_index_b=up; % decrease lower_index_b (whose x value 
+            lower_index_b=up; % Decrease lower_index_b (whose xvec value 
                               % remains > to upper bound and thus to 
-                              % the lower bound)
+                              % the lower bound).
         end
     end
 end
 
-%
-% Choose the final answer
-%
-if x(lower_index_a)>=LowerBound
+% Choose the final answer.
+
+if xvec(lower_index_a) >= LowerBound
     lower_index = lower_index_a;
 else
     lower_index = lower_index_b;
 end
-if x(upper_index_b)<=UpperBound
+if xvec(upper_index_b) <= UpperBound
     upper_index = upper_index_b;
 else
     upper_index = upper_index_a;
 end
 
-if lower_index>upper_index
+if lower_index > upper_index
     lower_index=[];
     upper_index=[];
 end

@@ -19,51 +19,53 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
-%%%%%%%%                   objFnToMinimize.m                       %%%%%%%%
+%%%%%%%%                     exactSampling.m                       %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
+%%%%%%%%                Last Modified: 12/04/2016                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function evaluates the objective function that must be minimized in 
-% order to obtain maximum-likelihood estimates for the alpha, beta, and 
-% gamma parameters of the Ising model. 
+% This function draws an exact Monte Carlo sample from the Ising model 
+% within a genomic region containing N CpG sites.
 %
 % USAGE:
 %
-% objFn = objFnToMinimize(theta)
+% Xsamp = exactSampling(p1,transProbs)
 %
-% INPUT:
+% INPUTS:
 %
-% theta
-%       Parameter vector containing the alpha, beta, and gamma parameters 
-%       of the Ising model.
+% p1        
+%            The probability Pr[X_1=1] of the first CpG site within the 
+%            genomic region to be methylated.
+%
+% transProbs 
+%            (N-1)x2 matrix whose elements are given by:  
+%               transProbs(n,1) = Pr[X_{n+1}=0 | X_n=0]
+%               transProbs(n,2) = Pr[X_{n+1}=0 | X_n=1]
+%            where X_n is the methylation status of the n-th CpG 
+%            site within the genomic region.
 %
 % OUTPUT:
 %
-% objFn
-%       The negative of the average "marginalized" log-likelihood of 
-%       the input parameters given observations of the methylation 
-%       state within a genomic region used for estimation. 
+% Xsamp
+%           An Nx1 vector containg a sample drawn from the Ising model.
 %
 
-function objFn = objFnToMinimize(theta)
+function Xsamp = exactSampling(p1,transProbs)
 
-% Set global variables.
+% Initialization.
 
-global CpGstart CpGend density Dist newMatrix 
+N = size(transProbs,1)+1;
+Xsamp = zeros(N,1);
 
-% Compute model from parameters.
+% Draw an exact sample.
 
-[An,Cn] = computeAnCn(density,Dist,theta);
+Xsamp(1) = rand <= p1;
 
-% Compute average "marginalized" log-likelihood.
+for n = 1:(N-1)
+    if Xsamp(n)==1
+        Xsamp(n+1) = rand > transProbs(n,2);
+    else
+        Xsamp(n+1) = rand > transProbs(n,1);       
+    end
+end
 
-tempMat   = int32(newMatrix');
-tempStart = int32(CpGstart);
-tempEnd   = int32(CpGend);
-
-aveLogLikelihood = computeAveLogLikelihood(An,Cn,tempMat,tempStart,tempEnd);
-
-% Objective function to be minimized for maximum-likelihood estimation.
-
-objFn = -aveLogLikelihood;

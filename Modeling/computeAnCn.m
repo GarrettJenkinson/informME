@@ -19,51 +19,46 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
-%%%%%%%%                   objFnToMinimize.m                       %%%%%%%%
+%%%%%%%%                    computeAnCn.m                          %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
 %%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function evaluates the objective function that must be minimized in 
-% order to obtain maximum-likelihood estimates for the alpha, beta, and 
-% gamma parameters of the Ising model. 
+% This function computes the a_n and c_n parameters of the Ising model 
+% within a genomic region by using the CpG densities, the CpG distances, 
+% and the estimated alpha, beta and gamma parameters of the model. 
 %
 % USAGE:
 %
-% objFn = objFnToMinimize(theta)
+% [An,Cn] = computeAnCn(density,distance,theta)
 %
-% INPUT:
+% INPUTS:
 %
-% theta
-%       Parameter vector containing the alpha, beta, and gamma parameters 
-%       of the Ising model.
+% theta   
+%           Vector containing the estimated values of the five alpha, 
+%           beta, and gamma parameters of the Ising model.
 %
-% OUTPUT:
+% density  
+%           Vector containing the CpG densities of the CpG sites within 
+%           the genomic region. 
+%          
+% distance
+%           Vector containing the CpG distances associated with the 
+%           CpG sites within the genomic region. 
 %
-% objFn
-%       The negative of the average "marginalized" log-likelihood of 
-%       the input parameters given observations of the methylation 
-%       state within a genomic region used for estimation. 
+% OUTPUTS:
+%
+% An
+%           Vector containing the values of the a_n parameters.
+%
+% Cn
+%           Vector containing the values of the c_n parameters.
 %
 
-function objFn = objFnToMinimize(theta)
+function [An,Cn] = computeAnCn(density,distance,theta)
 
-% Set global variables.
+An      = theta(1)+(theta(2)*density);
+An(1)   = theta(4);
+An(end) = theta(5);
 
-global CpGstart CpGend density Dist newMatrix 
-
-% Compute model from parameters.
-
-[An,Cn] = computeAnCn(density,Dist,theta);
-
-% Compute average "marginalized" log-likelihood.
-
-tempMat   = int32(newMatrix');
-tempStart = int32(CpGstart);
-tempEnd   = int32(CpGend);
-
-aveLogLikelihood = computeAveLogLikelihood(An,Cn,tempMat,tempStart,tempEnd);
-
-% Objective function to be minimized for maximum-likelihood estimation.
-
-objFn = -aveLogLikelihood;
+Cn = theta(3)./double(distance);

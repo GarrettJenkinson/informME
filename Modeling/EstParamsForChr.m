@@ -17,85 +17,90 @@
 %   or see <http://www.gnu.org/licenses/>.
 %
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%  Statistical Model for DNA Methylation Patterns    %%%%%%%%%%%%
-%%%%%%%%%%%  Code by: Garrett Jenkinson                        %%%%%%%%%%%%
-%%%%%%%%%%%             Last Modified: 05/22/2015              %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
+%%%%%%%%                   EstParamsForChr.m                       %%%%%%%%
+%%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
+%%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% This function takes a list of BAM files (which correspond to the same
+% phenotype) and performs statistical model estimation within a specific  
+% chromosome of interest. The function can be used on a computing cluster 
+% to break the work of model estimation to many independent parallel job 
+% processes. This is performed only after MatrixFromBAMfile.m in the 
+% ParseBAMfile subdirectory is run to produce the data required for 
+% statistical estimation.
 %
-% This function takes a list of bam files (all corresponding to the same
-% phenotype) and performs statistical model estimation for regions within
-% the specified chromosome of interest. In particular, this function can be
-% used on a computing cluster to break up the work to many independent
-% parallel job processes. This is performed only after MatrixFromBamfile.m
-% has been run to produce the data formats required for statistical
-% esimtation.
+% USAGE (default):
 %
-% Example Default Usage:
 % EstParamsForChr(bamFileNames,chr_num,phenoName)
 %
-% Example Usage Modifying optional parameter "species" as name-value pair:
+% USAGE (optional):
+% 
+% Example of optional usage with additional input parameters.
 % EstParamsForChr(bamFileNames,chr_num,phenoName,'species','Mouse')
 %
-% This file takes as mandatroy inputs (which must appear first and in the 
-% following order):
+% MANDATORY INPUTS:
 %
 % bamFileNames
 %               A cell array of strings of BAM file names. These BAM files
-%               should have already been processed by MatrixFromBAMfile.m
-%               to produce matrices. e.g. {'bamFilenameWithoutExtension'}
+%               must be processed first by the MatrixFromBAMfile.m function 
+%               in the ParseBAMfile subdirectory.
 %
 % chr_num
-%               The chromosome number 1 to 22 (in humans) which
-%               details the chromosome for which statistical estimation
-%               should be performed.
+%               Chromosome number 1 to 22 (in humans) specifying the 
+%               chromosome for which statistical estimation must be 
+%               performed.
 %
 % phenoName
-%               A string which details the name of the phenotype that is
-%               represented by the BAM files specified in bamFileNames
+%               A string that specifies the name of the modeled phenotype.
 %
-% This file takes as optional inputs, specified in any order after the 
-% mandatory inputs as name-value pairs; i.e.,
-% EstParamsForChr(...,'inputName',inputValue):
+% OPTIONAL INPUTS: 
 %
 % species
-%               A string detailing the species from which the data is
-%               obtained. i.e., 'Human' or 'Mouse'. Default: 'Human'
+%               A string that specifies the species from which the data is
+%               obtained (e.g., 'Human' or 'Mouse'). 
+%               Default value: 'Human'
 %
 % totalProcessors
 %               An integer that specifies the number of processors on a
 %               computing cluster that will be devoted to the task of
-%               statistical estimation of this phenotype on this chromosome
-%               Default value:1
+%               statistical estimation of this phenotype on this
+%               chromosome.
+%               Default value: 1
 %
 % processorNum
-%               An integer from 1 to totalProcessors which labels which
-%               processor of the totalProcessors is being called here. Each
-%               processor is assigned a disntinct location of regions
-%               within the chromosome to perform estimation on. Default
-%               value:1
+%               An integer from 1 to totalProcessors that labels which
+%               processor of the totalProcessors is being called. Each
+%               processor is assigned a distinct location of regions
+%               within the chromosome to perform estimation. 
+%               Default value: 1
 %
-% resultsPathRoot
-%               A string with the path to the results directory where the
-%               estimation and analysis results are written in its
-%               subdirectories. Default value './results/'
+% estResultsPathRoot
+%               A string that specifies the path to the directory in which  
+%               the estimation results are written. 
+%               Default value './results/'
 %
 % genomePathRoot
-%               A string with the path to the results directory where the
-%               genome analysis results are written in its subdirectories.
+%               A string that specifies the path to the directory that 
+%               contains the results of analysis of the reference genome 
+%               performed by FastaToCpG.m as well as the results of 
+%               methylation calling performed by MatrixFromBAMfile.m.
 %               Default value: '../ParseBAMfile/'
 %
-% Any other optional inputs should only be modified by professionals with a
-% detailed understanding of the code.
-
-function EstParamsForChr(bamFileNames,chr_num,phenoName,varargin)%species,totalProcessors,processorNum)
-
+% regionSize
+%               The size of the genomic region used for parameter 
+%               estimation (in number of base pairs).
+%               Default value: 3000 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Parse values passed as inputs to the fuction and validate them
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% The default value of regionSize should only be changed by an expert with 
+% a detailed understanding of the code and the methods used. 
 %
+
+function EstParamsForChr(bamFileNames,chr_num,phenoName,varargin)
+
+% Parse values passed as inputs to the fuction and validate them.
 
 p = inputParser;
 
@@ -105,139 +110,128 @@ addRequired(p,'phenoName')
 addParameter(p,'species','Human',...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'totalProcessors',1,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))
 addParameter(p,'processorNum',1,...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
-addParameter(p,'resultsPathRoot',['.' filesep 'results' filesep],...
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))
+addParameter(p,'estResultsPathRoot',['.' filesep 'results' filesep],...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'genomePathRoot',['..' filesep 'ParseBAMfile' filesep],...
                @(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'regionSize',int64(3000),...
-               @(x)validateattributes(x,{'numeric'},{'nonempty','integer','positive','scalar'}))
+               @(x)validateattributes(x,{'numeric'},{'nonempty',...
+               'integer','positive','scalar'}))
 
-     
 parse(p,bamFileNames,chr_num,phenoName,varargin{:})
 
-species         = p.Results.species;
-totalProcessors = p.Results.totalProcessors;
-processorNum    = p.Results.processorNum;
-resultsPathRoot = p.Results.resultsPathRoot;
-genomePathRoot  = p.Results.genomePathRoot;
-regionSize      = p.Results.regionSize;
+species            = p.Results.species;
+totalProcessors    = p.Results.totalProcessors;
+processorNum       = p.Results.processorNum;
+estResultsPathRoot = p.Results.estResultsPathRoot;
+genomePathRoot     = p.Results.genomePathRoot;
+regionSize         = p.Results.regionSize;
 
-
-%
-% Manual checks/corrections of inputs
-%
+% Manual checks/corrections of inputs.
 
 if genomePathRoot(end)~=filesep
     genomePathRoot=[genomePathRoot filesep];
 end
-if resultsPathRoot(end)~=filesep
-    resultsPathRoot=[resultsPathRoot filesep];
+if estResultsPathRoot(end)~=filesep
+    estResultsPathRoot=[estResultsPathRoot filesep];
 end
 if processorNum > totalProcessors
     disp('error: processorNum must be <= totalProcessors');
     return;
 end
 
-
-
-
 chr_num_str = num2str(chr_num);
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Check if the final output already exists, and exit with error if so
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-if exist([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
-      phenoName '_chr' chr_num_str '_file' num2str(processorNum) '.mat'],'file')
+% Check if final output already exists, and exit with error if so.
+
+if exist([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
+      phenoName '_chr' chr_num_str '_file' num2str(processorNum) ...
+      '.mat'],'file')
     disp('Exiting. Final output file already exists:');
-    disp([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
+    disp([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
       phenoName '_chr' chr_num_str '_file' num2str(processorNum) '.mat']);
     return;
-elseif exist([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
-                phenoName '_chr' chr_num_str '.mat'],'file')
+elseif exist([estResultsPathRoot species filesep 'chr' chr_num_str  ...
+               filesep phenoName '_chr' chr_num_str '.mat'],'file')
     disp('Exiting. Final merged output file already exists:');
-    disp([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
+    disp([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
                 phenoName '_chr' chr_num_str '.mat']);
     return;
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Find which regions are assigned to this processor
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Find which genomic regions are assigned to this processor.
 
-% Load CpG site data on chromosome (to determine how many regions to loop through, etc.)
-CpGdata = [genomePathRoot 'genome' filesep species filesep 'CpGlocationChr' chr_num_str '.mat'];
+% Load CpG site data on chromosome (to determine how many regions 
+% to loop through, etc.).
+CpGdata = [genomePathRoot 'genome' filesep species filesep ...
+    'CpGlocationChr' chr_num_str '.mat'];
 load(CpGdata,'finalCpGloc','Dist','density','CpGlocation');
 
-% find all start base-pairs for regions to be modeled on this chromsome
-allStartBPs  = int64(1):regionSize:int64(finalCpGloc); % only need to go to the last CpG site, not last BP
+% Find all start base-pairs for regions to be modeled on this chromsome.
+allStartBPs  = int64(1):regionSize:int64(finalCpGloc); 
+               % Only need to go to the last CpG site, not last base pair.
 
-% break up the indices of allStartBPs to those relevant to this processor
+% Break up the indices of allStartBPs to those relevant to this processor.
 indexOfProcessor = processorNum:totalProcessors:length(allStartBPs);
 
-% find all start base-pairs for regions to be modeled on this chromosome by
-% this processor
+% Find all start base pairs for regions to be modeled on this chromosome
+% by this processor.
 thisProcessorStartBPs = allStartBPs(indexOfProcessor);
 
+% Load data for this chromosome.
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Load data for this chromosome
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
 for dataFile = 1:length(bamFileNames)
-    load([genomePathRoot 'matrices' filesep species filesep 'chr' chr_num_str ... 
-          filesep bamFileNames{dataFile} '.mat'],'mapObjData');
+    load([genomePathRoot 'matrices' filesep species filesep 'chr' ...
+        chr_num_str filesep bamFileNames{dataFile} '.mat'],'mapObjData');
     dataMapObj{dataFile} = mapObjData; %#ok<AGROW>
     clear mapObjData;
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Loop through all regions on chromosome designated to this processor
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Loop through all regions on chromosome designated to this processor.
 
-%initialize hashtable
+% Initialize hashtable.
 mapObjTemp = containers.Map('KeyType','char','ValueType','any');
 
 for startBP = thisProcessorStartBPs
     try
-        endBP = int64(startBP+regionSize-int64(1)); % the last region might be too large in BP but this does not matter
+        endBP = int64(startBP+regionSize-int64(1)); 
+        % The last region might be too large in base pairs but this 
+        % does not matter.
 
-        % find relative path of this region
-        locationPathName = ['chr' chr_num_str '/bp' num2str(startBP) '-' num2str(endBP)];
+        % Find relative path of this region.
+        locationPathName = ['chr' chr_num_str '/bp' ...
+            num2str(startBP) '-' num2str(endBP)];
         
-        %
-        % load data for region
-        %
+        % Load data for region.
+       
         dataMat=[];
         for dataFile = 1:length(bamFileNames)
             if isKey(dataMapObj{dataFile},locationPathName)
                 regionDataStruct = dataMapObj{dataFile}(locationPathName);
-                if isempty(dataMat) %get values of Dist and density in region 
-                    [lower_index,upper_index] = findSortedIndices(CpGlocation,startBP,endBP);
+                if isempty(dataMat) % Get values of Dist and density in region.  
+                    [lower_index,upper_index] = ...
+                        findSortedIndices(CpGlocation,startBP,endBP);
                     DistInRegion    = Dist(lower_index:upper_index);
                     densityInRegion = density(lower_index:upper_index);
                 end
-                dataMat = [dataMat;regionDataStruct.observedMatrix]; %#ok<AGROW>
+                dataMat = [dataMat;regionDataStruct.observedMatrix];%#ok<AGROW>
             end
         end
         
-        %
-        % Estimate parameters
-        %
+        % Estimate parameters.
+        
         if ~isempty(dataMat)
-            % estimate parameters for this region
-            regionStruct = EstimateParams(locationPathName,phenoName,DistInRegion,densityInRegion,dataMat);
+            
+            % Estimate parameters for this region.
+            regionStruct = EstimateParams(locationPathName,phenoName,...
+                DistInRegion,densityInRegion,dataMat);
 
-            % Add to hashtable
+            % Add to hashtable.
             if ~isempty(regionStruct)
                 mapObjTemp(locationPathName) = regionStruct;
             end
@@ -247,19 +241,16 @@ for startBP = thisProcessorStartBPs
     end
 end
 
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Save output to file
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
+% Save output to file.
 
-% check that results folder exists, create it if not
-if ~exist([resultsPathRoot species filesep 'chr' chr_num_str],'dir')
-    mkdir([resultsPathRoot species filesep 'chr' chr_num_str]);
+% Check if results folder exists, create it if not.
+if ~exist([estResultsPathRoot species filesep 'chr' chr_num_str],'dir')
+    mkdir([estResultsPathRoot species filesep 'chr' chr_num_str]);
 end
 
-% write output to file
-save([resultsPathRoot species filesep 'chr' chr_num_str filesep ...
-      phenoName '_chr' chr_num_str '_file' num2str(processorNum) '.mat'],'mapObjTemp','-v7.3')
+% Write output to file.
+save([estResultsPathRoot species filesep 'chr' chr_num_str filesep ...
+      phenoName '_chr' chr_num_str '_file' num2str(processorNum) ...
+      '.mat'],'mapObjTemp','-v7.3')
   
 end
