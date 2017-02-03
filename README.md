@@ -102,14 +102,11 @@ tasks:
    http://www.mpfr.org/). The current version of informME 
    is based on MPFR v3.1.2 and GMP v5.1.3, but newer 
    versions may work as well. The required mpreal.h file 
-   is provided in the directory informME/MexSource.
+   can be found at the author's webpage:
+   http://www.holoborodko.com/pavel/mpfr/
 
 3. Install the EIGEN C++ template library for linear algebra 
-   (see http://eigen.tuxfamily.org). Since it is not tested 
-   whether newer versions of this library will work with 
-   informME, the EIGEN files used in the current 
-   implementation are available in the directory 
-   informME/eigen.
+   (see http://eigen.tuxfamily.org).  
 
 
 C. INSTALLING InformME
