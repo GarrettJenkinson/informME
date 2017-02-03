@@ -292,7 +292,7 @@ indicated order:
 
    This step estimates the parameters of the Ising probability 
    distribution used to model methylation within equally sized 
-   (in base pairs) non-overlapping regions of the the genome. 
+   (in base pairs) non-overlapping regions of the genome. 
    The results are organized within the directory 
    informME/Modeling/results with a subdirectory for each 
    species (Human, Mouse, etc.), and with each species folder 
@@ -522,7 +522,7 @@ v0.1.0-	Initial release. Code widely tested internally.
 # Licensing
 --------------------------------------------------
 
-All code authored by Garrett Jenkinsin in informME is licensed 
+All code authored by Garrett Jenkinson in informME is licensed 
 under a GPLv3 license; the exceptions to GPL licensing are the 
 files contained in the following directories:
 
@@ -534,7 +534,7 @@ These files have their own licensing information in their headers.
 Specifically, the individual authors' of these files have provided 
 Garrett Jenkinson with permission to modify and distribute this code
 with the informME software package. Any licensing questions
-beyond using this software within the informME pacakage should
+beyond using this software within the informME package should
 be directed at the authors' per the license information in the headers 
 of these files. Thanks to the authors Arnold Neumaier and 
 Ali Mohammad-Djafari for their licensing permissions. 
