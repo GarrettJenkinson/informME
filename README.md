@@ -522,20 +522,22 @@ v0.1.0-	Initial release. Code widely tested internally.
 # Licensing
 --------------------------------------------------
 
-All code in informME is licensed under a GPLv3 license, except for the 
-files contained in the following directory:
+All code authored by Garrett Jenkinsin in informME is licensed 
+under a GPLv3 license; the exceptions to GPL licensing are the 
+files contained in the following directories:
 
 informME/Modeling/private
 
 informME/SingleAnalysis/private
 
-These files have their own licensing information in their header. 
-Specifically, the authors' of these files have provided Garrett
-Jenkinson with permission to modify and distribute this code
+These files have their own licensing information in their headers. 
+Specifically, the individual authors' of these files have provided 
+Garrett Jenkinson with permission to modify and distribute this code
 with the informME software package. Any licensing questions
-beyond using this software with the informME pacakage should
-be directed at the authors' per the license in the header of these
-files. Thanks to the authors Arnold Neumaier and Ali Mohammad-Djafari 
-for their kind licensing permissions. 
+beyond using this software within the informME pacakage should
+be directed at the authors' per the license information in the headers 
+of these files. Thanks to the authors Arnold Neumaier and 
+Ali Mohammad-Djafari for their licensing permissions. 
+
 
 
