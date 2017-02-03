@@ -53,8 +53,6 @@ JOB=`qsub << EOJ
 #$ -l mem_free=15G
 #$ -l h_vmem=16G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 # 
 ${SCRIPTDIR}compile.sh "${EIGEN}" "${MPFRINCL}" "${MPFRLIB}" "${MATLICE}"

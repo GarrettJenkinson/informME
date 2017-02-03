@@ -68,8 +68,6 @@ JOB=`qsub << EOJ
 #$ -l mem_free=21G
 #$ -l h_vmem=22G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 #
 ${SCRIPTDIR}MakeDiffMethAnalysisBEDs.sh  "{'$phenoName_t','$phenoName_r'}" "$species" "1" "$max_chr_num" "$ESIflag" "$MCflag" "$MATLICE"

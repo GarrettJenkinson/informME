@@ -72,8 +72,6 @@ do # start do over processors
 #$ -l mem_free=12G
 #$ -l h_vmem=13G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 # 
 ${SCRIPTDIR}Estimation.sh "$bamFileNames" "$chr" "$phenoName" "$species" "$totalProcessors" "$processorNum" "$MATLICE"
@@ -100,8 +98,6 @@ JOB=`qsub -hold_jid ${JOBLIST} << EOJ
 #$ -l mem_free=61G
 #$ -l h_vmem=62G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 # 
 ${SCRIPTDIR}MergeEstimation.sh "$bamFileNames" "$chr" "$phenoName" "$species" "$totalProcessors" "$MATLICE"

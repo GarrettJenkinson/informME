@@ -80,8 +80,6 @@ JOB=`qsub << EOJ
 #$ -l mem_free=20G
 #$ -l h_vmem=21G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 # 
 ${SCRIPTDIR}SingleMethAnalysis.sh "$chr" "$phenoName" "$totalProcessors" "$processorNum" "$species" "$ESIflag" "$MCflag" "$MATLICE"
@@ -108,8 +106,6 @@ JOB=`qsub -hold_jid ${JOBLIST1} << EOJ
 #$ -l mem_free=61G
 #$ -l h_vmem=62G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 #
 ${SCRIPTDIR}MergeSingleMethAnalysis.sh "$chr" "$phenoName" "$species" "$totalProcessors" "$ESIflag" "$MCflag" "$MATLICE"
@@ -136,8 +132,6 @@ JOB=`qsub -hold_jid ${JOBLIST2} << EOJ
 #$ -l mem_free=61G
 #$ -l h_vmem=62G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 #
 ${SCRIPTDIR}MakeSingleMethAnalysisBEDs.sh "$phenoName" "$species" "1" "$totalChrNum" "$ESIflag" "$MCflag" "$MATLICE"

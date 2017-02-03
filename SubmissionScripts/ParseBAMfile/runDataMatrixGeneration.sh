@@ -79,8 +79,6 @@ JOB=`qsub << EOJ
 #$ -l mem_free=6G
 #$ -l h_vmem=7G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 # 
 ${SCRIPTDIR}MatrixFromBAMfile.sh "$FILENAME" "$chr" "$totalProcessors" "$processorNum" "$species" "$includeChr" "$numBasesToTrim" "$MATLICE" "$BAMPATH"
@@ -107,8 +105,6 @@ JOB=`qsub -hold_jid ${JOBLIST} << EOJ
 #$ -l mem_free=31G
 #$ -l h_vmem=32G
 #$ -l h_fsize=100G
-#$ -l cegs2
-#$ -q cegs2.q
 #$ -o ${SOUTDIR}
 # 
 ${SCRIPTDIR}MergeMatrices.sh "$FILENAME" "$chr" "$totalProcessors" "$species" "$includeChr" "$numBasesToTrim" "$MATLICE" "$BAMPATH"
