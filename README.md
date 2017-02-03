@@ -1,7 +1,7 @@
 # informME
 An information-theoretic pipeline for methylation analysis of WGBS data.
 
-Last Modified: 12/16/16
+latest release: v0.2.0
 
 ----------------------------------------------------------------
 DIRECTORY informME
@@ -505,6 +505,18 @@ REFERENCES
     analysis of whole-genome bisulfite sequencing data, 
     Bioinformatics, XX, XXX-XXX.
 
+
+
+VERSION HISTORY
+-------------------
+
+v0.2.0- Code reorganized into more specialized directories,
+	streamlined, and general SGE submission scripts
+	provided as a guide. Updated README's. Variable
+	names changed to reflect Bioinformatics paper
+	notation.
+
+v0.1.0-	Initial release. Code widely tested internally.
 
 
 # Licensing
