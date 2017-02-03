@@ -1,11 +1,13 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
 %
-% Author website:
+% Permission was provided by the author, Arnold Neumaier, to 
+% modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package. 
+%
+% Author's website:
 % http://www.mat.univie.ac.at/~neum/
-% 
-% Author source websites:
+%
+% Author's source websites:
 % http://www.mat.univie.ac.at/~neum/software/mcs/
 % http://www.mat.univie.ac.at/~neum/software/minq/
 % http://www.mat.univie.ac.at/~neum/software/ls/
@@ -26,6 +28,7 @@
 % w1(1:n)  vector of lower bounds
 % w2(1:n)  vector of upper bounds
 % i.e. the box is [w1,w2]
+
 function [w1,w2] = bounds(n,n0,x,y,u,v)
 w1 = zeros(n,1);
 w2 = w1;

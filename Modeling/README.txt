@@ -74,10 +74,6 @@ This directory also contains the following subdirectories:
 private
 -------
 
-This subdirectory has code which has license provided by
-its author, Dr. Arnold Neumaier, to Garrett Jenkinson to 
-distribute and modify as part of the informME software package. 
-See the header of these files for more licensing information.
 This subdirectory contains the MATLAB code that implements 
 the Multivel Coordinated Search (MCS) optimization algorihm 
 presented in [1]. It also contains the MINQ, a bound 
@@ -89,6 +85,11 @@ with their corresponding documentation is available at:
 http://www.mat.univie.ac.at/~neum/software/mcs/
 http://www.mat.univie.ac.at/~neum/software/minq/
 http://www.mat.univie.ac.at/~neum/software/ls/
+This is a non-GPL code, whose author has provided permission 
+to modify and distribute with the informME package. Parties 
+interested in using this code outside of informME should 
+contact the author of the code directly.
+
 
 results
 -------

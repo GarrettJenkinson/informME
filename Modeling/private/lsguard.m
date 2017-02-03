@@ -1,17 +1,17 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
 %
-% Author website:
+% Permission was provided by the author, Arnold Neumaier, to 
+% modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package. 
+%
+% Author's website:
 % http://www.mat.univie.ac.at/~neum/
-% 
-% Author source websites:
+%
+% Author's source websites:
 % http://www.mat.univie.ac.at/~neum/software/mcs/
 % http://www.mat.univie.ac.at/~neum/software/minq/
 % http://www.mat.univie.ac.at/~neum/software/ls/
 %
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%% lsguard.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,7 +23,7 @@
 % 
 % assumes that alist(1:s) is within these bounds
 
-function alp=lsguard(alp,alist,amax,amin,small); 	
+function alp=lsguard(alp,alist,amax,amin,small)
 
 asort=sort(alist);
 s=size(asort,2);

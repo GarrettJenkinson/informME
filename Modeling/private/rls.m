@@ -1,17 +1,17 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
 %
-% Author website:
+% Permission was provided by the author, Arnold Neumaier, to 
+% modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package. 
+%
+% Author's website:
 % http://www.mat.univie.ac.at/~neum/
-% 
-% Author source websites:
+%
+% Author's source websites:
 % http://www.mat.univie.ac.at/~neum/software/mcs/
 % http://www.mat.univie.ac.at/~neum/software/minq/
 % http://www.mat.univie.ac.at/~neum/software/ls/
 %
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% rls.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -23,7 +23,8 @@
 % if nargin<4, x0=0 and r(k)=fac*||b||/||A(:,k)||
 % (default: fac=1000);
 %
-function [x,act]=rls(A,b,x0,r);
+
+function [x,act]=rls(A,b,x0,r)
 
 % set defaults
 if     nargin<3, fac=1000;x0=zeros(size(A,2),1); 

@@ -1,11 +1,13 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
 %
-% Author website:
+% Permission was provided by the author, Arnold Neumaier, to 
+% modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package. 
+%
+% Author's website:
 % http://www.mat.univie.ac.at/~neum/
-% 
-% Author source websites:
+%
+% Author's source websites:
 % http://www.mat.univie.ac.at/~neum/software/mcs/
 % http://www.mat.univie.ac.at/~neum/software/minq/
 % http://www.mat.univie.ac.at/~neum/software/ls/
@@ -87,6 +89,7 @@
 % updtoptl.m
 
 function [xbest,fbest,f0,xmin,fmi,ipar,level,ichild,f,flag,ncall] = splinit(fcn,data,i,s,smax,par,x0,n0,u,v,x,y,x1,x2,L,l,xmin,fmi,ipar,level,ichild,f,xbest,fbest,stop,prt)
+
 global nbasket nboxes nglob nsweep nsweepbest record xglob xloc  
 % nbasket   	counter for points in the shopping basket
 % nboxes      	counter for boxes outside the shopping basket

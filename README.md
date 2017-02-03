@@ -4,7 +4,7 @@ An information-theoretic pipeline for methylation analysis of WGBS data.
 latest release: v0.2.0
 
 ----------------------------------------------------------------
-DIRECTORY informME
+# DIRECTORY informME
 ----------------------------------------------------------------
 
 This directory contains the MATLAB, C++ and R software that 
@@ -18,12 +18,12 @@ statistical physics. This method is applied on BAM files with
 reads aligned to a reference genome that are generated during 
 a whole-genome bisulphite sequencing (WGBS) experiment, and 
 produces genome-wide information about the statistical 
-properties of methylation in a single-sample and a differential 
-analysis framework. The resulting information is stored in 
-multiple MATLAB MAT files for subsequent processing and is 
-summarized by bedGraph genomic tracks that can be visualized 
-using a genome browser (such as the UCSC genome browser, see 
-https://genome.ucsc.edu).  
+properties of methylation in a single-sample and in a 
+differential analysis framework. The resulting information 
+is stored in multiple MATLAB MAT files for subsequent 
+processing and is summarized by bedGraph genomic tracks that 
+can be visualized using a genome browser (such as the UCSC 
+genome browser, see https://genome.ucsc.edu).  
 
 The current implementation of informME has been tested within 
 the following environment:
@@ -421,8 +421,6 @@ indicated order:
               installed on $PATH: bedtools, bedClip, 
               bedGraphToBigWig, and fetchChromSizes
 
-   7.2. DMR DETECTION
-
 
 
 E. OUTPUT BED FILES
@@ -489,52 +487,47 @@ DIFFERENTIAL ANALYSIS
 
 
 
-REFERENCES
-----------
+# REFERENCES
+------------
 
 [1] Jenkinson, G., Pujadas, E., Goutsias, J., and Feinberg, A.P. 
     (2017), Potential energy landscapes reveal the 
     information-theoretic nature of the epigenome, Nature 
-    Genetics, XX, XXX-XXX.
+    Genetics, Accepted.
 
 [2] Jenkinson, G., Feinberg, A.P., and Goutsias, J. (2017) 
     informME: An information-theoretic pipeline for methylation 
     analysis of whole-genome bisulfite sequencing data, 
-    Bioinformatics, XX, XXX-XXX.
+    Submitted.
 
 
 
-VERSION HISTORY
--------------------
+# VERSION HISTORY
+-----------------
 
-v0.2.0- Code reorganized into more specialized directories,
-	streamlined, and general SGE submission scripts
-	provided as a guide. Updated README's. Variable
-	names changed to reflect Bioinformatics paper
-	notation.
+v0.2.0 - 	Code reorganized into more specialized directories,
+	    	streamlined, and general SGE submission scripts
+	    	provided as a guide. Updated README's. Variable
+	    	names changed to reflect published notation.
 
-v0.1.0-	Initial release. Code widely tested internally.
+v0.1.0 -	Initial release. Code widely tested internally.
 
 
-# Licensing
---------------------------------------------------
 
-All code authored by Garrett Jenkinson in informME is licensed 
-under a GPLv3 license; the exceptions to GPL licensing are the 
-files contained in the following directories:
+# LICENCING
+-----------
+
+All code authored by Garrett Jenkinson in informME is 
+licensed under a GPLv3 license; exceptions to GPL 
+licensing are the files contained in the following 
+directories:
 
 informME/Modeling/private
 
 informME/SingleAnalysis/private
 
-These files have their own licensing information in their headers. 
-Specifically, the individual authors' of these files have provided 
-Garrett Jenkinson with permission to modify and distribute this code
-with the informME software package. Any licensing questions
-beyond using this software within the informME package should
-be directed at the authors' per the license information in the headers 
-of these files. Thanks to the authors Arnold Neumaier and 
-Ali Mohammad-Djafari for their licensing permissions. 
-
-
+These files have their own licensing information in their 
+headers. Thanks to Arnold Neumaier and Ali Mohammad-Djafari 
+for their permissions to modify and distribute their 
+software with informME.
 

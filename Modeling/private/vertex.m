@@ -1,11 +1,13 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
 %
-% Author website:
+% Permission was provided by the author, Arnold Neumaier, to 
+% modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package. 
+%
+% Author's website:
 % http://www.mat.univie.ac.at/~neum/
-% 
-% Author source websites:
+%
+% Author's source websites:
 % http://www.mat.univie.ac.at/~neum/software/mcs/
 % http://www.mat.univie.ac.at/~neum/software/minq/
 % http://www.mat.univie.ac.at/~neum/software/ls/
@@ -72,6 +74,7 @@
 % vert3.m          
 
 function [n0,x,y,x1,x2,f1,f2] = vertex(j,n,u,v,v1,x0,f0,ipar,isplit,ichild,z,f,l,L)
+
 % initialization
 % The coordinates of x, y, x1 and x2 are initially set to Inf to 
 % indicate that these quantities haven't been found yet in the course of

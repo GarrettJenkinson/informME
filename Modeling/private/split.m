@@ -1,11 +1,13 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
 %
-% Author website:
+% Permission was provided by the author, Arnold Neumaier, to 
+% modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package. 
+%
+% Author's website:
 % http://www.mat.univie.ac.at/~neum/
-% 
-% Author source websites:
+%
+% Author's source websites:
 % http://www.mat.univie.ac.at/~neum/software/mcs/
 % http://www.mat.univie.ac.at/~neum/software/minq/
 % http://www.mat.univie.ac.at/~neum/software/ls/
@@ -90,6 +92,7 @@
 % updtrec.m
 %
 function [xbest,fbest,xmin,fmi,ipar,level,ichild,f,flag,ncall] = split(fcn,data,i,s,smax,par,n0,u,v,x,y,x1,x2,z,xmin,fmi,ipar,level,ichild,f,xbest,fbest,stop,prt)  
+
 global nbasket nboxes nglob nsweep nsweepbest record xglob 
 % nbasket   	counter for points in the 'shopping basket'
 % nboxes      	counter for boxes not in the 'shopping basket'

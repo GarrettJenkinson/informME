@@ -1,4 +1,4 @@
-Last Modified: 12/16/16
+Last Modified: 02/03/17
 
 ----------------------------------------------------------------
 DIRECTORY SingleAnalysis
@@ -92,16 +92,13 @@ This directory also contains the following subdirectories:
 private
 -------
 
-This subdirectory has non-GPL code, whose author has 
-provided Garrett Jenkinson with permission to distribute
-and modify the code as part of the informME pacakge.
-Parties interested in using the code beyond the informME
-package shoudl contact the author of the code as per
-the header of the file which has licensing information.
 This subdirectory contains the MATLAB code that implements 
-the maxEnt method presented in [1]. This code has been 
+the maxEnt method presented in [1]. The code has been 
 modified to ensure compatability with new versions of 
-MATLAB.
+MATLAB. This is a non-GPL code, whose author has provided 
+permission to modify and distribute with the informME 
+package. Parties interested in using this code outside 
+of informME should contact the author of the code directly.
 
 results
 -------

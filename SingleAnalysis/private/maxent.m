@@ -1,11 +1,15 @@
-% License permission provided by the author to Garrett Jenkinson 
-% to modify and distribute with informME package. Contact
-% the original author directly for use outside of informME.
+%
+% Permission was provided by the author, Ali Mahammad-Djafari, 
+% to modify and distribute this MATLAB code with the informME 
+% package. Contact the original author directly for use outside 
+% this package.
 %
 % Author's website:
 % http://djafari.free.fr/index.htm
 % 
+
 function [lambda,p,entr] = maxent(mu,x,lambda0)
+
 %
 % ME_DENS2
 % [LAMBDA,P,ENTR]=ME_DENS2(MU,X,LAMBDA0)
