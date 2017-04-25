@@ -1,7 +1,7 @@
 # informME
 An information-theoretic pipeline for methylation analysis of WGBS data.
 
-latest release: v0.2.0
+LATEST RELEASE: v0.2.1
 
 ----------------------------------------------------------------
 # DIRECTORY informME
@@ -32,7 +32,7 @@ o Red Hat Enterprise Linux Server Release 6.5 (Santiago)
 
 o Sun Grid Engine OGS/GE 2011.11
 
-o MATLAB R2013b 64-bit with Bioinformatics Toolbox
+o MATLAB R2013b 64-bit with Bioinformatics and Symbolic Math Toolboxes 
 
 and by using the following tools:
 
@@ -52,8 +52,7 @@ informME/SubmissionScripts - contains the scripts used for
                              running the informME software on  
                              a SGE computer cluster
 
-informME/MexSource         - contains the C++ portion of 
-                             informME
+informME/MexSource         - contains the C++ portion of informME
 
 informME/ParseBAMfile      - contains the MATLAB code that  
                              extracts genomic information from 
@@ -188,7 +187,8 @@ indicated order:
    the file Homo_sapiens_assembly19.fasta, which can be dowloaded 
    from 
 
-   http://archive.broadinstitute.org/ftp/pub/seq/references/Homo_sapiens_assembly19.fasta
+   http://archive.broadinstitute.org/ftp/pub/seq/
+   references/Homo_sapiens_assembly19.fasta
 
    Subsequently, place within the directory 
 
@@ -237,10 +237,11 @@ indicated order:
 
    run, for EACH BAM FILE, the command
 
-   ./runDataMatrixGeneration.sh "BAMfileName" "spc" "[trim1,trim2]"
+   ./runDataMatrixGeneration.sh "BAMfileName" "spc" 
+   "[trim1,trim2]"
 
    where BAMfileName is the name of the BAM file to be 
-   processed (e.g., colonnormal for file colonnormal.bam), 
+   processed (e.g., lungnormal-1 for file lungnormal-1.bam), 
    spc is the name of the species (e.g., Human), trim1 is 
    the number of bases to be trimmed from the first read in 
    a read pair (e.g., 15), and trim2 is the number of bases 
@@ -250,9 +251,9 @@ indicated order:
    step, depending on the number of computing nodes available 
    to the user. 
 
-   This step generates methylation data matrices, used as 
-   inputs to informME, which are organized within subdirectories 
-   of informME/ParseBAMfile/matrices  with a subdirectory for 
+   This step generates methylation data matrices, which 
+   are organized within subdirectories of 
+   informME/ParseBAMfile/matrices  with a subdirectory for 
    each species (Human, Mouse, etc.), and with each species 
    folder including subdirectories for each chromosome (chr1, 
    chr2, etc.). Each chromosome subdirectory includes the 
@@ -277,11 +278,11 @@ indicated order:
 
    ./runModelEstimation.sh "{'BAMfileName1','BAMfileName2',...}" "PhenoName" "spc"
 
-   where BAMfileName1 is the name of the first BAM file in the 
-   set, BAMfileName2 is the name of the second file, etc., 
+   where BAMfileName1 is the name of the first BAM file in 
+   the set, BAMfileName2 is the name of the second file, etc., 
    PhenoName is a unique name for the phenotype (e.g., 
-   colonnormal), and spc is the name of the associated species 
-   (e.g., Human). 
+   lungnormal-1), and spc is the name of the associated 
+   species (e.g., Human). 
 
    MULTIPLE SETS OF PHENOTYPES can be processed in parallel 
    during this step depending on the number of computing nodes 
@@ -296,7 +297,7 @@ indicated order:
    containing a subdirectory for each chromosome (chr1, chr2, 
    etc.). Each chromosome subdirectory contains the MATLAB 
    file phenoName.mat for each phenotypic methylation sample 
-   (colonnormal, coloncancer, etc.), with each phenoName.mat 
+   (lungnormal-1, lungcancer-1, etc.), with each phenoName.mat 
    file containing the following information for each genomic 
    region used in model estimation: 
    o CpG distances
@@ -322,8 +323,8 @@ indicated order:
    ./runSingleMethAnalysis.sh "PhenoName" "spc"
 
    where PhenoName is the name of the phenotype (e.g., 
-   colonnormal), as specified in STEP 4 above, and spc is the 
-   name of the associated species (e.g., Human). 
+   lungnormal-1), as specified in STEP 4 above, and spc 
+   is the name of the associated species (e.g., Human). 
 
    MULTIPLE PHENOTYPES can be analyzed in parallel during this 
    step depending on the number of computing nodes available to 
@@ -333,7 +334,8 @@ indicated order:
    phenotype by computing a number of statistical summaries of 
    the methylation state, including probability distributions 
    of methylation levels, mean methylation levels, and 
-   normalized methylation entropies. If desired, this step also 
+   normalized methylation entropies, as well as mean and 
+   entropy based classifications. If desired, this step also 
    computes entropic sensitivity indices, as well 
    information-theoretic quantities associated with methylation 
    channels, such as turnover ratios, channel capacities, and 
@@ -343,7 +345,7 @@ indicated order:
    with each species folder containing a subdirectory for each 
    chromosome (chr1, chr2, etc.). Each chromosome subdirectory 
    contains the MATLAB file phenoName_Analysis.mat for each 
-   phenotypic methylation sample (colonnormal, coloncancer, 
+   phenotypic methylation sample (lungnormal-1, lungcancer-1, 
    etc.), with each phenoName_Analysis.mat file containing 
    the following information for each genomic region used in 
    model estimation: 
@@ -374,8 +376,8 @@ indicated order:
    ./runDiffMethAnalysis.sh "tPhenoName" "rPhenoName" "spc"
 
    where tPhenoName is the name of the test phenotype (e.g., 
-   coloncancer), as specified in STEP 3 above, rPhenoName is 
-   the name of the reference phenotype (e.g., colonnormal), 
+   lungcancer-1), as specified in STEP 3 above, rPhenoName is 
+   the name of the reference phenotype (e.g., lungnormal-1), 
    as specified in STEP 3, and spc is the name of the 
    associated species (e.g., Human). 
 
@@ -417,14 +419,94 @@ indicated order:
         to "hg19" when the Human assembly hg19 is used). The 
         resulting BW files within /path/BWfiles. 
   
-        NOTE: For this step, the following tools must be 
+        NOTE: For this utility, the following tools must be 
               installed on $PATH: bedtools, bedClip, 
               bedGraphToBigWig, and fetchChromSizes
 
+   7.2. DMR DETECTION
+
+        The user can use a provided utility to perform DMR
+        detection using the Jensen-Shannon distance (JSD) 
+        based on the method described in [2]. This utility 
+        must be run within an R session.
+
+        usage (when replicate reference data is available): 
+ 
+        setwd("/path/to/informME/PostProcess/")
+        source("jsDMR.R") 
+        runReplicateDMR(refVrefFiles,testVrefFiles,
+                        inFolder,outFolder)
+   
+        where refVrefFiles is a vector of BED file names that 
+        contain the JSD values of all pairwise reference 
+        comparisons, testVrefFiles is a vector of BED file 
+        names that contain the JSD values of test/reference 
+        comparisons, inFolder is the directory that contains 
+        all JSD files, and outFolder is the directory used to 
+        write the results. 
+   
+        usage (when no replicate reference data is available) 
+   
+        setwd("/path/to/informME/PostProcess/")
+        source("jsDMR.R") 
+        runNoReplicateDMR(JSDfile,inFolder,outFolder)
+   
+        where JSDfile is the name of a BED file that contains 
+        the JSD values of a test/reference comparison, inFolder 
+        is the directory that contains the JSD file, and 
+        outFolder is the directory used to write the result.
+   
+        NOTE: For this utility, the following tools must be 
+              installed in R: rtracklayer, logitnorm, mixtools.
+
+   7.3. GENE RANKING
+
+        The user can use a provided utility to rank all 
+        Human genes in the Bioconductor library 
+        TxDb.Hsapiens.UCSC.hg19.knownGene using the 
+        Jensen-Shannon distance (JSD) based on the 
+        method described in [2]. This utility must be 
+        run within an R session.
+
+        usage (when replicate reference data is available):
+
+        setwd("path/to/informME/PostProcess/")
+        source("jsGrank.R")
+        rankGenes(refVrefFiles,testVrefFiles,inFolder,outFolder,
+                  tName,rName)
+
+        where refVrefFiles is a vector of BED files that contain 
+        the JSD values of a test/reference comparison, 
+        testVrefFiles is a vector of BED files that contain the 
+        JSD values of available test/reference comparisons, 
+        inFolder is the directory that contains the JSD files, 
+        outFolder is the directory used to write the result 
+        in an .xlsx file, and tName and rName are strings 
+        providing names for the test and reference phenotypes.
+
+        usage (when no replicate reference data is available):  
+
+        setwd("path/to/informME/PostProcess/")
+        source("jsGrank.R")
+        rankGenes(c(),testVrefFiles,inFolder,outFolder,
+                  tName,rName)
+
+        where testVrefFiles is a vector of BED files that 
+        contain the JSD values of available test/reference 
+        comparisons, inFolder is the directory that contains 
+        the JSD files, outFolder is the directory used to write 
+        the result in an .xlsx file, and tName and rName are 
+        strings providing names for the test and reference 
+        phenotypes.
+     
+        NOTE: For this utility, the following tools must be 
+              installed in R: GenomicFeatures, GenomicRanges, 
+              Homo.sapiens, rtracklayer, 
+              TxDb.Hsapiens.UCSC.hg19.knownGene, XLConnect.
 
 
-E. OUTPUT BED FILES
--------------------
+E. OUTPUT FILES
+---------------
 
 informME generates the following methylation tracks in the form 
 of BED files, which are written within the directory 
@@ -432,71 +514,90 @@ of BED files, which are written within the directory
 
 SINGLE SAMPLE ANALYSIS
 
-  o MML-phenoName.bed
+  o MML-PhenoName.bed
         mean methylation levels
 
-  o NME-phenoName.bed
+  o NME-PhenoName.bed
         normalized methylation entropy
 
-  o METH-phenoName.bed
+  o METH-PhenoName.bed
          methylation-based classification (non-variable)
 
-  o VAR-phenoName.bed
+  o VAR-PhenoName.bed
         methylation-based classification (variable)
 
-  o ENTR-phenoName.bed
+  o ENTR-PhenoName.bed
          entropy-based classification
 
-  o ESI-phenoName.bed (if ESIflag = 1) 
+  o ESI-PhenoName.bed (if ESIflag = 1) 
         entropic sensitivity indices
 
-  o TURN-phenoName.bed (if MCflag = 1)
+  o TURN-PhenoName.bed (if MCflag = 1)
          turnover ratios
 
-  o CAP-phenoName.bed (if MCflag = 1) 
+  o CAP-PhenoName.bed (if MCflag = 1) 
         channel capacities
 
-  o RDE-phenoName.bed (if MCflag = 1) 
+  o RDE-PhenoName.bed (if MCflag = 1) 
         relative dissipated energies
 
 DIFFERENTIAL ANALYSIS
 
-  o dMML-phenoName1-VS-phenoName2.bed
+  o dMML-tPhenoName-VS-rPhenoName.bed
          differences in mean methylation levels
 
-  o DMU-phenoName1-VS-phenoName2.bed
-        differential mean-based classification
-
-  o dNME-phenoName1-VS-phenoName2.bed
+  o dNME-tPhenoName-VS-rPhenoName.bed
          differences in normalized methylation entropies
 
-  o DEU-phenoName1-VS-phenoName2.bed
+  o DMU-tPhenoName-VS-rPhenoName.bed
+        differential mean-based classification
+
+  o DEU-tPhenoName-VS-rPhenoName.bed
         differential entropy-based classification
 
-  o JSD-phenoName1-VS-phenoName2.bed
+  o JSD-tPhenoName-VS-rPhenoName.bed
         Jensen-Shannon distances
 
-  o dESI-phenoName1-VS-phenoName2.bed (if ESIflag = 1) 
+  o dESI-tPhenoName-VS-rPhenoName.bed 
+         (if ESIflag = 1) 
          differences in entropic sensitivity indices
 
-  o dCAP-phenoName1-VS-phenoName2.bed (if MCflag = 1) 
+  o dCAP-tPhenoName-VS-rPhenoName.bed 
+         (if MCflag = 1) 
          differences in channel capacities
 
-  o dRDE-phenoName1-VS-phenoName2.bed (if MCflag = 1) 
+  o dRDE-tPhenoName-VS-rPhenoName.bed 
+         (if MCflag = 1) 
          differences in relative dissipated energies
 
+In addition, the following files are generated when using the 
+provided utilities.
+
+  o DMR-JSD-tPhenoName-VS-rPhenoName.bed
+        differentially methylated regions
+        (when the jsDMR.R utility is used)
+
+  o gRank-JSD-tName-VS-rName.xlsx
+        JSD based gene ranking when no replicate reference 
+        data is available
+        (when the jsGRank.R utility is used)
+
+  o gRankRRD-JSD-tName-VS-rName.xlsx
+        JSD based gene ranking when replicate reference 
+        data is available
+        (when the jsGRank.R utility is used)
 
 
 # REFERENCES
 ------------
 
 [1] Jenkinson, G., Pujadas, E., Goutsias, J., and Feinberg, A.P. 
-    (2017), Potential energy landscapes reveal the 
+    (2017), Potential energy landscapes indentify the 
     information-theoretic nature of the epigenome, Nature 
-    Genetics, Accepted.
+    Genetics, Advance Online Publication.
 
 [2] Jenkinson, G., Feinberg, A.P., and Goutsias, J. (2017) 
-    informME: An information-theoretic pipeline for methylation 
+    An information-theoretic approach to the modeling and 
     analysis of whole-genome bisulfite sequencing data, 
     Submitted.
 
@@ -504,6 +605,10 @@ DIFFERENTIAL ANALYSIS
 
 # VERSION HISTORY
 -----------------
+
+v0.2.1 -   Added R utilities for DMR detection and gene ranking   
+           using the Jensen-Shannon distance (JSD). Various 
+           documentation improvements.
 
 v0.2.0 - 	Code reorganized into more specialized directories,
 	    	streamlined, and general SGE submission scripts

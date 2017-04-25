@@ -1,4 +1,4 @@
-Last Modified: 12/08/16
+Last Modified: 04/22/17
 
 ----------------------------------------------------------------
 DIRECTORY Modeling
@@ -23,9 +23,8 @@ EstimateParams.m
 ----------------
 
 This function takes a list of BAM files (which correspond to the 
-same phenotype) and estimates the parameters of the 1D Ising model 
-that best fits the methylation data associated with a specific 
-genomic region.
+same phenotype) and estimates the parameters of the 1D Ising model that best fits the methylation data associated with a 
+specific genomic region.
 
 EstParamsForChr.m
 -----------------
@@ -99,8 +98,8 @@ This subdirectory contains the parameter estimation
 species (Human, Mouse, etc.), with each species folder 
 containing a subdirectory for each chromosome (chr1, chr2, 
 etc.). Each chromosome subdirectory contains the MATLAB 
-file phenoName.mat for each phenotypic methylation sample 
-(colonnormal, coloncancer, etc.), with each phenoName.mat 
+file PhenoName.mat for each phenotypic methylation sample 
+(lungnormal-1, lungcancer-1, etc.), with each PhenoName.mat 
 file containing the following information for each genomic 
 region used in model estimation: 
 o CpG distances

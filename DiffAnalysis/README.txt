@@ -1,4 +1,4 @@
-Last Modified: 12/09/16
+Last Modified: 04/22/17
 
 ----------------------------------------------------------------
 DIRECTORY DiffAnalysis
@@ -35,26 +35,26 @@ of differential methylation analysis in the form of BED
 files, which are written in the subdirectory /informME/BEDfiles 
 organized for each species (Human, Mouse, etc.):
 
-o dMML-phenoName1-VS-phenoName2.bed
+o dMML-tPhenoName-VS-rPhenoName.bed
        differences in mean methylation levels
 
-o DMU-phenoName1-VS-phenoName2.bed
+o DMU-tPhenoName-VS-rPhenoName.bed
       differential mean-based classification
 
-o dNME-phenoName1-VS-phenoName2.bed
+o dNME-tPhenoName-VS-rPhenoName.bed
        differences in normalized methylation entropies
 
-o DEU-phenoName1-VS-phenoName2.bed
+o DEU-tPhenoName-VS-rPhenoName.bed
        differential entropy-based classification
 
-o JSD-phenoName1-VS-phenoName2.bed
+o JSD-tPhenoName-VS-rPhenoName.bed
        Jensen-Shannon distances 
 
-o dESI-phenoName1-VS-phenoName2.bed (if ESIflag = 1) 
+o dESI-tPhenoName-VS-rPhenoName.bed (if ESIflag = 1) 
        differences in entropic sensitivity indices
 
-o dCAP-phenoName1-VS-phenoName2.bed (if MCflag = 1) 
+o dCAP-tPhenoName-VS-rPhenoName.bed (if MCflag = 1) 
        differences in channel capacities
 
-o dRDE-phenoName1-VS-phenoName2.bed (if MCflag = 1) 
+o dRDE-tPhenoName-VS-rPhenoName.bed (if MCflag = 1) 
        differences in relative dissipated energies

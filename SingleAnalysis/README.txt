@@ -1,4 +1,4 @@
-Last Modified: 02/03/17
+Last Modified: 04/22/17
 
 ----------------------------------------------------------------
 DIRECTORY SingleAnalysis
@@ -80,11 +80,13 @@ region used for estimating the parameters of the Ising
 model by computing a number of statistical summaries of 
 the methylation state within the region, including 
 probability distributions of methylation levels, mean 
-meathylation levels, and normalized methylation entropies. 
-If desired, this function also computes entropic sensitivity 
-indices, as well information-theoretic quantities associated 
-with methylation channels, such as turnover ratios, channel 
-capacities, and relative dissipated energies. 
+meathylation levels, and normalized methylation entropies, 
+as well as methylation level and entropy based classifictaions 
+of genomic units. If desired, this function also computes 
+entropic sensitivity indices, as well information-theoretic 
+quantities associated with methylation channels, such as 
+turnover ratios, channel capacities, and relative dissipated 
+energies. 
 
 
 This directory also contains the following subdirectories:
@@ -108,9 +110,9 @@ analysis results organized within a subdirectory for
 each species (Human, Mouse, etc.), with each species 
 folder containing a subdirectory for each chromosome 
 (chr1, chr2, etc.). Each chromosome subdirectory 
-contains the MATLAB file phenoName_Analysis.mat for 
-each phenotypic methylation sample (colonnormal, 
-coloncancer, etc.), with each phenoName_Analysis.mat 
+contains the MATLAB file PhenoName_Analysis.mat for 
+each phenotypic methylation sample (lungnormal-1, 
+lungcancer-1, etc.), with each PhenoName_Analysis.mat 
 file containing the following information for each 
 genomic region used in model estimation: 
 o The locations of the CpG sites within the genomic region.
@@ -135,31 +137,31 @@ of single-sample analysis in the form of BED files, which
 are written within the subdirectory /informME/BEDfiles 
 organized for each species (Human, Mouse, etc.):
 
-o MML-phenoName.bed
+o MML-PhenoName.bed
       mean methylation levels
 
-o NME-phenoName.bed
+o NME-PhenoName.bed
       normalized methylation entropy
 
-o METH-phenoName.bed
+o METH-PhenoName.bed
        methylation-based classification (non-variable)
 
-o VAR-phenoName.bed
+o VAR-PhenoName.bed
       methylation-based classification (variable)
 
-o ENTR-phenoName.bed
+o ENTR-PhenoName.bed
        entropy-based classification
 
-o ESI-phenoName.bed (if ESIflag = 1)
+o ESI-PhenoName.bed (if ESIflag = 1)
       entropic sensitivity indices
 
-o TURN-phenoName.bed (if MCflag = 1) 
+o TURN-PhenoName.bed (if MCflag = 1) 
        turnover ratios
 
-o CAP-phenoName.bed (if MCflag = 1) 
+o CAP-PhenoName.bed (if MCflag = 1) 
       channel capacities
 
-o RDE-phenoName.bed (if MCflag = 1) 
+o RDE-PhenoName.bed (if MCflag = 1) 
       relative dissipated energies
 
 

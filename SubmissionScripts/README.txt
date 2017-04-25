@@ -1,4 +1,4 @@
-Last Modified: 12/13/16
+Last Modified: 04/22/17
 
 ----------------------------------------------------------------
 SUBDIRECTORY SubmissionScripts
@@ -37,11 +37,11 @@ subdirectory in order to analyze the reference genome
 
 Subsequently, the following script must be run within 
 this subdirectory for each BAM file (for example, for 
-using file colonnormal.bam for species "Human" and 
+using file lungnormal-1.bam for species "Human" and 
 for trimming 15 bases from the first read in a read 
 pair and 17 bases from the second read in the pair):
 
-./runDataMatrixGeneration.sh "colonnormal" "Human" "[15,17]"
+./runDataMatrixGeneration.sh "lungnormal-1" "Human" "[15,17]"
 
 ** run for each BAM file to generate methylation data 
    matrices 
@@ -53,11 +53,11 @@ The following script must be run within this subdirectory
 to build statistical models of data from BAM files for 
 which the "ParseBAMfile"ùcode has already been run (for 
 example, for modeling two parsed BAM files, 
-colonnormal-1.bam and colonnormal-2.bam that provide 
-methylation data for a normal colon phenotype in the 
+lungnormal-1.bam and lungnormal-2.bam that provide 
+methylation data for a normal lung phenotype in the 
 species "Human"):
 
-./runModelEstimation.sh "{'colonnormal-1','colonnormal-2'}" "colonnormal" "Human"
+./runModelEstimation.sh "{'lungnormal-1','lungnormal-2'}" "lungnormal" "Human"
 
 ** run for each model to be built from a set of parsed BAM 
    files
@@ -68,9 +68,9 @@ SingleAnalysis
 The following script must be run within this subdirectory 
 to analyze a single model that was built using the 
 "Modeling" code (for example, for a model built from a 
-normal colon phenotype in the species "Human"):
+normal lung phenotype in the species "Human"):
 
-./runSingleMethAnalysis.sh "colonnormal" "Human"
+./runSingleMethAnalysis.sh "lungnormal-1" "Human"
 
 ** run for each model to generate single (inter-sample) 
    methylation analysis results
@@ -82,10 +82,10 @@ The following script must be run within this subdirectory
 to produce a differential analysis of two models that 
 have been analyzed using the "SingleAnalysis"ùcode (for 
 example, for a test and reference model, which were 
-respectively built from a colon cancer and colon normal 
+respectively built from a lung cancer and lung normal 
 phenotype in the species "Human"):
 
-./runDiffMethAnalysis.sh "coloncancer" "colonnormal" "Human"
+./runDiffMethAnalysis.sh "lungcancer-1" "lungnormal-1" "Human"
 
 ** run for each pair of a test and a reference model to 
    generate differential methylation results

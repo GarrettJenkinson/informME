@@ -1,4 +1,4 @@
-Last Modified: 12/03/16
+Last Modified: 04/22/17
 
 ----------------------------------------------------------------
 DIRECTORY MexSource
@@ -15,8 +15,7 @@ calcMargProb.cpp
 ----------------
 
 This function computes the joint probability of a 
-contiguous set of CpG sites using Equations (S18) 
-and (S19) in the Supplementary Methods of [1].
+contiguous set of CpG sites using Equation (25) in [1].
 
 compile.m
 ---------					
@@ -35,7 +34,7 @@ computeAveLogLikelihood.cpp
 This function computes the average "marginalized" 
 log-likelihood function of a set of methylation 
 observations for a given Ising model, given by 
-Equation (S26) in the Supplementary Methods of [1].
+Equation (27) in [1].
 
 computeMCtransProbs.cpp
 -----------------------
@@ -43,31 +42,30 @@ computeMCtransProbs.cpp
 This function computes the initial and transition 
 probabilities of the alternative inhomogeneous Markov 
 chain representation of the 1D Ising model given by 
-Equations (S15) and (S16) in the Supplementary Methods 
-of [1].
+Equations (17) and (18) in [1].
 
 computeZ.cpp
 ------------
 	        
 This function recursively computes the partition 
-function of the 1D Ising model using Equation (S13) 
-in the Supplementary Methods of [1].
+function of the 1D Ising model using Equation (15) 
+in [1].
 
 computeZtilde.cpp 
 -----------------
       
 This function recursively computes the Ztilde 
 function associated with the 1D Ising model using 
-Equations (S22) and (S23) in the Supplementary 
-Methods of [1].
+Equation (24) in [1].
 
 
 REFERENCES
 ----------
 
 [1] Jenkinson, G., Feinberg, A.P., and Goutsias, J. (2017) 
-    informME: An information-theoretic pipeline for methylation 
-    analysis of whole-genome bisulfite sequencing data, Submitted.
+    An information-theoretic approach to the modeling and    
+    analysis of whole-genome bisulfite sequencing data, 
+    Submitted.
 
 
 DEPENDENCIES
