@@ -606,9 +606,9 @@ provided utilities.
 # VERSION HISTORY
 -----------------
 
-v0.2.1 -   Added R utilities for DMR detection and gene ranking   
-           using the Jensen-Shannon distance (JSD). Various 
-           documentation improvements.
+v0.2.1 -   	Added R utilities for DMR detection and gene ranking   
+           	using the Jensen-Shannon distance (JSD). Various 
+           	documentation improvements.
 
 v0.2.0 - 	Code reorganized into more specialized directories,
 	    	streamlined, and general SGE submission scripts
