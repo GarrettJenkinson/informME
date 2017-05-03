@@ -29,10 +29,11 @@
 BEDDIR=$1
 ASSEMBLY=$2
 
-# Make list of BED files in BEDDIR
-FILES="${BEDDIR}*.bed"
-
 cd ${BEDDIR}
+
+# Make list of BED files in BEDDIR
+FILES="*.bed"
+
 mkdir BWfiles
 
 # Read chr sizes
@@ -52,6 +53,6 @@ do
 done
 
 # Clean up:
-rm ${BEDDIR}${ASSEMBLY}.sizes
+rm ${ASSEMBLY}.sizes
 mv *.bw BWfiles/
 

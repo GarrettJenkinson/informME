@@ -33,7 +33,7 @@
 %
 % USAGE:
 %
-% compile(eigen,mpfr_incl,mpfr_lib,eigen)
+% compile(eigen,mpfr_incl,mpfr_lib)
 %
 % INPUTS:
 %
