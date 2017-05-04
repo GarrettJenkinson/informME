@@ -7,8 +7,8 @@ SUBDIRECTORY SubmissionScripts
 This directory contains the submission scripts used to run 
 informME on a computer cluster using the Sun Grid Engine 
 (SGE) environment. These files can be used as templates to 
-develope scripts that can allow the user to run informME 
-on other grid engine parallele enviroments. This directory 
+develop scripts that can allow the user to run informME 
+on other grid engine parallel enviroments. This directory 
 is organized using the following subdirectories:
 
 MexSource
@@ -51,7 +51,7 @@ Modeling
 
 The following script must be run within this subdirectory 
 to build statistical models of data from BAM files for 
-which the "ParseBAMfile"ùcode has already been run (for 
+which the "ParseBAMfile" code has already been run (for 
 example, for modeling two parsed BAM files, 
 lungnormal-1.bam and lungnormal-2.bam that provide 
 methylation data for a normal lung phenotype in the 
@@ -80,7 +80,7 @@ DiffAnalysis
 
 The following script must be run within this subdirectory
 to produce a differential analysis of two models that 
-have been analyzed using the "SingleAnalysis"ùcode (for 
+have been analyzed using the "SingleAnalysis" code (for 
 example, for a test and reference model, which were 
 respectively built from a lung cancer and lung normal 
 phenotype in the species "Human"):
