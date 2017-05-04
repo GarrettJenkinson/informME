@@ -41,7 +41,7 @@
 %          Directory containing the files of the EIGEN instalation
 %          (PATH/eigen).
 %
-% mpfr_inc
+% mpfr_incl
 %          Directory containing the "include" files of the MPFR
 %          instalation (PATH/mpfr/include).
 %
