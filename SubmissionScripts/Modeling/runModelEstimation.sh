@@ -78,10 +78,10 @@ EOJ
 `
 echo "JobID = ${JOB} submitted on `date`"
 if [ "${JOBLIST}" = "" ]; then
-    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
+    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,9}')
 	JOBLIST="${TEMP}"
 else
-    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
+    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,9}')
 	JOBLIST="${JOBLIST},${TEMP}"
 fi
 done # end of loop over processors

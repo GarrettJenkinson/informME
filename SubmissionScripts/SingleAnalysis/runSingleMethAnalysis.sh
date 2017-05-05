@@ -86,10 +86,10 @@ EOJ
 `
 echo "JobID = ${JOB} submitted on `date`"
 if [ "${JOBLIST1}" = "" ]; then
-    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
+    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,9}')
     JOBLIST1="${TEMP}"
 else
-    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
+    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,9}')
     JOBLIST1="${JOBLIST1},${TEMP}"
 fi
 done # end of loop over processors
@@ -112,10 +112,10 @@ EOJ
 `
 echo "JobID = ${JOB} submitted on `date`"
 if [ "${JOBLIST2}" = "" ]; then
-    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
+    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,9}')
     JOBLIST2="${TEMP}"
 else
-    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
+    TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,9}')
     JOBLIST2="${JOBLIST2},${TEMP}"
 fi
 done # end of do over chromosomes

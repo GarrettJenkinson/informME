@@ -73,5 +73,3 @@ ${SCRIPTDIR}MakeDiffMethAnalysisBEDs.sh  "{'$phenoName_t','$phenoName_r'}" "$spe
 EOJ
 `
 echo "JobID = ${JOB} submitted on `date`"
-TEMP=$(echo "${JOB}" | grep -Eo '[0-9]{1,7}')
-JOBLIST="${TEMP}"
