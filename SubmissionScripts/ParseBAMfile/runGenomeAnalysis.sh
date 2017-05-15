@@ -56,5 +56,5 @@ JOB=`qsub << EOJ
 ${SCRIPTDIR}FastaToCpG.sh "${FastaFile}" "${species}" "${MATLICE}"
 EOJ
 `
-echo "${JOB} for file ${INFILENAME3} submitted on `date`"
+echo "${JOB} for file ${FastaFile} submitted on `date`"
 
