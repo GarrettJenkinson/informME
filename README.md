@@ -594,7 +594,7 @@ provided utilities.
 [1] Jenkinson, G., Pujadas, E., Goutsias, J., and Feinberg, A.P. 
     (2017), Potential energy landscapes indentify the 
     information-theoretic nature of the epigenome, Nature 
-    Genetics, Advance Online Publication.
+    Genetics, 49: 719-729.
 
 [2] Jenkinson, G., Feinberg, A.P., and Goutsias, J. (2017) 
     An information-theoretic approach to the modeling and 
@@ -606,8 +606,8 @@ provided utilities.
 # VERSION HISTORY
 -----------------
 
-v0.2.1 -   	Added R utilities for DMR detection and gene ranking   
-           	using the Jensen-Shannon distance (JSD). Various 
+v0.2.1 -   	Added R utilities for DMR detection and gene ranking
+            using the Jensen-Shannon distance (JSD). Various 
            	documentation improvements.
 
 v0.2.0 - 	Code reorganized into more specialized directories,
