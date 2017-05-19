@@ -615,7 +615,8 @@ v0.2.0 - 	Code reorganized into more specialized directories,
 	    	provided as a guide. Updated README's. Variable
 	    	names changed to reflect published notation.
 
-v0.1.0 -	Initial release. Code widely tested internally.
+v0.1.0 -	Initial release. Code widely tested internally. 
+            Code used to create results for ref [1].
 
 
 
