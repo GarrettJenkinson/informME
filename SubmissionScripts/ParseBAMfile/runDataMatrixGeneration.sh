@@ -76,7 +76,7 @@ JOB=`qsub << EOJ
 #$ -S /bin/bash
 #$ -N INFM_MTRX 
 #$ -l mem_free=6G
-#$ -l h_vmem=7G
+#$ -l h_vmem=6G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 
@@ -102,7 +102,7 @@ JOB=`qsub -hold_jid ${JOBLIST} << EOJ
 #$ -S /bin/bash
 #$ -N INFM_MTRX_MERGE
 #$ -l mem_free=31G
-#$ -l h_vmem=32G
+#$ -l h_vmem=31G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 

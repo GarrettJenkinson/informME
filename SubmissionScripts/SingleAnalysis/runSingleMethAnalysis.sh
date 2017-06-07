@@ -77,7 +77,7 @@ JOB=`qsub << EOJ
 #$ -S /bin/bash
 #$ -N INFM_SMA
 #$ -l mem_free=20G
-#$ -l h_vmem=21G
+#$ -l h_vmem=20G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 
@@ -103,7 +103,7 @@ JOB=`qsub -hold_jid ${JOBLIST1} << EOJ
 #$ -S /bin/bash
 #$ -N INFM_SMA_MERGE
 #$ -l mem_free=61G
-#$ -l h_vmem=62G
+#$ -l h_vmem=61G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 #
@@ -129,7 +129,7 @@ JOB=`qsub -hold_jid ${JOBLIST2} << EOJ
 #$ -S /bin/bash
 #$ -N INFM_SMA_MBED
 #$ -l mem_free=61G
-#$ -l h_vmem=62G
+#$ -l h_vmem=61G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 #

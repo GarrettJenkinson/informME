@@ -69,7 +69,7 @@ do # start do over processors
 #$ -S /bin/bash
 #$ -N INFM_EST 
 #$ -l mem_free=12G
-#$ -l h_vmem=13G
+#$ -l h_vmem=12G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 
@@ -95,7 +95,7 @@ JOB=`qsub -hold_jid ${JOBLIST} << EOJ
 #$ -S /bin/bash
 #$ -N INFM_EST_MERGE
 #$ -l mem_free=61G
-#$ -l h_vmem=62G
+#$ -l h_vmem=61G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 

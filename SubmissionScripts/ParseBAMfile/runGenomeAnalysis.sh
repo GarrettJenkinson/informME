@@ -49,7 +49,7 @@ JOB=`qsub << EOJ
 #$ -S /bin/bash
 #$ -N INFM_GA 
 #$ -l mem_free=15G
-#$ -l h_vmem=16G
+#$ -l h_vmem=15G
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 
