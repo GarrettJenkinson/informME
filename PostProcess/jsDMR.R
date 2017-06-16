@@ -92,7 +92,7 @@ binnedSumms <- function(bins, numvar, mcolname)
 # This function operates on gr$score. 
 doThreshMorph <- function(gr,file,outFolder,threshVal=50,
                           bandwidthVal=50000,GUsize=150.0,
-                          requiredPercentBand=(2/3)){
+                          requiredPercentBand=0.5){
   library(rtracklayer)
   
   # Check folders for trailing slash, add if missing.
