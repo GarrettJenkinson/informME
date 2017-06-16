@@ -90,7 +90,9 @@ binnedSumms <- function(bins, numvar, mcolname)
 
 # Define thresholding and morphological closing function.
 # This function operates on gr$score. 
-doThreshMorph <- function(gr,file,outFolder,threshVal=50,bandwidthVal=50000,GUsize=150.0){
+doThreshMorph <- function(gr,file,outFolder,threshVal=50,
+                          bandwidthVal=50000,GUsize=150.0,
+                          requiredPercentBand=(2/3)){
   library(rtracklayer)
   
   # Check folders for trailing slash, add if missing.
@@ -132,8 +134,14 @@ doThreshMorph <- function(gr,file,outFolder,threshVal=50,bandwidthVal=50000,GUsi
     # Sum values inside the grThresh objects.
     #
     score <- coverage(gr,weight="score")
+    cov   <- coverage(gr)
     grThresh <- binnedSumms(grThresh,score,"score")
     grThresh$score <- as.numeric(grThresh$score)/GUsize
+    grThresh <- binnedSumms(grThresh,cov,"coverage")
+    
+    # remove DMRs that do not have enough data and get rid of coverage column
+    grThresh <- grThresh[grThresh$coverage >= (bandwidthVal*requiredPercentBand)]
+    grThresh$coverage <- NULL  
     
     #
     # Write output to file.
@@ -279,7 +287,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,
     if(outflag){
       myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",refVrefFiles[ind],sep=""), 
                        visibility="full",autoScale=TRUE)
-      export.bedGraph(nullGRs[[ind]],file.path(outFolder,paste("SQS-s",refVrefFiles[ind],".bed",sep=""),fsep=""))
+      export.bedGraph(nullGRs[[ind]],file.path(outFolder,paste("SQS-s",refVrefFiles[ind],sep=""),fsep=""))
     }
     
     nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
@@ -292,7 +300,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,
     if(outflag){
       myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",testVrefFiles[ind],sep=""), 
                        visibility="full",autoScale=TRUE)
-      export.bedGraph(altGRs[[ind]],file.path(outFolder,paste("SQS-s",testVrefFiles[ind],".bed",sep=""),fsep = ""))
+      export.bedGraph(altGRs[[ind]],file.path(outFolder,paste("SQS-s",testVrefFiles[ind],sep=""),fsep = ""))
     }
     
     altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
