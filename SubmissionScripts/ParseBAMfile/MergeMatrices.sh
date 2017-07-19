@@ -37,7 +37,7 @@ BAMPATH=$8
 echo "starting command: MergeMatrices('${bamFilename}', ${chr_num}, 'totalProcessors', ${totalProcessors},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');"
 
 # Run MATLAB command
-matlab -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "disp('Job Running');tic; MergeMatrices('${bamFilename}', ${chr_num}, 'totalProcessors', ${totalProcessors},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc;"
+matlab -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic; MergeMatrices('${bamFilename}', ${chr_num}, 'totalProcessors', ${totalProcessors},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?

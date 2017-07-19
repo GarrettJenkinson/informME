@@ -36,7 +36,7 @@ MATLICE=$7
 echo "starting command: EstParamsForChr(${bamFileNames},${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors},'processorNum',${processorNum});"
 
 # Run MATLAB command
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "disp('Job Running');tic;EstParamsForChr(${bamFileNames},${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors},'processorNum',${processorNum});toc;"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;EstParamsForChr(${bamFileNames},${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors},'processorNum',${processorNum});toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?

@@ -38,7 +38,7 @@ BAMPATH=$9
 echo "starting command: MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');"
 
 # Run MATLAB command
-matlab -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "disp('Job Running');tic; MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc"
+matlab -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic; MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?

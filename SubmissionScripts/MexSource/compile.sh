@@ -33,7 +33,7 @@ MATLICE=$4
 echo "starting command: compile('${EIGEN}','${MPFRINCL}','${MPFRLIB}');"
 
 # Run MATLAB command
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "disp('Job Running');tic;compile('${EIGEN}','${MPFRINCL}','${MPFRLIB}');toc;"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;compile('${EIGEN}','${MPFRINCL}','${MPFRLIB}');toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?

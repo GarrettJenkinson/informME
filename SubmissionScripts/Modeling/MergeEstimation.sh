@@ -35,7 +35,7 @@ MATLICE=$6
 echo "starting command: MergeEstParams(${bamFileNames},${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors});"
 
 # Run MATLAB command
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "disp('Job Running');tic;MergeEstParams(${bamFileNames},${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors});toc;"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;MergeEstParams(${bamFileNames},${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors});toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, othewise declare success
 EXITCODE=$?

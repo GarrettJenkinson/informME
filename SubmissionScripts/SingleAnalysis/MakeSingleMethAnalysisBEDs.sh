@@ -38,7 +38,7 @@ echo "starting command: MakeBEDsForMethAnalysis('${phenoName}','species','${spec
 
 # Run MATLAB command
 
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "disp('Job Running');tic;MakeBEDsForMethAnalysis('${phenoName}','species','${species}','minChrNum',${min_chr_num},'maxChrNum',${max_chr_num},'ESIflag',${ESIflag},'MCflag',${MCflag});toc;"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;MakeBEDsForMethAnalysis('${phenoName}','species','${species}','minChrNum',${min_chr_num},'maxChrNum',${max_chr_num},'ESIflag',${ESIflag},'MCflag',${MCflag});toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?
