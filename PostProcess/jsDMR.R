@@ -169,6 +169,45 @@ constructNullPvals <- function(nullValues){
   function(x) 1-Fn(x)
 }
 
+# Perform MH testing: BH or BY
+multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction){
+  # Collapse all pvalues
+  x <- c()
+  for(ind in 1:numNullComp){
+    x <- rbind(x,data.frame(group='null',index=ind,pVals=nullGRs[[ind]]$pVals))
+  }
+  for(ind in 1:numAltComp){
+    x <- rbind(x,data.frame(group='alt',index=ind,pVals=altGRs[[ind]]$pVals))
+  }
+  
+  # Adjust p-values
+  if(correction=='BH'){
+    # Adjust p-values based on BH
+    x$qVals <- p.adjust(x$pVals, method = 'BH')
+  } else if(correction=='BY'){
+    # Adjust p-values based on BH
+    x$qVals <- p.adjust(x$pVals, method = 'BY')
+  } else {
+    # Correction type not valid
+    print("Multiple hypothesis correction not valid.")
+    exit(1)   
+  }
+  
+  # Correct q-values smaller than machine precision.
+  x$qVals[x$qVals<.Machine$double.eps] <- .Machine$double.eps
+  
+  # Add q-values with original GR objects
+  for(ind in 1:numNullComp){
+    nullGRs[[ind]]$qVals <- x[(x$group=='null') & (x$index==ind),]$qVals
+  }
+  for(ind in 1:numAltComp){
+    altGRs[[ind]]$qVals <- x[(x$group=='alt') & (x$index==ind),]$qVals
+  }
+
+  # Return
+  list(nullGRs,altGRs) 
+}
+
 # Function to compute p-values from mixture of normals in logit space.
 # Used when replicate refernce data is not available.
 logitMixturePvals <- function(values){
@@ -227,9 +266,9 @@ logitMixturePvals <- function(values){
 
 # Function to perform DMR detection when replicate reference data 
 # is available. 
-runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder, 
+runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.05, 
                             maxSQS = 250, chrsOfInterest=paste("chr",1:22,sep=""), 
-                            bandwidthVal=50000, outflag=FALSE) {
+                            bandwidthVal=50000,correction='BH',outflag=FALSE) {
   
   # Check folders for trailing slash, add if missing
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -275,35 +314,65 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,
     altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   
+  # Estimate q-values if required: BH or BY
+  if(!is.na(correction)){
+    out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
+    nullGRs <- out[[1]]
+    altGRs <- out[[2]]
+  }
+
   # Write SQS files and DMRs.
   nullGRthresh <- list()
   altGRthresh  <- list()
   for (ind in 1:numNullComp){
     # Find SQS.
     nullGRs[[ind]]$sJSD <- nullGRs[[ind]]$score
-    nullGRs[[ind]]$score <-  -10*log10(nullGRs[[ind]]$pVals)
+    if(is.na(correction)){
+      nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$pVals)
+    } else {
+      nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$qVals)
+    }
     nullGRs[[ind]]$score[nullGRs[[ind]]$score>maxSQS] <- maxSQS
-    
+
+    # Generate SQS track    
     if(outflag){
       myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",refVrefFiles[ind],sep=""), 
                        visibility="full",autoScale=TRUE)
       export.bedGraph(nullGRs[[ind]],file.path(outFolder,paste("SQS-s",refVrefFiles[ind],sep=""),fsep=""))
     }
-    
-    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
+
+    # Morphological closing
+    if(is.na(correction)){
+      nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
+    } else {
+      fdrToSqs <- -10*log10(FDR)
+      nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],threshVal=fdrToSqs,outFolder,bandwidthVal=bandwidthVal)
+    }
   }
   for (ind in 1:numAltComp){
     # Find SQS.
     altGRs[[ind]]$sJSD <- altGRs[[ind]]$score
-    altGRs[[ind]]$score <-  -10*log10(altGRs[[ind]]$pVals)
+    if(is.na(correction)){
+      altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$pVals)
+    } else {
+      altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$qVals)
+    }
     altGRs[[ind]]$score[altGRs[[ind]]$score>maxSQS] <- maxSQS
+
+    # Generate SQS track    
     if(outflag){
       myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",testVrefFiles[ind],sep=""), 
                        visibility="full",autoScale=TRUE)
       export.bedGraph(altGRs[[ind]],file.path(outFolder,paste("SQS-s",testVrefFiles[ind],sep=""),fsep = ""))
     }
     
-    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
+    # Morphological closing
+    if(is.na(correction)){
+      altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
+    } else {
+      fdrToSqs <- -10*log10(FDR)
+      altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],threshVal=fdrToSqs,outFolder,bandwidthVal=bandwidthVal)
+    }
   }
   
   # Return DMRs in alternative comparison.
