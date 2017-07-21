@@ -390,7 +390,8 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
 # is available. 
 runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
                               chrsOfInterest=paste("chr",1:22,sep=""),
-                              bandwidthVal=50000, outflag=FALSE) {
+                              bandwidthVal=50000, correction='BH', 
+			      FDR=0.05, outflag=FALSE) {
   
   
   # Check folders for trailing slash, add if missing.
@@ -402,13 +403,38 @@ runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
   }
   
   # Smooth track.
+  write(paste("[",date(),"]: Smoothing JSD values"), stderr())
   GR <- doSmoothing(file,inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
   GR$sJSD <- GR$score
   
   # Find p-values.
+  write(paste("[",date(),"]: Computing p-values"), stderr())
   GR$PvalsMix <- logitMixturePvals(GR$sJSD)
-  GR$score <- -10*log10(GR$PvalsMix)
+  
+  # Adjust p-values
+  if(correction=='BH'){
+    write(paste("[",date(),"]: Computing q-values based on BH"), stderr())
+    # Adjust p-values based on BH
+    x$qVals <- p.adjust(x$pVals, method = 'BH')
+    GR$score <- -10*log10(GR$qVals)
+  } else if(correction=='BY'){
+    write(paste("[",date(),"]: Computing q-values based on BY"), stderr())
+    # Adjust p-values based on BH
+    x$qVals <- p.adjust(x$pVals, method = 'BY')
+    GR$score <- -10*log10(GR$qVals)
+  } else if(is.na(correction)) {
+    # Compute SQS score
+    GR$score <- -10*log10(GR$PvalsMix)
+  } else {
+    # Correction type not valid
+    print("Multiple hypothesis correction not valid.")
+    exit(1)   
+  }
+
+  # Saturate SQS
   GR$score[GR$score>maxSQS] <- maxSQS
+  
+  # Save bedgraph file with SQS scores
   if(outflag){
     myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",file,sep=""), 
                        visibility="full",autoScale=TRUE)
@@ -416,7 +442,9 @@ runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
   }
   
   # Do thresholding.
-  GRthresh <- doThreshMorph(GR,file,outFolder,bandwidthVal=bandwidthVal)
+  write(paste("[",date(),"]: Morphological closing"), stderr())
+  fdrToSqs <- -10*log10(FDR)
+  GRthresh <- doThreshMorph(GR,file,outFolder,threshVal=fdrToSqs,bandwidthVal=bandwidthVal)
   
   # Return GR.
   GRthresh
