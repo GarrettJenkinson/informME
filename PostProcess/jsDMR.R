@@ -107,7 +107,7 @@ doThreshMorph <- function(gr,file,outFolder,threshVal=50,
   # Remove ranges below threshVal.
   grThresh <- gr[gr$score>threshVal]
   
-  if (length(grThresh)>0){
+  if (length(grThresh[!is.na(grThresh$score)])>0){
     #
     # Do morphological closing.
     #
@@ -143,16 +143,19 @@ doThreshMorph <- function(gr,file,outFolder,threshVal=50,
     grThresh <- grThresh[grThresh$coverage >= (bandwidthVal*requiredPercentBand)]
     grThresh$coverage <- NULL  
     
-    #
-    # Write output to file.
-    #
-    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("DMR-",file,sep=""), 
-                       visibility="full",autoScale=TRUE)
-    export.bedGraph(grThresh[!is.na(grThresh$score)],file.path(outFolder,paste("DMR-",file,sep=""),fsep = ""),
-                    trackLine=myTrackLine)
-  } else{
-    print("No DMRs - no output file is generated for:")
-    print(file.path(outFolder,paste("DMR-",file,sep=""),fsep=""))
+    if (length(grThresh[!is.na(grThresh$score)])>0){
+      # Write output to file.
+      myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("DMR-",file,sep=""), 
+		         visibility="full",autoScale=TRUE)
+      export.bedGraph(grThresh[!is.na(grThresh$score)],file.path(outFolder,paste("DMR-",file,sep=""),fsep = ""),
+		      trackLine=myTrackLine)
+    } else {
+      write(paste("[",date(),"]: No DMRs - no output file is generated for:"), stderr())
+      write(paste("[",date(),"]: ",file.path(outFolder,paste("DMR-",file,sep=""),fsep="")),stderr())
+    }
+  } else {
+    write(paste("[",date(),"]: No DMRs - no output file is generated for:"), stderr())
+    write(paste("[",date(),"]: ",file.path(outFolder,paste("DMR-",file,sep=""),fsep="")),stderr())
   }
   
   # Return object.
@@ -172,36 +175,40 @@ constructNullPvals <- function(nullValues){
 # Perform MH testing: BH or BY
 multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction){
   # Collapse all pvalues
-  x <- c()
+  x.null <- c()
+  x.alt <- c()
   for(ind in 1:numNullComp){
-    x <- rbind(x,data.frame(group='null',index=ind,pVals=nullGRs[[ind]]$pVals))
+    x.null <- rbind(x.null,data.frame(index=ind,pVals=nullGRs[[ind]]$pVals))
   }
   for(ind in 1:numAltComp){
-    x <- rbind(x,data.frame(group='alt',index=ind,pVals=altGRs[[ind]]$pVals))
+    x.alt <- rbind(x.alt,data.frame(index=ind,pVals=altGRs[[ind]]$pVals))
   }
   
   # Adjust p-values
   if(correction=='BH'){
     # Adjust p-values based on BH
-    x$qVals <- p.adjust(x$pVals, method = 'BH')
+    x.null$qVals <- p.adjust(x.null$pVals, method = 'BH')
+    x.alt$qVals <- p.adjust(x.alt$pVals, method = 'BH')
   } else if(correction=='BY'){
     # Adjust p-values based on BH
-    x$qVals <- p.adjust(x$pVals, method = 'BY')
+    x.null$qVals <- p.adjust(x.null$pVals, method = 'BY')
+    x.alt$qVals <- p.adjust(x.alt$pVals, method = 'BY')
   } else {
     # Correction type not valid
-    print("Multiple hypothesis correction not valid.")
+    write(paste("[",date(),"]: Correction type not valid"), stderr())
     exit(1)   
   }
   
   # Correct q-values smaller than machine precision.
-  x$qVals[x$qVals<.Machine$double.eps] <- .Machine$double.eps
+  x.null$qVals[x.null$qVals<.Machine$double.eps] <- .Machine$double.eps
+  x.alt$qVals[x.alt$qVals<.Machine$double.eps] <- .Machine$double.eps
   
   # Add q-values with original GR objects
   for(ind in 1:numNullComp){
-    nullGRs[[ind]]$qVals <- x[(x$group=='null') & (x$index==ind),]$qVals
+    nullGRs[[ind]]$qVals <- x.null[x.null$index==ind,]$qVals
   }
   for(ind in 1:numAltComp){
-    altGRs[[ind]]$qVals <- x[(x$group=='alt') & (x$index==ind),]$qVals
+    altGRs[[ind]]$qVals <- x.alt[x.alt$index==ind,]$qVals
   }
 
   # Return
@@ -268,9 +275,9 @@ logitMixturePvals <- function(values){
 
 # Function to perform DMR detection when replicate reference data 
 # is available. 
-runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.05, 
-                            maxSQS = 250, chrsOfInterest=paste("chr",1:22,sep=""), 
-                            bandwidthVal=50000,correction='BH',outflag=FALSE) {
+runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),
+			    bandwidthVal=50000,pThresh=10^(-5),correction='BH',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),
+			    -10*log10(pThresh),-10*log10(qThresh)),outflag=FALSE) {
 
   # Check folders for trailing slash, add if missing
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -323,6 +330,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
   # Estimate q-values if required: BH or BY
   if(!is.na(correction)){
     write(paste("[",date(),"]: Computing q-values based on",correction), stderr())
+    # MH is done independently: one procedure for NULL, and a second one for ALT
     out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
     nullGRs <- out[[1]]
     altGRs <- out[[2]]
@@ -331,6 +339,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
   # Write SQS files and DMRs.
   nullGRthresh <- list()
   altGRthresh  <- list()
+  # Null comparisons
   for (ind in 1:numNullComp){
     # Find SQS.
     nullGRs[[ind]]$sJSD <- nullGRs[[ind]]$score
@@ -350,13 +359,10 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
 
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stderr())
-    if(is.na(correction)){
-      nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
-    } else {
-      fdrToSqs <- -10*log10(FDR)
-      nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],threshVal=fdrToSqs,outFolder,bandwidthVal=bandwidthVal)
-    }
+    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],threshVal=sqsThreshold,outFolder,bandwidthVal=bandwidthVal)
   }
+  
+  # Alternative comparisons
   for (ind in 1:numAltComp){
     # Find SQS.
     altGRs[[ind]]$sJSD <- altGRs[[ind]]$score
@@ -376,12 +382,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
     
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stderr())
-    if(is.na(correction)){
-      altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
-    } else {
-      fdrToSqs <- -10*log10(FDR)
-      altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],threshVal=fdrToSqs,outFolder,bandwidthVal=bandwidthVal)
-    }
+    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],threshVal=sqsThreshold,outFolder,bandwidthVal=bandwidthVal)
   }
   
   # Return DMRs in alternative comparison.
@@ -390,11 +391,9 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
 
 # Function to perform DMR detection when no replicate reference data 
 # is available. 
-runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
-                              chrsOfInterest=paste("chr",1:22,sep=""),
-                              bandwidthVal=50000, correction='BH', 
-			      FDR=0.05, outflag=FALSE) {
-  
+runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,
+			      pThresh=10^(-5),correction='BH',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),-10*log10(pThresh),
+			      -10*log10(qThresh)),outflag=FALSE) {
   
   # Check folders for trailing slash, add if missing.
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -444,8 +443,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
   
   # Do thresholding.
   write(paste("[",date(),"]: Morphological closing"), stderr())
-  fdrToSqs <- -10*log10(FDR)
-  GRthresh <- doThreshMorph(GR,file,outFolder,threshVal=fdrToSqs,bandwidthVal=bandwidthVal)
+  GRthresh <- doThreshMorph(GR,file,outFolder,threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   
   # Return GR.
   GRthresh
