@@ -221,6 +221,7 @@ logitMixturePvals <- function(values){
   values[minVals] <- NA
   
   # Do mixture modeling in logit space.
+  write(paste("[",date(),"]: Running EM algorithm"), stderr())
   maxiters <- 1000
   df <- data.frame(sJSDlogit=log((values)/(1-values)))
   mixmdl <- normalmixEM(df$sJSDlogit[!is.na(df$sJSDlogit)],mu=c(-2.0,0.0),sigma=c(0.5,0.5),maxit = maxiters)
@@ -255,6 +256,7 @@ logitMixturePvals <- function(values){
   }
   
   # Compute p-values.
+  write(paste("[",date(),"]: Computing p-values"), stderr())
   pVals <- 1 - plogitnorm(values,mu=muNull,sigma=sigmaNull)
   pVals[maxVals] <- min(pVals,na.rm=TRUE) # 1 value maps to smallest pval.
   pVals[minVals] <- 1                     # 0 value maps to 1 pval.
@@ -408,7 +410,6 @@ runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
   GR$sJSD <- GR$score
   
   # Find p-values.
-  write(paste("[",date(),"]: Computing p-values"), stderr())
   GR$PvalsMix <- logitMixturePvals(GR$sJSD)
   
   # Adjust p-values
