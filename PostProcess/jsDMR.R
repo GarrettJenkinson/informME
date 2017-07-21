@@ -416,12 +416,12 @@ runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
   if(correction=='BH'){
     write(paste("[",date(),"]: Computing q-values based on BH"), stderr())
     # Adjust p-values based on BH
-    x$qVals <- p.adjust(x$pVals, method = 'BH')
+    GR$qVals <- p.adjust(GR$PvalsMix, method = 'BH')
     GR$score <- -10*log10(GR$qVals)
   } else if(correction=='BY'){
     write(paste("[",date(),"]: Computing q-values based on BY"), stderr())
     # Adjust p-values based on BH
-    x$qVals <- p.adjust(x$pVals, method = 'BY')
+    GR$qVals <- p.adjust(GR$PvalsMix, method = 'BY')
     GR$score <- -10*log10(GR$qVals)
   } else if(is.na(correction)) {
     # Compute SQS score
