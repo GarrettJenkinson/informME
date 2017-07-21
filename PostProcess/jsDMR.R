@@ -28,7 +28,7 @@
 
 # Define smoothing function.
 doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,outflag=FALSE) {
-  library(rtracklayer)
+  suppressMessages(library(rtracklayer))
   
   # Check folders for trailing slash, add if missing.
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -93,7 +93,7 @@ binnedSumms <- function(bins, numvar, mcolname)
 doThreshMorph <- function(gr,file,outFolder,threshVal=50,
                           bandwidthVal=50000,GUsize=150.0,
                           requiredPercentBand=0.5){
-  library(rtracklayer)
+  suppressMessages(library(rtracklayer))
   
   # Check folders for trailing slash, add if missing.
   if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
@@ -211,8 +211,8 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
 # Function to compute p-values from mixture of normals in logit space.
 # Used when replicate refernce data is not available.
 logitMixturePvals <- function(values){
-  library(logitnorm)
-  library(mixtools)
+  suppressMessages(library(logitnorm))
+  suppressMessages(library(mixtools))
   
   # Save 0,1 boundary values for the end.
   maxVals <- values>=1
@@ -269,7 +269,7 @@ logitMixturePvals <- function(values){
 runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.05, 
                             maxSQS = 250, chrsOfInterest=paste("chr",1:22,sep=""), 
                             bandwidthVal=50000,correction='BH',outflag=FALSE) {
-  
+
   # Check folders for trailing slash, add if missing
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
     inFolder <- paste(inFolder,.Platform$file.sep,sep="")
@@ -289,9 +289,11 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
   
   # Do smoothing.
   for(ind in 1:numNullComp){
+    write(paste("[",date(),"]: Smoothing JSD reference sample",ind,"out of",numNullComp), stderr())
     nullGRs[[ind]] <- doSmoothing(refVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
   }
   for(ind in 1:numAltComp){
+    write(paste("[",date(),"]: Smoothing JSD test sample",ind,"out of",numAltComp), stderr())
     altGRs[[ind]] <- doSmoothing(testVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
   }
   
@@ -304,11 +306,13 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
   
   # Find p-values.
   for(ind in 1:numNullComp){
+    write(paste("[",date(),"]: Computing p-values reference sample",ind,"out of",numNullComp), stderr())
     nullGRs[[ind]]$pVals <- pValFn(nullGRs[[ind]]$score)
     # Correct p-values smaller than machine precision.
     nullGRs[[ind]]$pVals[nullGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   for(ind in 1:numAltComp){
+    write(paste("[",date(),"]: Computing p-values test sample",ind,"out of",numAltComp), stderr())
     altGRs[[ind]]$pVals <- pValFn(altGRs[[ind]]$score)
     # Correct p-values smaller than machine precision.
     altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
@@ -316,6 +320,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
   
   # Estimate q-values if required: BH or BY
   if(!is.na(correction)){
+    write(paste("[",date(),"]: Computing q-values based on",correction), stderr())
     out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
     nullGRs <- out[[1]]
     altGRs <- out[[2]]
@@ -342,6 +347,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
     }
 
     # Morphological closing
+    write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stderr())
     if(is.na(correction)){
       nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
     } else {
@@ -367,6 +373,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,FDR=0.
     }
     
     # Morphological closing
+    write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stderr())
     if(is.na(correction)){
       altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
     } else {
