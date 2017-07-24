@@ -50,9 +50,7 @@ described in [1]. It should be run within an R session.
             qThresh argument (default is 0.05).
           -'BY': Benjamini & Yekutieli. Q-value threshold set with
             qThresh argument (default is 0.05).
-          - NA : no correction applied. P-value threshold set with 
-            pThresh argument (default is 10^(-5)).
-    E.g. BY applied with FDR control under 0.025.
+   E.g. BY applied with FDR control under 0.025.
        runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
 		       correction='BY',qThresh=0.025)
        
@@ -104,8 +102,6 @@ described in [1]. It should be run within an R session.
             qThresh argument (default is 0.05).
           -'BY': Benjamini & Yekutieli. Q-value threshold set with
             qThresh argument (default is 0.05).
-          - NA : no correction applied. P-value threshold set with 
-            pThresh argument (default is 10^(-5)).
    E.g. BH applied with FDR control under 0.025.
       runNoReplicateDMR(JSDfile,inFolder,outFolder,correction='BH',
 			qThresh=0.025)
