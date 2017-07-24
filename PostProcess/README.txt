@@ -44,7 +44,18 @@ described in [1]. It should be run within an R session.
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
    runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder)
-   
+   Optional argument:
+      * correction: type of multiple hypothesis correction:
+          -'BH': Benjamini & Hochberg. Q-value threshold set with
+            qThresh argument (default is 0.05).
+          -'BY': Benjamini & Yekutieli. Q-value threshold set with
+            qThresh argument (default is 0.05).
+          - NA : no correction applied. P-value threshold set with 
+            pThresh argument (default is 10^(-5)).
+    E.g. BY applied with FDR control under 0.025.
+       runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
+		       correction='BY',qThresh=0.025)
+       
    # refVrefFiles is a vector of BED file names that contain  
    # the JSD values of all pairwise reference comparisons. 
    # For example: if 
@@ -87,7 +98,18 @@ described in [1]. It should be run within an R session.
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
    runNoReplicateDMR(JSDfile,inFolder,outFolder)
-   
+   Optional argument:
+      * correction: type of multiple hypothesis correction:
+          -'BH': Benjamini & Hochberg. Q-value threshold set with
+            qThresh argument (default is 0.05).
+          -'BY': Benjamini & Yekutieli. Q-value threshold set with
+            qThresh argument (default is 0.05).
+          - NA : no correction applied. P-value threshold set with 
+            pThresh argument (default is 10^(-5)).
+   E.g. BH applied with FDR control under 0.025.
+      runNoReplicateDMR(JSDfile,inFolder,outFolder,correction='BH',
+			qThresh=0.025)
+
    # JSDfile is the name of a BED file that contains 
    # the JSD values of a test/reference comparison. 
    # For example: if 
