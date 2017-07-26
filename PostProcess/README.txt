@@ -45,10 +45,11 @@ described in [1]. It should be run within an R session.
    source("jsDMR.R") 
    runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder)
    Optional argument:
-      * correction: type of multiple hypothesis correction:
-          -'BH': Benjamini & Hochberg. Q-value threshold set with
-            qThresh argument (default is 0.05).
+      * correction: type of multiple hypothesis correction. Default
+	choice is 'BY'.
           -'BY': Benjamini & Yekutieli. Q-value threshold set with
+            qThresh argument (default is 0.05).
+          -'BH': Benjamini & Hochberg. Q-value threshold set with
             qThresh argument (default is 0.05).
    E.g. BY applied with FDR control under 0.025.
        runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
@@ -97,10 +98,11 @@ described in [1]. It should be run within an R session.
    source("jsDMR.R") 
    runNoReplicateDMR(JSDfile,inFolder,outFolder)
    Optional argument:
-      * correction: type of multiple hypothesis correction:
-          -'BH': Benjamini & Hochberg. Q-value threshold set with
-            qThresh argument (default is 0.05).
+      * correction: type of multiple hypothesis correction. Default
+	choice is 'BY'.
           -'BY': Benjamini & Yekutieli. Q-value threshold set with
+            qThresh argument (default is 0.05).
+          -'BH': Benjamini & Hochberg. Q-value threshold set with
             qThresh argument (default is 0.05).
    E.g. BH applied with FDR control under 0.025.
       runNoReplicateDMR(JSDfile,inFolder,outFolder,correction='BH',
