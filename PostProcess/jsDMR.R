@@ -276,7 +276,7 @@ logitMixturePvals <- function(values){
 # Function to perform DMR detection when replicate reference data 
 # is available. 
 runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),
-			    bandwidthVal=50000,pThresh=10^(-5),correction='BH',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),
+			    bandwidthVal=50000,pThresh=10^(-5),correction='BY',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),
 			    -10*log10(pThresh),-10*log10(qThresh)),outflag=FALSE) {
 
   # Check folders for trailing slash, add if missing
@@ -394,7 +394,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 # Function to perform DMR detection when no replicate reference data 
 # is available. 
 runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,
-			      pThresh=10^(-5),correction='BH',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),-10*log10(pThresh),
+			      pThresh=10^(-5),correction='BY',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),-10*log10(pThresh),
 			      -10*log10(qThresh)),outflag=FALSE) {
   
   # Check folders for trailing slash, add if missing.
