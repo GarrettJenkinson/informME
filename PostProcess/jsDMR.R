@@ -27,7 +27,8 @@
 # mixtools
 
 # Define smoothing function.
-doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,outflag=FALSE) {
+doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),
+			bandwidthVal=50000,outflag=FALSE) {
   suppressMessages(library(rtracklayer))
   
   # Check folders for trailing slash, add if missing.
@@ -90,15 +91,16 @@ binnedSumms <- function(bins, numvar, mcolname)
 
 # Define thresholding and morphological closing function.
 # This function operates on gr$score. 
-doThreshMorph <- function(gr,file,outFolder,threshVal=50,
-                          bandwidthVal=50000,GUsize=150.0,
-                          requiredPercentBand=0.5){
+doThreshMorph <- function(gr,file,outFolder,correction,qThresh,threshVal=50,bandwidthVal=50000,
+			  GUsize=150.0,requiredPercentBand=0.5){
   suppressMessages(library(rtracklayer))
   
   # Check folders for trailing slash, add if missing.
   if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
     outFolder <- paste(outFolder,.Platform$file.sep,sep="")
   }
+  basename <- paste("DMR-",correction,"-",qThresh,"-",file,sep="")
+  file.full.path <- file.path(outFolder,basename,fsep = "")
   
   # Remove non-available (na) and infinite values.
   gr <- gr[!is.na(gr$score)]
@@ -145,17 +147,15 @@ doThreshMorph <- function(gr,file,outFolder,threshVal=50,
     
     if (length(grThresh[!is.na(grThresh$score)])>0){
       # Write output to file.
-      myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("DMR-",file,sep=""), 
-		         visibility="full",autoScale=TRUE)
-      export.bedGraph(grThresh[!is.na(grThresh$score)],file.path(outFolder,paste("DMR-",file,sep=""),fsep = ""),
-		      trackLine=myTrackLine)
+      myTrackLine <- new("GraphTrackLine",type="bedGraph",name=basename,visibility="full",autoScale=TRUE)
+      export.bedGraph(grThresh[!is.na(grThresh$score)],file.full.path,trackLine=myTrackLine)
     } else {
       write(paste("[",date(),"]: No DMRs - no output file is generated for:"), stderr())
-      write(paste("[",date(),"]: ",file.path(outFolder,paste("DMR-",file,sep=""),fsep="")),stderr())
+      write(paste("[",date(),"]: ",basename),stderr())
     }
   } else {
     write(paste("[",date(),"]: No DMRs - no output file is generated for:"), stderr())
-    write(paste("[",date(),"]: ",file.path(outFolder,paste("DMR-",file,sep=""),fsep="")),stderr())
+    write(paste("[",date(),"]: ",basename),stderr())
   }
   
   # Return object.
@@ -359,7 +359,8 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stderr())
-    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],threshVal=sqsThreshold,outFolder,bandwidthVal=bandwidthVal)
+    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,qThresh,
+					 threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   }
   
   # Alternative comparisons
@@ -382,7 +383,8 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stderr())
-    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],threshVal=sqsThreshold,outFolder,bandwidthVal=bandwidthVal)
+    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,qThresh,
+					threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   }
   
   # Return DMRs in alternative comparison.
@@ -442,7 +444,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   
   # Do thresholding.
   write(paste("[",date(),"]: Morphological closing"), stderr())
-  GRthresh <- doThreshMorph(GR,file,outFolder,threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
+  GRthresh <- doThreshMorph(GR,file,outFolder,correction,qThresh,threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   
   # Return GR.
   GRthresh
