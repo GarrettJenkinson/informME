@@ -91,10 +91,12 @@ binnedSumms <- function(bins, numvar, mcolname)
 
 # Define thresholding and morphological closing function.
 # This function operates on gr$score. 
-doThreshMorph <- function(gr,file,outFolder,correction,qThresh,threshVal=50,bandwidthVal=50000,
-			  GUsize=150.0,requiredPercentBand=0.5){
+doThreshMorph <- function(gr,file,outFolder,correction,qThresh,bandwidthVal=50000,
+	            		  GUsize=150.0,requiredPercentBand=0.5){
   suppressMessages(library(rtracklayer))
   
+  sqsThreshVal <- -10*log10(qThresh)
+
   # Check folders for trailing slash, add if missing.
   if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
     outFolder <- paste(outFolder,.Platform$file.sep,sep="")
@@ -104,10 +106,10 @@ doThreshMorph <- function(gr,file,outFolder,correction,qThresh,threshVal=50,band
   
   # Remove non-available (na) and infinite values.
   gr <- gr[!is.na(gr$score)]
-  gr$score[is.infinite(gr$score)] <- 5*threshVal
+  gr$score[is.infinite(gr$score)] <- 5*sqsThreshVal
   
-  # Remove ranges below threshVal.
-  grThresh <- gr[gr$score>threshVal]
+  # Remove ranges below sqsThreshVal.
+  grThresh <- gr[gr$score>sqsThreshVal]
   
   if (length(grThresh[!is.na(grThresh$score)])>0){
     #
@@ -185,20 +187,9 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
   }
   
   # Adjust p-values
-  if(correction=='BH'){
-    # Adjust p-values based on Benjamini & Hochberg
-    x.null$qVals <- p.adjust(x.null$pVals, method = 'BH')
-    x.alt$qVals <- p.adjust(x.alt$pVals, method = 'BH')
-  } else if(correction=='BY')
-    # Adjust p-values based on Benjamini & Yekutieli
-    x.null$qVals <- p.adjust(x.null$pVals, method = 'BY')
-    x.alt$qVals <- p.adjust(x.alt$pVals, method = 'BY')
-  } else {
-    # Correction type not valid
-    write(paste("[",date(),"]: Correction type not valid"), stderr())
-    exit(1)   
-  }
-  
+  x.null$qVals <- p.adjust(x.null$pVals, method = correction)
+  x.alt$qVals <- p.adjust(x.alt$pVals, method = correction)
+
   # Correct q-values smaller than machine precision.
   x.null$qVals[x.null$qVals<.Machine$double.eps] <- .Machine$double.eps
   x.alt$qVals[x.alt$qVals<.Machine$double.eps] <- .Machine$double.eps
@@ -276,8 +267,14 @@ logitMixturePvals <- function(values){
 # Function to perform DMR detection when replicate reference data 
 # is available. 
 runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),
-			    bandwidthVal=50000,pThresh=10^(-5),correction='BY',qThresh=0.01,sqsThreshold=ifelse(is.na(correction),
-			    -10*log10(pThresh),-10*log10(qThresh)),outflag=FALSE) {
+			                bandwidthVal=50000,correction='BY',qThresh=0.01,outflag=FALSE) {
+
+  # Check correction method
+  if(!(correction %in% c("BY","BH"))){
+    write(paste("[",date(),"]: Unrecommended correction method. Expert statistician use only."), stderr())
+    write(paste("[",date(),"]: Must modify code to remove this error to proceed."), stderr())
+    exit(1)
+  }
 
   # Check folders for trailing slash, add if missing
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -327,14 +324,12 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   
-  # Estimate q-values if required: Benjamini & Yekutieli or Benjamini & Hochberg
-  if(!is.na(correction)){
-    write(paste("[",date(),"]: Computing q-values based on",correction), stdout())
-    # MH is done independently: one procedure for NULL, and a second one for ALT
-    out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
-    nullGRs <- out[[1]]
-    altGRs <- out[[2]]
-  }
+  # Estimate q-values using Benjamini & Yekutieli or Benjamini & Hochberg
+  write(paste("[",date(),"]: Computing q-values based on",correction), stdout())
+  # MH is done independently: one procedure for NULL, and a second one for ALT
+  out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
+  nullGRs <- out[[1]]
+  altGRs <- out[[2]]
 
   # Write SQS files and DMRs.
   nullGRthresh <- list()
@@ -343,11 +338,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   for (ind in 1:numNullComp){
     # Find SQS.
     nullGRs[[ind]]$sJSD <- nullGRs[[ind]]$score
-    if(is.na(correction)){
-      nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$pVals)
-    } else {
-      nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$qVals)
-    }
+    nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$qVals)
     nullGRs[[ind]]$score[nullGRs[[ind]]$score>maxSQS] <- maxSQS
 
     # Generate SQS track    
@@ -360,18 +351,14 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stdout())
     nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,qThresh,
-					 threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
+					                     bandwidthVal=bandwidthVal)
   }
   
   # Alternative comparisons
   for (ind in 1:numAltComp){
     # Find SQS.
     altGRs[[ind]]$sJSD <- altGRs[[ind]]$score
-    if(is.na(correction)){
-      altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$pVals)
-    } else {
-      altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$qVals)
-    }
+    altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$qVals)
     altGRs[[ind]]$score[altGRs[[ind]]$score>maxSQS] <- maxSQS
 
     # Generate SQS track    
@@ -384,7 +371,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stdout())
     altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,qThresh,
-					threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
+					                    bandwidthVal=bandwidthVal)
   }
   
   # Return DMRs in alternative comparison.
@@ -394,9 +381,15 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 # Function to perform DMR detection when no replicate reference data 
 # is available. 
 runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,
-			      pThresh=10^(-5),correction='BY',qThresh=0.01,sqsThreshold=ifelse(is.na(correction),-10*log10(pThresh),
-			      -10*log10(qThresh)),outflag=FALSE) {
-  
+			                  correction='BY',qThresh=0.01,outflag=FALSE) {
+ 
+  # Check correction method
+  if(!(correction %in% c("BY","BH"))){
+    write(paste("[",date(),"]: Unrecommended correction method. Expert statistician use only."), stderr())
+    write(paste("[",date(),"]: Must modify code to remove this error to proceed."), stderr())
+    exit(1)
+  }
+ 
   # Check folders for trailing slash, add if missing.
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
     inFolder <- paste(inFolder,.Platform$file.sep,sep="")
@@ -414,23 +407,10 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   GR$PvalsMix <- logitMixturePvals(GR$sJSD)
   
   # Adjust p-values
-  if(!is.na(correction)){
-    if(correction=='BH'){
-      write(paste("[",date(),"]: Computing q-values based on Benjamini and Hochberg"), stdout())
-      # Adjust p-values based on Benjamini & Hochberg
-      GR$qVals <- p.adjust(GR$PvalsMix, method = 'BH')
-      GR$score <- -10*log10(GR$qVals)
-    } else if(correction=='BY'){
-      write(paste("[",date(),"]: Computing q-values based on Benjamini and Yekutieli"), stdout())
-      # Adjust p-values based on Benjamini & Yekutieli
-      GR$qVals <- p.adjust(GR$PvalsMix, method = 'BY')
-      GR$score <- -10*log10(GR$qVals)
-    } else {
-      # Correction type not valid
-      print("Multiple hypothesis correction not valid.")
-      exit(1)   
-    }
-  }
+  write(paste("[",date(),"]: Computing q-values based on ",correction," method."), stdout())
+  # Adjust p-values based on Benjamini & Hochberg
+  GR$qVals <- p.adjust(GR$PvalsMix, method = correction)
+  GR$score <- -10*log10(GR$qVals)
 
   # Saturate SQS
   GR$score[GR$score>maxSQS] <- maxSQS
@@ -444,7 +424,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   
   # Do thresholding.
   write(paste("[",date(),"]: Morphological closing"), stdout())
-  GRthresh <- doThreshMorph(GR,file,outFolder,correction,qThresh,threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
+  GRthresh <- doThreshMorph(GR,file,outFolder,correction,qThresh,bandwidthVal=bandwidthVal)
   
   # Return GR.
   GRthresh
