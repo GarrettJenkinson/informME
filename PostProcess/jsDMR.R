@@ -18,7 +18,7 @@
 # or see <http://www.gnu.org/licenses/>.
 #
 # *************************************************************************
-# Last Modified: 02/10/2017
+# Last Modified: 07/27/2017
 # *************************************************************************
 #
 # REQUIRED PACKAGES:
@@ -172,7 +172,7 @@ constructNullPvals <- function(nullValues){
   function(x) 1-Fn(x)
 }
 
-# Perform MH testing: BH or BY
+# Perform MH testing: Benjamini & Yekutieli (default) or Benjamini & Hochberg
 multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction){
   # Collapse all pvalues
   x.null <- c()
@@ -186,11 +186,11 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
   
   # Adjust p-values
   if(correction=='BH'){
-    # Adjust p-values based on BH
+    # Adjust p-values based on Benjamini & Hochberg
     x.null$qVals <- p.adjust(x.null$pVals, method = 'BH')
     x.alt$qVals <- p.adjust(x.alt$pVals, method = 'BH')
-  } else if(correction=='BY'){
-    # Adjust p-values based on BH
+  } else if(correction=='BY')
+    # Adjust p-values based on Benjamini & Yekutieli
     x.null$qVals <- p.adjust(x.null$pVals, method = 'BY')
     x.alt$qVals <- p.adjust(x.alt$pVals, method = 'BY')
   } else {
@@ -276,7 +276,7 @@ logitMixturePvals <- function(values){
 # Function to perform DMR detection when replicate reference data 
 # is available. 
 runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),
-			    bandwidthVal=50000,pThresh=10^(-5),correction='BY',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),
+			    bandwidthVal=50000,pThresh=10^(-5),correction='BY',qThresh=0.01,sqsThreshold=ifelse(is.na(correction),
 			    -10*log10(pThresh),-10*log10(qThresh)),outflag=FALSE) {
 
   # Check folders for trailing slash, add if missing
@@ -327,7 +327,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   
-  # Estimate q-values if required: BH or BY
+  # Estimate q-values if required: Benjamini & Yekutieli or Benjamini & Hochberg
   if(!is.na(correction)){
     write(paste("[",date(),"]: Computing q-values based on",correction), stderr())
     # MH is done independently: one procedure for NULL, and a second one for ALT
@@ -394,7 +394,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 # Function to perform DMR detection when no replicate reference data 
 # is available. 
 runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,
-			      pThresh=10^(-5),correction='BY',qThresh=0.05,sqsThreshold=ifelse(is.na(correction),-10*log10(pThresh),
+			      pThresh=10^(-5),correction='BY',qThresh=0.01,sqsThreshold=ifelse(is.na(correction),-10*log10(pThresh),
 			      -10*log10(qThresh)),outflag=FALSE) {
   
   # Check folders for trailing slash, add if missing.
@@ -416,13 +416,13 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   # Adjust p-values
   if(!is.na(correction)){
     if(correction=='BH'){
-      write(paste("[",date(),"]: Computing q-values based on BH"), stderr())
-      # Adjust p-values based on BH
+      write(paste("[",date(),"]: Computing q-values based on Benjamini and Hochberg"), stderr())
+      # Adjust p-values based on Benjamini & Hochberg
       GR$qVals <- p.adjust(GR$PvalsMix, method = 'BH')
       GR$score <- -10*log10(GR$qVals)
     } else if(correction=='BY'){
-      write(paste("[",date(),"]: Computing q-values based on BY"), stderr())
-      # Adjust p-values based on BH
+      write(paste("[",date(),"]: Computing q-values based on Benjamini and Yekutieli"), stderr())
+      # Adjust p-values based on Benjamini & Yekutieli
       GR$qVals <- p.adjust(GR$PvalsMix, method = 'BY')
       GR$score <- -10*log10(GR$qVals)
     } else {
