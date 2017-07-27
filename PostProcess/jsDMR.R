@@ -228,7 +228,7 @@ logitMixturePvals <- function(values){
   values[minVals] <- NA
   
   # Do mixture modeling in logit space.
-  write(paste("[",date(),"]: Running EM algorithm"), stderr())
+  write(paste("[",date(),"]: Running EM algorithm"), stdout())
   maxiters <- 1000
   df <- data.frame(sJSDlogit=log((values)/(1-values)))
   mixmdl <- normalmixEM(df$sJSDlogit[!is.na(df$sJSDlogit)],mu=c(-2.0,0.0),sigma=c(0.5,0.5),maxit = maxiters)
@@ -263,7 +263,7 @@ logitMixturePvals <- function(values){
   }
   
   # Compute p-values.
-  write(paste("[",date(),"]: Computing p-values"), stderr())
+  write(paste("[",date(),"]: Computing p-values"), stdout())
   pVals <- 1 - plogitnorm(values,mu=muNull,sigma=sigmaNull)
   pVals[maxVals] <- min(pVals,na.rm=TRUE) # 1 value maps to smallest pval.
   pVals[minVals] <- 1                     # 0 value maps to 1 pval.
@@ -298,11 +298,11 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   
   # Do smoothing.
   for(ind in 1:numNullComp){
-    write(paste("[",date(),"]: Smoothing JSD reference sample",ind,"out of",numNullComp), stderr())
+    write(paste("[",date(),"]: Smoothing JSD reference sample",ind,"out of",numNullComp), stdout())
     nullGRs[[ind]] <- doSmoothing(refVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
   }
   for(ind in 1:numAltComp){
-    write(paste("[",date(),"]: Smoothing JSD test sample",ind,"out of",numAltComp), stderr())
+    write(paste("[",date(),"]: Smoothing JSD test sample",ind,"out of",numAltComp), stdout())
     altGRs[[ind]] <- doSmoothing(testVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
   }
   
@@ -315,13 +315,13 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   
   # Find p-values.
   for(ind in 1:numNullComp){
-    write(paste("[",date(),"]: Computing p-values reference sample",ind,"out of",numNullComp), stderr())
+    write(paste("[",date(),"]: Computing p-values reference sample",ind,"out of",numNullComp), stdout())
     nullGRs[[ind]]$pVals <- pValFn(nullGRs[[ind]]$score)
     # Correct p-values smaller than machine precision.
     nullGRs[[ind]]$pVals[nullGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   for(ind in 1:numAltComp){
-    write(paste("[",date(),"]: Computing p-values test sample",ind,"out of",numAltComp), stderr())
+    write(paste("[",date(),"]: Computing p-values test sample",ind,"out of",numAltComp), stdout())
     altGRs[[ind]]$pVals <- pValFn(altGRs[[ind]]$score)
     # Correct p-values smaller than machine precision.
     altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
@@ -329,7 +329,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   
   # Estimate q-values if required: Benjamini & Yekutieli or Benjamini & Hochberg
   if(!is.na(correction)){
-    write(paste("[",date(),"]: Computing q-values based on",correction), stderr())
+    write(paste("[",date(),"]: Computing q-values based on",correction), stdout())
     # MH is done independently: one procedure for NULL, and a second one for ALT
     out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
     nullGRs <- out[[1]]
@@ -358,7 +358,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     }
 
     # Morphological closing
-    write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stderr())
+    write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stdout())
     nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,qThresh,
 					 threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   }
@@ -382,7 +382,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     }
     
     # Morphological closing
-    write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stderr())
+    write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stdout())
     altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,qThresh,
 					threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   }
@@ -406,7 +406,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   }
   
   # Smooth track.
-  write(paste("[",date(),"]: Smoothing JSD values"), stderr())
+  write(paste("[",date(),"]: Smoothing JSD values"), stdout())
   GR <- doSmoothing(file,inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
   GR$sJSD <- GR$score
   
@@ -416,12 +416,12 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   # Adjust p-values
   if(!is.na(correction)){
     if(correction=='BH'){
-      write(paste("[",date(),"]: Computing q-values based on Benjamini and Hochberg"), stderr())
+      write(paste("[",date(),"]: Computing q-values based on Benjamini and Hochberg"), stdout())
       # Adjust p-values based on Benjamini & Hochberg
       GR$qVals <- p.adjust(GR$PvalsMix, method = 'BH')
       GR$score <- -10*log10(GR$qVals)
     } else if(correction=='BY'){
-      write(paste("[",date(),"]: Computing q-values based on Benjamini and Yekutieli"), stderr())
+      write(paste("[",date(),"]: Computing q-values based on Benjamini and Yekutieli"), stdout())
       # Adjust p-values based on Benjamini & Yekutieli
       GR$qVals <- p.adjust(GR$PvalsMix, method = 'BY')
       GR$score <- -10*log10(GR$qVals)
@@ -443,7 +443,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   }
   
   # Do thresholding.
-  write(paste("[",date(),"]: Morphological closing"), stderr())
+  write(paste("[",date(),"]: Morphological closing"), stdout())
   GRthresh <- doThreshMorph(GR,file,outFolder,correction,qThresh,threshVal=sqsThreshold,bandwidthVal=bandwidthVal)
   
   # Return GR.
