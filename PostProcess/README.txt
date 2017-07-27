@@ -39,12 +39,11 @@ This is an R script that performs DMR detection using
 the Jensen-Shannon distance (JSD) based on the method 
 described in [1]. It should be run within an R session.
 
-  usage (replicate reference data is available): 
+  default usage (replicate reference data is available): 
  
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
-   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
-                   correction,qThresh)
+   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder)
      
    # refVrefFiles is a vector of BED file names that contain  
    # the JSD values of all pairwise reference comparisons. 
@@ -83,25 +82,16 @@ described in [1]. It should be run within an R session.
    # inFolder <- "/path/to/in-folder/"
    # outFolder <- "/path/to/out-folder/"
    #
-   # correction is an optional argument that specifies the 
-   # type of multiple hypothesis correction used:
-   #
-   # BY: Benjamini & Yekutieli (default).
-   # BH: Benjamini & Hochberg
-   # 
-   # qThresh is an optional argument that specifies the 
-   # q-value threshold used (default is 0.01). 
-   #
    # Examples: 
    #
-   # Default usage: BY applied with FDR control under 0.01.
+   # Default usage: Benjamini & Yekutieli applied with FDR control under 0.01.
    #   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder)
    # 
-   # Another usage: BH applied with FDR control under 0.05.
+   # Another usage: Benjamini & Hochberg applied with FDR control under 0.05.
    #   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
-		       correction='BH',qThresh=0.05)
+   #                   correction='BH',qThresh=0.05)
 
-  usage (no replicate reference data is available) 
+  default usage (no replicate reference data is available) 
    
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
@@ -124,23 +114,14 @@ described in [1]. It should be run within an R session.
    # inFolder <- "/path/to/in-folder/"
    # outFolder <- "/path/to/out-folder/"
    #
-   # correction is an optional argument that specifies the 
-   # type of multiple hypothesis correction used:
-   #
-   # BY: Benjamini & Yekutieli (default).
-   # BH: Benjamini & Hochberg
-   # 
-   # qThresh is an optional argument that specifies the 
-   # q-value threshold used (default is 0.01). 
-   #
    # Examples: 
    #
-   # Default usage: BY applied with FDR control under 0.01.
+   # Default usage: Benjamini & Yekutieli applied with FDR control under 0.01.
    #   runNoReplicateDMR(JSDfile,inFolder,outFolder)
    # 
-   # Another usage: BH applied with FDR control under 0.05.
+   # Another usage: Benjamini & Hochberg applied with FDR control under 0.05.
    #   runNoReplicateDMR(JSDfile,inFolder,outFolder,
-		       correction='BH',qThresh=0.05)
+   #                     correction='BH',qThresh=0.05)
 
   requirements: 
 
@@ -158,7 +139,7 @@ Bioconductor library TxDb.Hsapiens.UCSC.hg19.knownGene using
 the Jensen-Shannon distance (JSD) based on the method described 
 in [1]. It should be run within an R session.
 
-  usage (replicate reference data is available):
+  default usage (replicate reference data is available):
 
    setwd("path/to/informME/PostProcess/")
    source("jsGrank.R")
@@ -210,7 +191,7 @@ in [1]. It should be run within an R session.
    # tName <- "lungcancer"
    # rName <- "lungnormal"
 
-  usage (no replicate reference data is available):  
+  default usage (no replicate reference data is available):  
 
    setwd("path/to/informME/PostProcess/")
    source("jsGrank.R")
