@@ -95,7 +95,7 @@ described in [1]. It should be run within an R session.
    
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
-   runNoReplicateDMR(JSDfile,inFolder,outFolder,correction,qThresh)
+   runNoReplicateDMR(JSDfile,inFolder,outFolder)
 
    # JSDfile is the name of a BED file that contains 
    # the JSD values of a test/reference comparison. 
@@ -120,8 +120,7 @@ described in [1]. It should be run within an R session.
    #   runNoReplicateDMR(JSDfile,inFolder,outFolder)
    # 
    # Another usage: Benjamini & Hochberg applied with FDR control under 0.05.
-   #   runNoReplicateDMR(JSDfile,inFolder,outFolder,
-   #                     correction='BH',qThresh=0.05)
+   #   runNoReplicateDMR(JSDfile,inFolder,outFolder,correction='BH',qThresh=0.05)
 
   requirements: 
 

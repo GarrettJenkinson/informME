@@ -18,7 +18,7 @@
 # or see <http://www.gnu.org/licenses/>.
 #
 # *************************************************************************
-# Last Modified: 07/27/2017
+# Last Modified: 07/28/2017
 # *************************************************************************
 #
 # REQUIRED PACKAGES:
@@ -26,9 +26,17 @@
 # logitnorm
 # mixtools
 
+#######################################################################################################################################
+# GLOBAL VARIABLES
+#######################################################################################################################################
+PERM_CORR <- c('BH','BY')
+
+#######################################################################################################################################
+# FUNCTIONS
+#######################################################################################################################################
 # Define smoothing function.
-doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),
-			bandwidthVal=50000,outflag=FALSE) {
+doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,outflag=FALSE) {
+  # Dependencies
   suppressMessages(library(rtracklayer))
   
   # Check folders for trailing slash, add if missing.
@@ -50,28 +58,23 @@ doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,
     gr.chr <- GRTRACK[seqnames(GRTRACK) %in% chr]
     gr.chr <- sort(gr.chr)
     gr.chr$scoreOld <- gr.chr$score
-    gr.chr$score <- ksmooth(x=start(gr.chr),
-                            y=gr.chr$score,
-                            kernel="normal",
-                            bandwidth=bandwidthVal,
-                            x.points=start(gr.chr))$y
+    gr.chr$score <- ksmooth(x=start(gr.chr),y=gr.chr$score,kernel="normal",bandwidth=bandwidthVal,x.points=start(gr.chr))$y
     gr <- c(gr,gr.chr)
   }
   gr <- gr[!is.na(gr$score)]
   
-  if (length(gr)>0 && outflag){ # To output, set outflag=TRUE.
-    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("s",file,sep=""), 
-                       visibility="full",autoScale=FALSE,viewLimits=c(0,1.0))
-    export.bedGraph(gr,file.path(outFolder,paste("s",file,sep=""),fsep = ""),
-                    trackLine=myTrackLine)
+  # To output, set outflag=TRUE.
+  if (length(gr)>0 && outflag){ 
+    myTrackLine<-new("GraphTrackLine",type="bedGraph",name=paste("s",file,sep=""),visibility="full",autoScale=FALSE,viewLimits=c(0,1.0))
+    export.bedGraph(gr,file.path(outFolder,paste("s",file,sep=""),fsep = ""),trackLine=myTrackLine)
   }
   
+  # Return
   gr
 } # End smoothing.
 
-# Define function that computes the sum of SQS values (stored in numvar)
-# within each DMR (stored in bins) - adapted from previously available 
-# documentation of the tileGenome function in GenomicRanges. 
+# Define function that computes the sum of SQS values (stored in numvar) within each DMR (stored in bins) - adapted from previously
+# available documentation of the tileGenome function in GenomicRanges. 
 binnedSumms <- function(bins, numvar, mcolname)
 {
   stopifnot(is(bins, "GRanges"))
@@ -80,8 +83,7 @@ binnedSumms <- function(bins, numvar, mcolname)
   bins_per_chrom <- split(ranges(bins), seqnames(bins))
   sums_list <- lapply(names(numvar),
                       function(seqname) {
-                        views <- Views(numvar[[seqname]],
-                                       bins_per_chrom[[seqname]])
+                        views <- Views(numvar[[seqname]],bins_per_chrom[[seqname]])
                         viewSums(views)
                       })
   new_mcol <- unsplit(sums_list, as.factor(seqnames(bins)))
@@ -89,12 +91,12 @@ binnedSumms <- function(bins, numvar, mcolname)
   bins
 }
 
-# Define thresholding and morphological closing function.
-# This function operates on gr$score. 
-doThreshMorph <- function(gr,file,outFolder,correction,qThresh,bandwidthVal=50000,
-	            		  GUsize=150.0,requiredPercentBand=0.5){
+# Define thresholding and morphological closing function. This function operates on gr$score. 
+doThreshMorph <- function(gr,file,outFolder,correction,qThresh,bandwidthVal=50000,GUsize=150.0,requiredPercentBand=0.5){
+  # Dependencies
   suppressMessages(library(rtracklayer))
   
+  # Get equivalent SQS score
   sqsThreshVal <- -10*log10(qThresh)
 
   # Check folders for trailing slash, add if missing.
@@ -112,9 +114,7 @@ doThreshMorph <- function(gr,file,outFolder,correction,qThresh,bandwidthVal=5000
   grThresh <- gr[gr$score>sqsThreshVal]
   
   if (length(grThresh[!is.na(grThresh$score)])>0){
-    #
     # Do morphological closing.
-    #
     strEl <- bandwidthVal
     
     # Increase size of intervals by 0.5*strEl on each side.
@@ -126,24 +126,21 @@ doThreshMorph <- function(gr,file,outFolder,correction,qThresh,bandwidthVal=5000
     
     # Shrink size of intervals by 0.5*strEl on each side.
     grThreshUpSub <- flank(grThresh,round(-0.5*strEl),start=TRUE)
-    grThreshDownSub <- flank(grThresh,round(-0.5*strEl),start=FALSE)
-    
+    grThreshDownSub <- flank(grThresh,round(-0.5*strEl),start=FALSE) 
     grThresh <- setdiff(grThresh,grThreshUpSub)
     grThresh <- setdiff(grThresh,grThreshDownSub)
     
     # Make sure everything is still within bounds.
     grThresh <- trim(grThresh)
     
-    #
     # Sum values inside the grThresh objects.
-    #
     score <- coverage(gr,weight="score")
     cov   <- coverage(gr)
     grThresh <- binnedSumms(grThresh,score,"score")
     grThresh$score <- as.numeric(grThresh$score)/GUsize
     grThresh <- binnedSumms(grThresh,cov,"coverage")
     
-    # remove DMRs that do not have enough data and get rid of coverage column
+    # Remove DMRs that do not have enough data and get rid of coverage column
     grThresh <- grThresh[grThresh$coverage >= (bandwidthVal*requiredPercentBand)]
     grThresh$coverage <- NULL  
     
@@ -206,9 +203,9 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
   list(nullGRs,altGRs) 
 }
 
-# Function to compute p-values from mixture of normals in logit space.
-# Used when replicate refernce data is not available.
+# Function to compute p-values from mixture of normals in logit space. Used when replicate refernce data is not available.
 logitMixturePvals <- function(values){
+  # Dependencies
   suppressMessages(library(logitnorm))
   suppressMessages(library(mixtools))
   
@@ -228,10 +225,8 @@ logitMixturePvals <- function(values){
   sigma <- mixmdl$sigma
   lambda <- mixmdl$lambda
   
-  if (length(mixmdl$all.loglik)>=maxiters){ # Mixture modeling not converged.
-                                            # Be on the safe side and use a 
-                                            # conservative model with large 
-                                            # mean/sigma.
+  if (length(mixmdl$all.loglik)>=maxiters){ 
+    # Mixture modeling not converged. Be on the safe side and use a conservative model with large mean/sigma.
     if (mu[1]>mu[2]){
       muNull <- mu[1]
     }else{
@@ -242,8 +237,8 @@ logitMixturePvals <- function(values){
     }else{
       sigmaNull <- sigma[2]
     }
-  }else{ # Mixture modeling converged. 
-         # Null model comes from mixture component with smaller mean.
+  }else{ 
+    # Mixture modeling converged. Null model comes from mixture component with smaller mean.
     if (mu[1]<mu[2]){
       muNull <- mu[1]
       sigmaNull <- sigma[1]
@@ -264,14 +259,13 @@ logitMixturePvals <- function(values){
   
 }# End logitMixturePvals.
 
-# Function to perform DMR detection when replicate reference data 
-# is available. 
+# Function to perform DMR detection when replicate reference data is available. 
 runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),
-			                bandwidthVal=50000,correction='BY',qThresh=0.01,outflag=FALSE) {
+			    bandwidthVal=50000,correction='BY',qThresh=0.01,outflag=FALSE) {
 
   # Check correction method
-  if(!(correction %in% c("BY","BH"))){
-    write(paste("[",date(),"]: Unrecommended correction method. Expert statistician use only."), stderr())
+  if(!(correction %in% PERM_CORR)){
+    write(paste("[",date(),"]: Unrecommended correction method",correction,". Expert statistician use only."), stderr())
     write(paste("[",date(),"]: Must modify code to remove this error to proceed."), stderr())
     exit(1)
   }
@@ -284,8 +278,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     outFolder <- paste(outFolder,.Platform$file.sep,sep="")
   }
   
-  # Count number of null (reference/reference) comparisons and 
-  # number of alternative (test/reference) comparisons.
+  # Count number of null (reference/reference) comparisons and number of alternative (test/reference) comparisons.
   numNullComp <- length(refVrefFiles)
   numAltComp  <- length(testVrefFiles)
   
@@ -296,11 +289,13 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   # Do smoothing.
   for(ind in 1:numNullComp){
     write(paste("[",date(),"]: Smoothing JSD reference sample",ind,"out of",numNullComp), stdout())
-    nullGRs[[ind]] <- doSmoothing(refVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
+    nullGRs[[ind]] <- doSmoothing(refVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,
+				  outflag=outflag)
   }
   for(ind in 1:numAltComp){
     write(paste("[",date(),"]: Smoothing JSD test sample",ind,"out of",numAltComp), stdout())
-    altGRs[[ind]] <- doSmoothing(testVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
+    altGRs[[ind]] <- doSmoothing(testVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,
+				 outflag=outflag)
   }
   
   # Find p-value function.
@@ -314,19 +309,17 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   for(ind in 1:numNullComp){
     write(paste("[",date(),"]: Computing p-values reference sample",ind,"out of",numNullComp), stdout())
     nullGRs[[ind]]$pVals <- pValFn(nullGRs[[ind]]$score)
-    # Correct p-values smaller than machine precision.
     nullGRs[[ind]]$pVals[nullGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   for(ind in 1:numAltComp){
     write(paste("[",date(),"]: Computing p-values test sample",ind,"out of",numAltComp), stdout())
     altGRs[[ind]]$pVals <- pValFn(altGRs[[ind]]$score)
-    # Correct p-values smaller than machine precision.
     altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
   }
   
-  # Estimate q-values using Benjamini & Yekutieli or Benjamini & Hochberg
+  # Estimate q-values using Benjamini & Yekutieli or Benjamini & Hochberg. MH is done independently: one procedure for NULL, 
+  # and a second one for ALT. 
   write(paste("[",date(),"]: Computing q-values based on",correction), stdout())
-  # MH is done independently: one procedure for NULL, and a second one for ALT
   out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
   nullGRs <- out[[1]]
   altGRs <- out[[2]]
@@ -343,15 +336,13 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 
     # Generate SQS track    
     if(outflag){
-      myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",refVrefFiles[ind],sep=""), 
-                       visibility="full",autoScale=TRUE)
+      myTrackLine<-new("GraphTrackLine",type="bedGraph",name=paste("SQS-s",refVrefFiles[ind],sep=""),visibility="full",autoScale=TRUE)
       export.bedGraph(nullGRs[[ind]],file.path(outFolder,paste("SQS-s",refVrefFiles[ind],sep=""),fsep=""))
     }
 
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stdout())
-    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,qThresh,
-					                     bandwidthVal=bandwidthVal)
+    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,qThresh,bandwidthVal=bandwidthVal)
   }
   
   # Alternative comparisons
@@ -363,30 +354,27 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 
     # Generate SQS track    
     if(outflag){
-      myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",testVrefFiles[ind],sep=""), 
-                       visibility="full",autoScale=TRUE)
+      myTrackLine<-new("GraphTrackLine",type="bedGraph",name=paste("SQS-s",testVrefFiles[ind],sep=""),visibility="full",autoScale=TRUE)
       export.bedGraph(altGRs[[ind]],file.path(outFolder,paste("SQS-s",testVrefFiles[ind],sep=""),fsep = ""))
     }
     
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stdout())
-    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,qThresh,
-					                    bandwidthVal=bandwidthVal)
+    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,qThresh,bandwidthVal=bandwidthVal)
   }
   
   # Return DMRs in alternative comparison.
   altGRthresh
 } 
 
-# Function to perform DMR detection when no replicate reference data 
-# is available. 
+# Function to perform DMR detection when no replicate reference data is available. 
 runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,
-			                  correction='BY',qThresh=0.01,outflag=FALSE) {
+			      correction='BY',qThresh=0.01,outflag=FALSE) {
  
   # Check correction method
-  if(!(correction %in% c("BY","BH"))){
-    write(paste("[",date(),"]: Unrecommended correction method. Expert statistician use only."), stderr())
-    write(paste("[",date(),"]: Must modify code to remove this error to proceed."), stderr())
+  if(!(correction %in% PERM_CORR)){
+    write(paste("[",date(),"]: Unrecommended correction method",correction,". Expert statistician use only."), stderr())
+    write(paste("[",date(),"]: Must modify code to remove this error to proceed or choose."), stderr())
     exit(1)
   }
  
@@ -408,7 +396,6 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   
   # Adjust p-values
   write(paste("[",date(),"]: Computing q-values based on ",correction," method."), stdout())
-  # Adjust p-values based on Benjamini & Hochberg
   GR$qVals <- p.adjust(GR$PvalsMix, method = correction)
   GR$score <- -10*log10(GR$qVals)
 
@@ -417,8 +404,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   
   # Save bedgraph file with SQS scores
   if(outflag){
-    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",file,sep=""), 
-                       visibility="full",autoScale=TRUE)
+    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",file,sep=""),visibility="full",autoScale=TRUE)
     export.bedGraph(GR[!is.na(GR$score)],file.path(outFolder,paste("SQS-s",file,sep=""),fsep = ""))
   }
   
