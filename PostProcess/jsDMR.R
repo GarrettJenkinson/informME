@@ -30,6 +30,7 @@
 # GLOBAL VARIABLES
 #######################################################################################################################################
 PERM_CORR <- c('BH','BY')
+SEED <- 100
 
 #######################################################################################################################################
 # FUNCTIONS
@@ -65,7 +66,8 @@ doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,
   
   # To output, set outflag=TRUE.
   if (length(gr)>0 && outflag){ 
-    myTrackLine<-new("GraphTrackLine",type="bedGraph",name=paste("s",file,sep=""),visibility="full",autoScale=FALSE,viewLimits=c(0,1.0))
+    myTrackLine<-new("GraphTrackLine",type="bedGraph",name=paste("s",file,sep=""),visibility="full",autoScale=FALSE,
+		     viewLimits=c(0,1.0))
     export.bedGraph(gr,file.path(outFolder,paste("s",file,sep=""),fsep = ""),trackLine=myTrackLine)
   }
   
@@ -171,6 +173,16 @@ constructNullPvals <- function(nullValues){
   function(x) 1-Fn(x)
 }
 
+# Function to check correction method is valid
+checkValidCorrection <- function(correction) {
+  # Check if argument is in permitted set of corrections
+  if(!(correction %in% PERM_CORR)){
+    write(paste("[",date(),"]: Multiple hypothesis correction method",correction,"not currently supported."), stderr())
+    write(paste("[",date(),"]: Must modify code to remove this error to proceed."), stderr())
+    stop("Stopping due to invalid correction method")
+  }
+}
+
 # Perform MH testing: Benjamini & Yekutieli (default) or Benjamini & Hochberg
 multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction){
   # Collapse all pvalues
@@ -219,6 +231,9 @@ logitMixturePvals <- function(values){
   write(paste("[",date(),"]: Running EM algorithm"), stdout())
   maxiters <- 1000
   df <- data.frame(sJSDlogit=log((values)/(1-values)))
+
+  # EM Algorithm with fixed seed for reproducibility
+  set.seed(SEED)
   mixmdl <- normalmixEM(df$sJSDlogit[!is.na(df$sJSDlogit)],mu=c(-2.0,0.0),sigma=c(0.5,0.5),maxit = maxiters)
  
   # Get parameters from mixture 
@@ -266,11 +281,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 			    bandwidthVal=50000,correction='BY',pAdjThresh=0.01,outflag=FALSE) {
 
   # Check correction method
-  if(!(correction %in% PERM_CORR)){
-    write(paste("[",date(),"]: Unrecommended correction method",correction,". Expert statistician use only."), stderr())
-    write(paste("[",date(),"]: Must modify code to remove this error to proceed."), stderr())
-    exit(1)
-  }
+  checkValidCorrection(correction)
 
   # Check folders for trailing slash, add if missing
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -297,7 +308,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   for(ind in 1:numAltComp){
     write(paste("[",date(),"]: Smoothing JSD test sample",ind,"out of",numAltComp), stdout())
     altGRs[[ind]] <- doSmoothing(testVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,
-				 outflag=outflag)
+			         outflag=outflag)
   }
   
   # Find p-value function.
@@ -329,6 +340,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   # Write SQS files and DMRs.
   nullGRthresh <- list()
   altGRthresh  <- list()
+  
   # Null comparisons
   for (ind in 1:numNullComp){
     # Find SQS.
@@ -374,11 +386,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
 			      correction='BY',pAdjThresh=0.01,outflag=FALSE) {
  
   # Check correction method
-  if(!(correction %in% PERM_CORR)){
-    write(paste("[",date(),"]: Unrecommended correction method",correction,". Expert statistician use only."), stderr())
-    write(paste("[",date(),"]: Must modify code to remove this error to proceed or choose."), stderr())
-    exit(1)
-  }
+  checkValidCorrection(correction)
  
   # Check folders for trailing slash, add if missing.
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
