@@ -92,18 +92,18 @@ binnedSumms <- function(bins, numvar, mcolname)
 }
 
 # Define thresholding and morphological closing function. This function operates on gr$score. 
-doThreshMorph <- function(gr,file,outFolder,correction,qThresh,bandwidthVal=50000,GUsize=150.0,requiredPercentBand=0.5){
+doThreshMorph <- function(gr,file,outFolder,correction,pAdjThresh,bandwidthVal=50000,GUsize=150.0,requiredPercentBand=0.5){
   # Dependencies
   suppressMessages(library(rtracklayer))
   
   # Get equivalent SQS score
-  sqsThreshVal <- -10*log10(qThresh)
+  sqsThreshVal <- -10*log10(pAdjThresh)
 
   # Check folders for trailing slash, add if missing.
   if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
     outFolder <- paste(outFolder,.Platform$file.sep,sep="")
   }
-  basename <- paste("DMR-",correction,"-",qThresh,"-",file,sep="")
+  basename <- paste("DMR-",correction,"-",pAdjThresh,"-",file,sep="")
   file.full.path <- file.path(outFolder,basename,fsep = "")
   
   # Remove non-available (na) and infinite values.
@@ -184,19 +184,19 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
   }
   
   # Adjust p-values
-  x.null$qVals <- p.adjust(x.null$pVals, method = correction)
-  x.alt$qVals <- p.adjust(x.alt$pVals, method = correction)
+  x.null$pAdjVals <- p.adjust(x.null$pVals, method = correction)
+  x.alt$pAdjVals <- p.adjust(x.alt$pVals, method = correction)
 
   # Correct q-values smaller than machine precision.
-  x.null$qVals[x.null$qVals<.Machine$double.eps] <- .Machine$double.eps
-  x.alt$qVals[x.alt$qVals<.Machine$double.eps] <- .Machine$double.eps
+  x.null$pAdjVals[x.null$pAdjVals<.Machine$double.eps] <- .Machine$double.eps
+  x.alt$pAdjVals[x.alt$pAdjVals<.Machine$double.eps] <- .Machine$double.eps
   
   # Add q-values with original GR objects
   for(ind in 1:numNullComp){
-    nullGRs[[ind]]$qVals <- x.null[x.null$index==ind,]$qVals
+    nullGRs[[ind]]$pAdjVals <- x.null[x.null$index==ind,]$pAdjVals
   }
   for(ind in 1:numAltComp){
-    altGRs[[ind]]$qVals <- x.alt[x.alt$index==ind,]$qVals
+    altGRs[[ind]]$pAdjVals <- x.alt[x.alt$index==ind,]$pAdjVals
   }
 
   # Return
@@ -220,11 +220,13 @@ logitMixturePvals <- function(values){
   maxiters <- 1000
   df <- data.frame(sJSDlogit=log((values)/(1-values)))
   mixmdl <- normalmixEM(df$sJSDlogit[!is.na(df$sJSDlogit)],mu=c(-2.0,0.0),sigma=c(0.5,0.5),maxit = maxiters)
-  
+ 
+  # Get parameters from mixture 
   mu <- mixmdl$mu
   sigma <- mixmdl$sigma
   lambda <- mixmdl$lambda
   
+  # Check for convergence of the EM algorithm
   if (length(mixmdl$all.loglik)>=maxiters){ 
     # Mixture modeling not converged. Be on the safe side and use a conservative model with large mean/sigma.
     if (mu[1]>mu[2]){
@@ -261,7 +263,7 @@ logitMixturePvals <- function(values){
 
 # Function to perform DMR detection when replicate reference data is available. 
 runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),
-			    bandwidthVal=50000,correction='BY',qThresh=0.01,outflag=FALSE) {
+			    bandwidthVal=50000,correction='BY',pAdjThresh=0.01,outflag=FALSE) {
 
   # Check correction method
   if(!(correction %in% PERM_CORR)){
@@ -331,7 +333,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   for (ind in 1:numNullComp){
     # Find SQS.
     nullGRs[[ind]]$sJSD <- nullGRs[[ind]]$score
-    nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$qVals)
+    nullGRs[[ind]]$score <- -10*log10(nullGRs[[ind]]$pAdjVals)
     nullGRs[[ind]]$score[nullGRs[[ind]]$score>maxSQS] <- maxSQS
 
     # Generate SQS track    
@@ -342,14 +344,14 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing reference sample",ind,"out of",numNullComp), stdout())
-    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,qThresh,bandwidthVal=bandwidthVal)
+    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,correction,pAdjThresh,bandwidthVal=bandwidthVal)
   }
   
   # Alternative comparisons
   for (ind in 1:numAltComp){
     # Find SQS.
     altGRs[[ind]]$sJSD <- altGRs[[ind]]$score
-    altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$qVals)
+    altGRs[[ind]]$score <- -10*log10(altGRs[[ind]]$pAdjVals)
     altGRs[[ind]]$score[altGRs[[ind]]$score>maxSQS] <- maxSQS
 
     # Generate SQS track    
@@ -360,7 +362,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     
     # Morphological closing
     write(paste("[",date(),"]: Morphological closing test sample",ind,"out of",numAltComp), stdout())
-    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,qThresh,bandwidthVal=bandwidthVal)
+    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,pAdjThresh,bandwidthVal=bandwidthVal)
   }
   
   # Return DMRs in alternative comparison.
@@ -369,7 +371,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
 
 # Function to perform DMR detection when no replicate reference data is available. 
 runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,
-			      correction='BY',qThresh=0.01,outflag=FALSE) {
+			      correction='BY',pAdjThresh=0.01,outflag=FALSE) {
  
   # Check correction method
   if(!(correction %in% PERM_CORR)){
@@ -396,8 +398,8 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   
   # Adjust p-values
   write(paste("[",date(),"]: Computing q-values based on ",correction," method."), stdout())
-  GR$qVals <- p.adjust(GR$PvalsMix, method = correction)
-  GR$score <- -10*log10(GR$qVals)
+  GR$pAdjVals <- p.adjust(GR$PvalsMix, method = correction)
+  GR$score <- -10*log10(GR$pAdjVals)
 
   # Saturate SQS
   GR$score[GR$score>maxSQS] <- maxSQS
@@ -410,7 +412,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   
   # Do thresholding.
   write(paste("[",date(),"]: Morphological closing"), stdout())
-  GRthresh <- doThreshMorph(GR,file,outFolder,correction,qThresh,bandwidthVal=bandwidthVal)
+  GRthresh <- doThreshMorph(GR,file,outFolder,correction,pAdjThresh,bandwidthVal=bandwidthVal)
   
   # Return GR.
   GRthresh

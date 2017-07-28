@@ -89,7 +89,7 @@ described in [1]. It should be run within an R session.
    # 
    # Another usage: Benjamini & Hochberg applied with FDR control under 0.05.
    #   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
-   #                   correction='BH',qThresh=0.05)
+   #                   correction='BH',pAdjThresh=0.05)
 
   default usage (no replicate reference data is available) 
    
@@ -120,7 +120,7 @@ described in [1]. It should be run within an R session.
    #   runNoReplicateDMR(JSDfile,inFolder,outFolder)
    # 
    # Another usage: Benjamini & Hochberg applied with FDR control under 0.05.
-   #   runNoReplicateDMR(JSDfile,inFolder,outFolder,correction='BH',qThresh=0.05)
+   #   runNoReplicateDMR(JSDfile,inFolder,outFolder,correction='BH',pAdjThresh=0.05)
 
   requirements: 
 
