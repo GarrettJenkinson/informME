@@ -18,7 +18,7 @@
 # or see <http://www.gnu.org/licenses/>.
 #
 # *************************************************************************
-# Last Modified: 07/28/2017
+# Last Modified: 08/01/2017
 # *************************************************************************
 #
 # REQUIRED PACKAGES:
@@ -215,7 +215,7 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
   list(nullGRs,altGRs) 
 }
 
-# Function to compute p-values from mixture of normals in logit space. Used when replicate refernce data is not available.
+# Function to compute p-values from mixture of normals in logit space. Used when replicate reference data is not available.
 logitMixturePvals <- function(values){
   # Dependencies
   suppressMessages(library(logitnorm))
