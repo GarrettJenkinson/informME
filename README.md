@@ -241,7 +241,7 @@ indicated order:
    "[trim1,trim2]"
 
    where BAMfileName is the name of the BAM file to be 
-   processed (e.g., lungnormal-1 for file lungnormal-1.bam), 
+   processed (e.g., lungnormal for file lungnormal.bam), 
    spc is the name of the species (e.g., Human), trim1 is 
    the number of bases to be trimmed from the first read in 
    a read pair (e.g., 15), and trim2 is the number of bases 
