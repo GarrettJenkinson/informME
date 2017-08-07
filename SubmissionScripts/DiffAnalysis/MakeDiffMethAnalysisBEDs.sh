@@ -45,7 +45,7 @@ EXITCODE=$?
 if [ $EXITCODE -ne 0 ]
 then
    echo "error in MATLAB"
-   echo "tic;
+   echo "tic;MakeBEDsForDiffMethAnalysis(${phenoNames},'species','${species}','minChrNum',${min_chr_num},'maxChrNum',${max_chr_num},'ESIflag',${ESIflag},'MCflag',${MCflag});toc;"
    exit $EXITCODE
 fi
 

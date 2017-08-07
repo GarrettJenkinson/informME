@@ -45,7 +45,7 @@ EXITCODE=$?
 if [ $EXITCODE -ne 0 ]
 then
    echo "error in MATLAB"
-   echo "tic; 
+   echo "tic; MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc"
    exit $EXITCODE
 fi
 

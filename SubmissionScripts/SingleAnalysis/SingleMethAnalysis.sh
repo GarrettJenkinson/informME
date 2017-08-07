@@ -45,7 +45,7 @@ EXITCODE=$?
 if [ $EXITCODE -ne 0 ]
 then
    echo "error in MATLAB"
-   echo "tic;
+   echo "tic;MethAnalysisForChr(${chr_num},'${phenoName}','totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','ESIflag',${ESIflag},'MCflag',${MCflag});toc;"
    exit $EXITCODE
 fi
 
