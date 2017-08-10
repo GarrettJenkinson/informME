@@ -215,6 +215,11 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
   list(nullGRs,altGRs) 
 }
 
+# Function to annotate DMRs
+annotateDMRs<- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep="")) {
+
+}
+
 # Function to compute p-values from mixture of normals in logit space. Used when replicate refernce data is not available.
 logitMixturePvals <- function(values){
   # Dependencies
