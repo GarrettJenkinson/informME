@@ -27,6 +27,12 @@
 # mixtools
 
 #######################################################################################################################################
+# BASIC LIBRARIES
+#######################################################################################################################################
+suppressMessages(library(rtracklayer))
+
+
+#######################################################################################################################################
 # GLOBAL VARIABLES
 #######################################################################################################################################
 PERM_CORR <- c('BH','BY')
@@ -38,7 +44,7 @@ SEED <- 100
 # Define smoothing function.
 doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,outflag=FALSE) {
   # Dependencies
-  suppressMessages(library(rtracklayer))
+  # suppressMessages(library(rtracklayer))
   
   # Check folders for trailing slash, add if missing.
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -96,7 +102,7 @@ binnedSumms <- function(bins, numvar, mcolname)
 # Define thresholding and morphological closing function. This function operates on gr$score. 
 doThreshMorph <- function(gr,file,outFolder,correction,pAdjThresh,bandwidthVal=50000,GUsize=150.0,requiredPercentBand=0.5){
   # Dependencies
-  suppressMessages(library(rtracklayer))
+  # suppressMessages(library(rtracklayer))
   
   # Get equivalent SQS score
   sqsThreshVal <- -10*log10(pAdjThresh)
@@ -219,14 +225,13 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
 # TODO: Load dependencies outside the function, specially those shared with other functions?
 # TODO: Add loop in both replicate and noReplicate that go over every pair and produce tables and plots for each one.
 # TODO: Which objects we want the function to return?
-annotateDMRs<- function(dmrs.gr,chrsOfInterest=paste("chr",1:22,sep=""),genome.version='hg19') {
+annotateDMRs<- function(GRs,numAltComp,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),genome.version='hg19') {
   # Dependencies
   suppressMessages(library('annotatr'))
   suppressMessages(library('Biobase'))
   suppressMessages(library('AnnotationDbi'))
   suppressMessages(library('GenomicFeatures'))
   suppressMessages(library('IRanges'))
-  suppressMessages(library('rtracklayer'))
   suppressMessages(library('GenomicRanges'))
   suppressMessages(library('ggplot2'))
   suppressMessages(library('TxDb.Hsapiens.UCSC.hg19.knownGene'))
@@ -247,138 +252,176 @@ annotateDMRs<- function(dmrs.gr,chrsOfInterest=paste("chr",1:22,sep=""),genome.v
   annots.genes.gr <- annots.all.gr[annots.all.gr$type %in% annots]
   annots.genes.gr <- annots.all.gr[!is.na(annots.all.gr$symbol),]
 
-  # Assign ID to each DMR
-  dmrs.gr$dmrId <- seq(1,length(dmrs.gr))
+  # Loop over all alternative comparisons
+  for (ind in 1:numAltComp){
+    # Retrieve DMR GR and assign ID to each DMR
+    write(paste("[",date(),"]: Annotating test sample",ind,"out of",numAltComp), stdout())
+    dmrs.gr <- GRs[[ind]]
+    dmrs.gr$dmrId <- seq(1,length(dmrs.gr))
 
-  # Annotate DMRs with annotatr for plots with annotatr
-  write(paste("[",date(),"]: Default annotation with annotatr..."), stdout())
-  dmrs.annotatr.gr <- annotate_regions(dmrs.gr,annots.all.gr,ignore.strand=TRUE)
+    # Annotate DMRs with annotatr for plots with annotatr
+    write(paste("[",date(),"]: Default annotation with annotatr..."), stdout())
+    dmrs.annotatr.gr <- annotate_regions(dmrs.gr,annots.all.gr,ignore.strand=TRUE)
+    dmrs.annotatr.gr
 
-  # Annotate DMR (overlapping) with detail manually
-  # Note: this annotation agrees with annotatr's but contains metadata that can be included in the output table
-  # Note: all the annotations are included here (gene+enhancers+etc)
-  write(paste("[",date(),"]: Detailed annotation for overlapping DMRs..."), stdout())
-  olap.gr <- findOverlaps(dmrs.gr,annots.all.gr,ignore.strand=TRUE)
-  id.list <- strsplit(as.character(annots.all.gr[subjectHits(olap.gr),]$id),":")
-  id.df <- do.call(rbind,id.list)
-  dmrs.olap.gr <- dmrs.gr[queryHits(olap.gr),]
-  dmrs.olap.gr$feature <- id.df[,1]
-  dmrs.olap.gr$feature_id <- id.df[,2]
-  dmrs.olap.gr$tx_id <- annots.all.gr[subjectHits(olap.gr),]$tx_id
-  dmrs.olap.gr$symbol <- annots.all.gr[subjectHits(olap.gr),]$symbol
-  dmrs.olap.df <- as.data.frame(dmrs.olap.gr)
-  dmrs.olap.df$strand <- NULL
-  dmrs.olap.df$width <- NULL
-  
-  # Sort DMRs based on # features detected
-  dmrs.olap.table <- as.data.frame(table(dmrs.olap.gr$dmrId))
-  colnames(dmrs.olap.table) <- c('dmrId','Freq')
-  dmrs.olap.table <- dmrs.olap.table[order(dmrs.olap.table$Freq,decreasing=TRUE),]
-  dmrs.olap.df$rkg <- match(dmrs.olap.df$dmrId,dmrs.olap.table$dmrId)
-  dmrs.olap.df <- dmrs.olap.df[order(dmrs.olap.df$rkg),]
+    # Annotate DMR (overlapping) with detail manually
+    # Note: this annotation agrees with annotatr's but contains metadata that can be included in the output table
+    # Note: all the annotations are included here (gene+enhancers+etc)
+    write(paste("[",date(),"]: Detailed annotation for overlapping DMRs..."), stdout())
+    olap.gr <- findOverlaps(dmrs.gr,annots.all.gr,ignore.strand=TRUE)
+    id.list <- strsplit(as.character(annots.all.gr[subjectHits(olap.gr),]$id),":")
+    id.df <- do.call(rbind,id.list)
+    dmrs.olap.gr <- dmrs.gr[queryHits(olap.gr),]
+    dmrs.olap.gr$feature <- id.df[,1]
+    dmrs.olap.gr$feature_id <- id.df[,2]
+    dmrs.olap.gr$tx_id <- annots.all.gr[subjectHits(olap.gr),]$tx_id
+    dmrs.olap.gr$symbol <- annots.all.gr[subjectHits(olap.gr),]$symbol
+    dmrs.olap.df <- as.data.frame(dmrs.olap.gr)
+    dmrs.olap.df$strand <- NULL
+    dmrs.olap.df$width <- NULL
+    
+    # Sort DMRs based on # features detected
+    dmrs.olap.table <- as.data.frame(table(dmrs.olap.gr$dmrId))
+    colnames(dmrs.olap.table) <- c('dmrId','Freq')
+    dmrs.olap.table <- dmrs.olap.table[order(dmrs.olap.table$Freq,decreasing=TRUE),]
+    dmrs.olap.df$rkg <- match(dmrs.olap.df$dmrId,dmrs.olap.table$dmrId)
+    dmrs.olap.df <- dmrs.olap.df[order(dmrs.olap.df$rkg),]
+    dmrs.olap.df
 
-  # Annotate DMR based only on gene body and collapse
-  write(paste("[",date(),"]: Abbreviated gene body annotation..."), stdout())
-  
-  # (1) Overlapping
-  # Note: for precede and follows the DMRs found here are excluded
-  olap.genes.gr <- findOverlaps(dmrs.gr,annots.genes.gr,select="all",ignore.strand=TRUE)
-  dmrs.olap.genes.gr <- dmrs.gr[queryHits(olap.genes.gr),]
-  dmrs.olap.genes.gr$symbol <- annots.genes.gr[subjectHits(olap.genes.gr)]$symbol 
-  dmrs.olap.genes.gr <- unique(as.data.frame(dmrs.olap.genes.gr))
-  dmrs.olap.genes.df <- as.data.frame(dmrs.olap.genes.gr)
-  dmrs.olap.genes.df$distance <- rep(0,nrow(dmrs.olap.genes.df))
-  dmrs.olap.genes.df$strand <- NULL
-  dmrs.olap.genes.df$width <- NULL
-  dmrs.olap.genes.df <- dmrs.olap.genes.df[!is.na(dmrs.olap.genes.df$symbol),]
-  dmrs.olap.found.df <- unique(sort(dmrs.olap.genes.df$dmrId))
-  
-  # (2) DMR precedes gene (left->right)
-  # Note: here overlapping DMRs are NOT excluded and genes overlapping can appear here again because the overlap between DMR
-  # and gene is not total
-  # Note: distance has positive sign since the gene follows the DMR
-  prec.genes.gr <- precede(dmrs.gr,annots.genes.gr,select="all",ignore.strand=TRUE)
-  dmrs.prec.genes.gr <- dmrs.gr[queryHits(prec.genes.gr),]
-  dmrs.prec.genes.gr$symbol <- annots.genes.gr[subjectHits(prec.genes.gr)]$symbol
-  dmrs.prec.genes.gr$distance <- distance(dmrs.prec.genes.gr,annots.genes.gr[subjectHits(prec.genes.gr)])
-  dmrs.prec.genes.gr <- unique(as.data.frame(dmrs.prec.genes.gr))
-  dmrs.prec.genes.df <- as.data.frame(dmrs.prec.genes.gr)
-  dmrs.prec.genes.df$strand <- NULL
-  dmrs.prec.genes.df$width <- NULL
-  dmrs.prec.genes.df <- dmrs.prec.genes.df[!is.na(dmrs.prec.genes.df$symbol),]
-  # dmrs.prec.genes.df <- dmrs.prec.genes.df[!(dmrs.prec.genes.df$dmrId %in% dmrs.olap.found.df),]
-  
-  # (3) DMR follows gene (left->right)
-  # Note: here overlapping DMRs are NOT excluded and genes overlapping can appear here again because the overlap between DMR
-  # and gene is not total
-  # Note: distance has negative sign since the gene precedes the DMR
-  foll.genes.gr <- follow(dmrs.gr,annots.genes.gr,select="all",ignore.strand=TRUE)
-  dmrs.foll.genes.gr <- dmrs.gr[queryHits(foll.genes.gr),]
-  dmrs.foll.genes.gr$symbol <- annots.genes.gr[subjectHits(foll.genes.gr)]$symbol 
-  dmrs.foll.genes.gr$distance <- -distance(dmrs.foll.genes.gr,annots.genes.gr[subjectHits(foll.genes.gr)])
-  dmrs.foll.genes.gr <- unique(as.data.frame(dmrs.foll.genes.gr))
-  dmrs.foll.genes.df <- as.data.frame(dmrs.foll.genes.gr)
-  dmrs.foll.genes.df$strand <- NULL
-  dmrs.foll.genes.df$width <- NULL
-  dmrs.foll.genes.df <- dmrs.foll.genes.df[!is.na(dmrs.foll.genes.df$symbol),]
-  # dmrs.foll.genes.df <- dmrs.foll.genes.df[!(dmrs.foll.genes.df$dmrId %in% dmrs.olap.found.df),]
-  
-  # Collapse the searches and sort DMRs based on # features detected in complete annotation (beyond gene body)
-  dmrs.all.genes.df <- rbind(dmrs.olap.genes.df,dmrs.prec.genes.df,dmrs.foll.genes.df)
-  dmrs.all.genes.df$rkg <- match(dmrs.all.genes.df$dmrId,dmrs.olap.table$dmrId)
-  dmrs.all.genes.df <- dmrs.all.genes.df[order(dmrs.all.genes.df$rkg,dmrs.all.genes.df$distance),]
+    # Annotate DMR based only on gene body and collapse
+    write(paste("[",date(),"]: Abbreviated gene body annotation..."), stdout())
+    
+    # (1) Overlapping
+    # Note: for precede and follows the DMRs found here are excluded
+    olap.genes.gr <- findOverlaps(dmrs.gr,annots.genes.gr,select="all",ignore.strand=TRUE)
+    dmrs.olap.genes.gr <- dmrs.gr[queryHits(olap.genes.gr),]
+    dmrs.olap.genes.gr$symbol <- annots.genes.gr[subjectHits(olap.genes.gr)]$symbol 
+    dmrs.olap.genes.gr <- unique(as.data.frame(dmrs.olap.genes.gr))
+    dmrs.olap.genes.df <- as.data.frame(dmrs.olap.genes.gr)
+    dmrs.olap.genes.df$distance <- rep(0,nrow(dmrs.olap.genes.df))
+    dmrs.olap.genes.df$strand <- NULL
+    dmrs.olap.genes.df$width <- NULL
+    dmrs.olap.genes.df <- dmrs.olap.genes.df[!is.na(dmrs.olap.genes.df$symbol),]
+    dmrs.olap.found.df <- unique(sort(dmrs.olap.genes.df$dmrId))
+    
+    # (2) DMR precedes gene (left->right)
+    # Note: here overlapping DMRs are NOT excluded and genes overlapping can appear here again because the overlap between DMR
+    # and gene is not total
+    # Note: distance has positive sign since the gene follows the DMR
+    prec.genes.gr <- precede(dmrs.gr,annots.genes.gr,select="all",ignore.strand=TRUE)
+    dmrs.prec.genes.gr <- dmrs.gr[queryHits(prec.genes.gr),]
+    dmrs.prec.genes.gr$symbol <- annots.genes.gr[subjectHits(prec.genes.gr)]$symbol
+    dmrs.prec.genes.gr$distance <- distance(dmrs.prec.genes.gr,annots.genes.gr[subjectHits(prec.genes.gr)])
+    dmrs.prec.genes.gr <- unique(as.data.frame(dmrs.prec.genes.gr))
+    dmrs.prec.genes.df <- as.data.frame(dmrs.prec.genes.gr)
+    dmrs.prec.genes.df$strand <- NULL
+    dmrs.prec.genes.df$width <- NULL
+    dmrs.prec.genes.df <- dmrs.prec.genes.df[!is.na(dmrs.prec.genes.df$symbol),]
+    # dmrs.prec.genes.df <- dmrs.prec.genes.df[!(dmrs.prec.genes.df$dmrId %in% dmrs.olap.found.df),]
+    
+    # (3) DMR follows gene (left->right)
+    # Note: here overlapping DMRs are NOT excluded and genes overlapping can appear here again because the overlap between DMR
+    # and gene is not total
+    # Note: distance has negative sign since the gene precedes the DMR
+    foll.genes.gr <- follow(dmrs.gr,annots.genes.gr,select="all",ignore.strand=TRUE)
+    dmrs.foll.genes.gr <- dmrs.gr[queryHits(foll.genes.gr),]
+    dmrs.foll.genes.gr$symbol <- annots.genes.gr[subjectHits(foll.genes.gr)]$symbol 
+    dmrs.foll.genes.gr$distance <- -distance(dmrs.foll.genes.gr,annots.genes.gr[subjectHits(foll.genes.gr)])
+    dmrs.foll.genes.gr <- unique(as.data.frame(dmrs.foll.genes.gr))
+    dmrs.foll.genes.df <- as.data.frame(dmrs.foll.genes.gr)
+    dmrs.foll.genes.df$strand <- NULL
+    dmrs.foll.genes.df$width <- NULL
+    dmrs.foll.genes.df <- dmrs.foll.genes.df[!is.na(dmrs.foll.genes.df$symbol),]
+    # dmrs.foll.genes.df <- dmrs.foll.genes.df[!(dmrs.foll.genes.df$dmrId %in% dmrs.olap.found.df),]
+    
+    # Collapse the searches and sort DMRs based on # features detected in complete annotation (beyond gene body)
+    dmrs.all.genes.df <- rbind(dmrs.olap.genes.df,dmrs.prec.genes.df,dmrs.foll.genes.df)
+    dmrs.all.genes.df$rkg <- match(dmrs.all.genes.df$dmrId,dmrs.olap.table$dmrId)
+    dmrs.all.genes.df <- dmrs.all.genes.df[order(dmrs.all.genes.df$rkg,dmrs.all.genes.df$distance),]
+    dmrs.all.genes.df
 
-  # Annotate DMR based only on TSS and collapse
-  write(paste("[",date(),"]: Abbreviated TSS annotation..."), stdout())
-  
-  # Get TSS from TxDb
-  txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-  chr.filter <- list(tx_chrom = chrsOfInterest)
-  annots.tss.gr <- promoters(transcripts(txdb,filter=chr.filter),upstream=0L,downstream=1L)
-  symbol.table <- select(Homo.sapiens,key=as.character(annots.tss.gr$tx_id),keytype="TXID",columns=c("SYMBOL"))
-  annots.tss.gr$symbol <- symbol.table$SYMBOL
-  annots.tss.gr <- unique(annots.tss.gr[!is.na(annots.tss.gr$symbol),])
-  
-  # (1) Overlapping
-  # Note: for precede and follows the DMRs found here are excluded
-  olap.tss.gr <- findOverlaps(dmrs.gr,annots.tss.gr,select="all",ignore.strand=TRUE)
-  dmrs.olap.tss.gr <- dmrs.gr[queryHits(olap.tss.gr),]
-  dmrs.olap.tss.gr$symbol <- annots.tss.gr[subjectHits(olap.tss.gr)]$symbol 
-  dmrs.olap.tss.gr <- unique(as.data.frame(dmrs.olap.tss.gr))
-  dmrs.olap.tss.df <- as.data.frame(dmrs.olap.tss.gr)
-  dmrs.olap.tss.df$distance <- rep(0,nrow(dmrs.olap.tss.df))
-  dmrs.olap.tss.df$strand <- NULL
-  dmrs.olap.tss.df$width <- NULL
-  dmrs.olap.tss.df <- dmrs.olap.tss.df[!is.na(dmrs.olap.tss.df$symbol),]
-  
-  # (2) DMR precedes TSS (left->right)
-  # Note: distance has positive sign since the gene follows the DMR
-  prec.tss.gr <- precede(dmrs.gr,annots.tss.gr,select="all",ignore.strand=TRUE)
-  dmrs.prec.tss.gr <- dmrs.gr[queryHits(prec.tss.gr),]
-  dmrs.prec.tss.gr$symbol <- annots.tss.gr[subjectHits(prec.tss.gr)]$symbol
-  dmrs.prec.tss.gr$distance <- distance(dmrs.prec.tss.gr,annots.tss.gr[subjectHits(prec.tss.gr)])
-  dmrs.prec.tss.gr <- unique(as.data.frame(dmrs.prec.tss.gr))
-  dmrs.prec.tss.df <- as.data.frame(dmrs.prec.tss.gr)
-  dmrs.prec.tss.df$strand <- NULL
-  dmrs.prec.tss.df$width <- NULL
-  dmrs.prec.tss.df <- dmrs.prec.tss.df[!is.na(dmrs.prec.tss.df$symbol),]
-  
-  # (3) DMR follows TSS (left->right)
-  # Note: distance has negative sign since the gene precedes the DMR
-  foll.tss.gr <- follow(dmrs.gr,annots.tss.gr,select="all",ignore.strand=TRUE)
-  dmrs.foll.tss.gr <- dmrs.gr[queryHits(foll.tss.gr),]
-  dmrs.foll.tss.gr$symbol <- annots.tss.gr[subjectHits(foll.tss.gr)]$symbol 
-  dmrs.foll.tss.gr$distance <- -distance(dmrs.foll.tss.gr,annots.tss.gr[subjectHits(foll.tss.gr)])
-  dmrs.foll.tss.gr <- unique(as.data.frame(dmrs.foll.tss.gr))
-  dmrs.foll.tss.df <- as.data.frame(dmrs.foll.tss.gr)
-  dmrs.foll.tss.df$strand <- NULL
-  dmrs.foll.tss.df$width <- NULL
-  dmrs.foll.tss.df <- dmrs.foll.tss.df[!is.na(dmrs.foll.tss.df$symbol),]
-  
-  # Collapse the searches and sort DMRs based on # features detected in complete annotation (beyond gene body)
-  dmrs.all.tss.df <- rbind(dmrs.olap.tss.df,dmrs.prec.tss.df,dmrs.foll.tss.df)
-  dmrs.all.tss.df$rkg <- match(dmrs.all.tss.df$dmrId,dmrs.olap.table$dmrId)
-  dmrs.all.tss.df <- dmrs.all.tss.df[order(dmrs.all.tss.df$rkg,dmrs.all.tss.df$distance),]
+    # Annotate DMR based only on TSS and collapse
+    write(paste("[",date(),"]: Abbreviated TSS annotation..."), stdout())
+    
+    # Get TSS from TxDb
+    txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+    chr.filter <- list(tx_chrom = chrsOfInterest)
+    annots.tss.gr <- promoters(transcripts(txdb,filter=chr.filter),upstream=0L,downstream=1L)
+    symbol.table <- select(Homo.sapiens,key=as.character(annots.tss.gr$tx_id),keytype="TXID",columns=c("SYMBOL"))
+    annots.tss.gr$symbol <- symbol.table$SYMBOL
+    annots.tss.gr <- unique(annots.tss.gr[!is.na(annots.tss.gr$symbol),])
+    
+    # (1) Overlapping
+    # Note: for precede and follows the DMRs found here are excluded
+    olap.tss.gr <- findOverlaps(dmrs.gr,annots.tss.gr,select="all",ignore.strand=TRUE)
+    dmrs.olap.tss.gr <- dmrs.gr[queryHits(olap.tss.gr),]
+    dmrs.olap.tss.gr$symbol <- annots.tss.gr[subjectHits(olap.tss.gr)]$symbol 
+    dmrs.olap.tss.gr <- unique(as.data.frame(dmrs.olap.tss.gr))
+    dmrs.olap.tss.df <- as.data.frame(dmrs.olap.tss.gr)
+    dmrs.olap.tss.df$distance <- rep(0,nrow(dmrs.olap.tss.df))
+    dmrs.olap.tss.df$strand <- NULL
+    dmrs.olap.tss.df$width <- NULL
+    dmrs.olap.tss.df <- dmrs.olap.tss.df[!is.na(dmrs.olap.tss.df$symbol),]
+    
+    # (2) DMR precedes TSS (left->right)
+    # Note: distance has positive sign since the gene follows the DMR
+    prec.tss.gr <- precede(dmrs.gr,annots.tss.gr,select="all",ignore.strand=TRUE)
+    dmrs.prec.tss.gr <- dmrs.gr[queryHits(prec.tss.gr),]
+    dmrs.prec.tss.gr$symbol <- annots.tss.gr[subjectHits(prec.tss.gr)]$symbol
+    dmrs.prec.tss.gr$distance <- distance(dmrs.prec.tss.gr,annots.tss.gr[subjectHits(prec.tss.gr)])
+    dmrs.prec.tss.gr <- unique(as.data.frame(dmrs.prec.tss.gr))
+    dmrs.prec.tss.df <- as.data.frame(dmrs.prec.tss.gr)
+    dmrs.prec.tss.df$strand <- NULL
+    dmrs.prec.tss.df$width <- NULL
+    dmrs.prec.tss.df <- dmrs.prec.tss.df[!is.na(dmrs.prec.tss.df$symbol),]
+    
+    # (3) DMR follows TSS (left->right)
+    # Note: distance has negative sign since the gene precedes the DMR
+    foll.tss.gr <- follow(dmrs.gr,annots.tss.gr,select="all",ignore.strand=TRUE)
+    dmrs.foll.tss.gr <- dmrs.gr[queryHits(foll.tss.gr),]
+    dmrs.foll.tss.gr$symbol <- annots.tss.gr[subjectHits(foll.tss.gr)]$symbol 
+    dmrs.foll.tss.gr$distance <- -distance(dmrs.foll.tss.gr,annots.tss.gr[subjectHits(foll.tss.gr)])
+    dmrs.foll.tss.gr <- unique(as.data.frame(dmrs.foll.tss.gr))
+    dmrs.foll.tss.df <- as.data.frame(dmrs.foll.tss.gr)
+    dmrs.foll.tss.df$strand <- NULL
+    dmrs.foll.tss.df$width <- NULL
+    dmrs.foll.tss.df <- dmrs.foll.tss.df[!is.na(dmrs.foll.tss.df$symbol),]
+    
+    # Collapse the searches and sort DMRs based on # features detected in complete annotation (beyond gene body)
+    dmrs.all.tss.df <- rbind(dmrs.olap.tss.df,dmrs.prec.tss.df,dmrs.foll.tss.df)
+    dmrs.all.tss.df$rkg <- match(dmrs.all.tss.df$dmrId,dmrs.olap.table$dmrId)
+    dmrs.all.tss.df <- dmrs.all.tss.df[order(dmrs.all.tss.df$rkg,dmrs.all.tss.df$distance),]
+    dmrs.all.tss.df
+
+    # TABLES
+    write(paste("[",date(),"]: Saving annotations..."), stdout())
+    
+#    # Export extended annotations
+#    filepath <- paste(outFolder,prefix,'.ann_ext.bed',sep="")
+#    write.table(dmrs.olap.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
+#    
+#    # Export abbreviated gene body annotations
+#    filepath <- paste(outFolder,prefix,'.ann_abbr_gene.bed',sep="")
+#    write.table(dmrs.all.genes.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
+#    
+#    # Export abbreviated TSS annotations
+#    filepath <- paste(outFolder,prefix,'.ann_abbr_tss.bed',sep="")
+#    write.table(dmrs.all.tss.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
+#    
+    # PLOTS
+    write(paste("[",date(),"]: Saving plots..."), stdout())
+#    # Plot islands, shores, shelves, and open seas
+#    annots <- paste(genome.version,c('_cpg_islands','_cpg_shores','_cpg_shelves','_cpg_inter'),sep="")
+#    p.ann.1 <- plot_annotation(dmrs.annotatr.gr,annotation_order=annots,x_label='Type',y_label='Count')
+#    
+#    # Plot promoters, enhancers, 5UTRs, exons, introns, and 3UTRs
+#    annots <- paste(genome.version,c('_genes_promoters','_genes_5UTRs','_genes_cds','_genes_3UTRs'),sep="")
+#    p.ann.2 <- plot_annotation(dmrs.annotatr.gr,annotation_order=annots,x_label='Type',y_label='Count')
+#    
+#    # Save figures
+#    ggsave(filename=paste(outFolder,prefix,'_cpg.pdf',sep=""),plot=p.ann.1)
+#    ggsave(filename=paste(outFolder,prefix,'_body.pdf',sep=""),plot=p.ann.2)
+  }
 
 }
 
@@ -544,7 +587,11 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
     altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,correction,pAdjThresh,bandwidthVal=bandwidthVal)
   }
   
-  # Return DMRs in alternative comparison.
+  # DMR annotation
+  write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
+  annotateDMRs(altGRthresh,numAltComp,outFolder)
+
+  # Return DMRs in alternative comparison
   altGRthresh
 } 
 
