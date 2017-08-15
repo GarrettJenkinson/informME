@@ -160,7 +160,7 @@ doThreshMorph <- function(gr,file,outFolder,correction,pAdjThresh,bandwidthVal=5
   }
   
   # Return object.
-  grThresh
+  grThresh[!is.na(grThresh$score)]
   
 }# End doThreshMorph function.
 
