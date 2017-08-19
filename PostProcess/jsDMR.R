@@ -27,10 +27,9 @@
 # mixtools
 
 #######################################################################################################################################
-# BASIC LIBRARIES
+# COMMON DEPENDENCIES
 #######################################################################################################################################
 suppressMessages(library(rtracklayer))
-
 
 #######################################################################################################################################
 # GLOBAL VARIABLES
@@ -222,10 +221,9 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
 }
 
 # Function to annotate DMRs
-# TODO: Load dependencies outside the function, specially those shared with other functions?
-# TODO: Add loop in both replicate and noReplicate that go over every pair and produce tables and plots for each one.
-# TODO: Which objects we want the function to return?
-annotateDMRs<- function(GRs,numAltComp,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),genome.version='hg19') {
+# CONSIDER: Load dependencies outside the function in common place for dependencies?
+annotateDMRs<- function(GRs,numAltComp,comparisons,outFolder,correction,pAdjThresh,chrsOfInterest=paste("chr",1:22,sep=""),
+			genome.version='hg19') {
   # Dependencies
   suppressMessages(library('annotatr'))
   suppressMessages(library('Biobase'))
@@ -395,32 +393,35 @@ annotateDMRs<- function(GRs,numAltComp,outFolder,chrsOfInterest=paste("chr",1:22
 
     # TABLES
     write(paste("[",date(),"]: Saving annotations..."), stdout())
+    comp <- strsplit(comparisons[ind],"\\.")[[1]][1]
+    basename <- paste("DMR-",correction,"-",pAdjThresh,"-",comp,sep="")
+
+    # Export extended annotations
+    filepath <- paste(outFolder,basename,'.ann_ext.bed',sep="")
+    write.table(dmrs.olap.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
     
-#    # Export extended annotations
-#    filepath <- paste(outFolder,prefix,'.ann_ext.bed',sep="")
-#    write.table(dmrs.olap.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
-#    
-#    # Export abbreviated gene body annotations
-#    filepath <- paste(outFolder,prefix,'.ann_abbr_gene.bed',sep="")
-#    write.table(dmrs.all.genes.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
-#    
-#    # Export abbreviated TSS annotations
-#    filepath <- paste(outFolder,prefix,'.ann_abbr_tss.bed',sep="")
-#    write.table(dmrs.all.tss.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
-#    
+    # Export abbreviated gene body annotations
+    filepath <- paste(outFolder,basename,'.ann_abbr_gene.bed',sep="")
+    write.table(dmrs.all.genes.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
+    
+    # Export abbreviated TSS annotations
+    filepath <- paste(outFolder,basename,'.ann_abbr_tss.bed',sep="")
+    write.table(dmrs.all.tss.df,file=filepath,quote=FALSE,sep='\t',row.names=FALSE)
+    
     # PLOTS
     write(paste("[",date(),"]: Saving plots..."), stdout())
-#    # Plot islands, shores, shelves, and open seas
-#    annots <- paste(genome.version,c('_cpg_islands','_cpg_shores','_cpg_shelves','_cpg_inter'),sep="")
-#    p.ann.1 <- plot_annotation(dmrs.annotatr.gr,annotation_order=annots,x_label='Type',y_label='Count')
-#    
-#    # Plot promoters, enhancers, 5UTRs, exons, introns, and 3UTRs
-#    annots <- paste(genome.version,c('_genes_promoters','_genes_5UTRs','_genes_cds','_genes_3UTRs'),sep="")
-#    p.ann.2 <- plot_annotation(dmrs.annotatr.gr,annotation_order=annots,x_label='Type',y_label='Count')
-#    
-#    # Save figures
-#    ggsave(filename=paste(outFolder,prefix,'_cpg.pdf',sep=""),plot=p.ann.1)
-#    ggsave(filename=paste(outFolder,prefix,'_body.pdf',sep=""),plot=p.ann.2)
+
+    # Plot islands, shores, shelves, and open seas
+    annots <- paste(genome.version,c('_cpg_islands','_cpg_shores','_cpg_shelves','_cpg_inter'),sep="")
+    p.ann.1 <- plot_annotation(dmrs.annotatr.gr,annotation_order=annots,x_label='Type',y_label='Count')
+    
+    # Plot promoters, enhancers, 5UTRs, exons, introns, and 3UTRs
+    annots <- paste(genome.version,c('_genes_promoters','_genes_5UTRs','_genes_cds','_genes_3UTRs'),sep="")
+    p.ann.2 <- plot_annotation(dmrs.annotatr.gr,annotation_order=annots,x_label='Type',y_label='Count')
+    
+    # Save figures
+    ggsave(filename=paste(outFolder,basename,'_cpg.pdf',sep=""),plot=p.ann.1)
+    ggsave(filename=paste(outFolder,basename,'_body.pdf',sep=""),plot=p.ann.2)
   }
 
 }
@@ -589,7 +590,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   
   # DMR annotation
   write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
-  annotateDMRs(altGRthresh,numAltComp,outFolder)
+  annotateDMRs(altGRthresh,numAltComp,testVrefFiles,outFolder,correction,pAdjThresh)
 
   # Return DMRs in alternative comparison
   altGRthresh
@@ -635,6 +636,12 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   # Do thresholding.
   write(paste("[",date(),"]: Morphological closing"), stdout())
   GRthresh <- doThreshMorph(GR,file,outFolder,correction,pAdjThresh,bandwidthVal=bandwidthVal)
+
+  # DMR annotation
+  # GR passed as list so no extra code is required in annotateDMRs (fits structure in replicate case)
+  # numAltComp=1 hard-coded)
+  write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
+  annotateDMRs(list(GRthresh),1,c(file),outFolder,correction,pAdjThresh)
   
   # Return GR.
   GRthresh
