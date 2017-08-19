@@ -252,9 +252,13 @@ annotateDMRs<- function(GRs,numAltComp,comparisons,outFolder,correction,pAdjThre
 
   # Loop over all alternative comparisons
   for (ind in 1:numAltComp){
-    # Retrieve DMR GR and assign ID to each DMR
-    write(paste("[",date(),"]: Annotating test sample",ind,"out of",numAltComp), stdout())
+    # Retrieve DMR GR and assign ID to each DMR in case there are in fact DMRs
     dmrs.gr <- GRs[[ind]]
+    if(length(dmrs.gr)==0){
+      write(paste("[",date(),"]: Test sample",ind,"out of",numAltComp,"had no DMRs identified."), stdout())
+      next
+    }    
+    write(paste("[",date(),"]: Annotating test sample",ind,"out of",numAltComp), stdout())
     dmrs.gr$dmrId <- seq(1,length(dmrs.gr))
 
     # Annotate DMRs with annotatr for plots with annotatr
