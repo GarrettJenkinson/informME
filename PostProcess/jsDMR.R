@@ -226,14 +226,16 @@ annotateDMRs<- function(GRs,numAltComp,comparisons,outFolder,correction,pAdjThre
 			genome.version='hg19') {
   # Dependencies
   suppressMessages(library('annotatr'))
-  suppressMessages(library('Biobase'))
-  suppressMessages(library('AnnotationDbi'))
-  suppressMessages(library('GenomicFeatures'))
-  suppressMessages(library('IRanges'))
-  suppressMessages(library('GenomicRanges'))
   suppressMessages(library('ggplot2'))
-  suppressMessages(library('TxDb.Hsapiens.UCSC.hg19.knownGene'))
   suppressMessages(library('Homo.sapiens'))
+
+  #suppressMessages(library('Biobase'))
+
+  #suppressMessages(library('AnnotationDbi'))
+  #suppressMessages(library('GenomicFeatures'))
+  #suppressMessages(library('IRanges'))
+  #suppressMessages(library('GenomicRanges'))
+  #suppressMessages(library('TxDb.Hsapiens.UCSC.hg19.knownGene'))
 
   # Complete annotations
   write(paste("[",date(),"]: Building annotations..."), stdout())

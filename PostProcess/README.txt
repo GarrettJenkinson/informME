@@ -37,7 +37,9 @@ jsDMR.R
 
 This is an R script that performs DMR detection using 
 the Jensen-Shannon distance (JSD) based on the method 
-described in [1]. It should be run within an R session.
+described in [1]. Once DMR detection is done, the script
+generates helpful annotation tables and figures. It should 
+be run within an R session.
 
   default usage (replicate reference data is available): 
  
@@ -128,6 +130,9 @@ described in [1]. It should be run within an R session.
      - rtracklayer
      - logitnorm
      - mixtools 
+     - annotatr
+     - Homo.Sapiens
+     - ggplot2
 
 
 jsGrank.R
