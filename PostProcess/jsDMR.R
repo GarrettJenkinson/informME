@@ -239,8 +239,8 @@ annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfIn
   suppressMessages(library('ggplot2'))
   suppressMessages(library('Homo.sapiens'))
 
+  # We might have to activate these in case we get rid of annotatr
   #suppressMessages(library('Biobase'))
-
   #suppressMessages(library('AnnotationDbi'))
   #suppressMessages(library('GenomicFeatures'))
   #suppressMessages(library('IRanges'))
@@ -276,7 +276,6 @@ annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfIn
     # Annotate DMRs with annotatr for plots with annotatr
     write(paste("[",date(),"]: Default annotation with annotatr..."), stdout())
     dmrs.annotatr.gr <- annotate_regions(dmrs.gr,annots.all.gr,ignore.strand=TRUE)
-    dmrs.annotatr.gr
 
     # Annotate DMR (overlapping) with detail manually
     # Note: this annotation agrees with annotatr's but contains metadata that can be included in the output table
@@ -300,7 +299,6 @@ annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfIn
     dmrs.olap.table <- dmrs.olap.table[order(dmrs.olap.table$Freq,decreasing=TRUE),]
     dmrs.olap.df$rkg <- match(dmrs.olap.df$dmrId,dmrs.olap.table$dmrId)
     dmrs.olap.df <- dmrs.olap.df[order(dmrs.olap.df$rkg),]
-    dmrs.olap.df
 
     # Annotate DMR based only on gene body and collapse
     write(paste("[",date(),"]: Abbreviated gene body annotation..."), stdout())
@@ -352,7 +350,6 @@ annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfIn
     dmrs.all.genes.df <- rbind(dmrs.olap.genes.df,dmrs.prec.genes.df,dmrs.foll.genes.df)
     dmrs.all.genes.df$rkg <- match(dmrs.all.genes.df$dmrId,dmrs.olap.table$dmrId)
     dmrs.all.genes.df <- dmrs.all.genes.df[order(dmrs.all.genes.df$rkg,dmrs.all.genes.df$distance),]
-    dmrs.all.genes.df
 
     # Annotate DMR based only on TSS and collapse
     write(paste("[",date(),"]: Abbreviated TSS annotation..."), stdout())
@@ -405,7 +402,6 @@ annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfIn
     dmrs.all.tss.df <- rbind(dmrs.olap.tss.df,dmrs.prec.tss.df,dmrs.foll.tss.df)
     dmrs.all.tss.df$rkg <- match(dmrs.all.tss.df$dmrId,dmrs.olap.table$dmrId)
     dmrs.all.tss.df <- dmrs.all.tss.df[order(dmrs.all.tss.df$rkg,dmrs.all.tss.df$distance),]
-    dmrs.all.tss.df
 
     # TABLES
     write(paste("[",date(),"]: Saving annotations..."), stdout())
