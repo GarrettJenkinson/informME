@@ -438,7 +438,7 @@ annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfIn
 
 }
 
-# Function to compute p-values from mixture of normals in logit space. Used when replicate refernce data is not available.
+# Function to compute p-values from mixture of normals in logit space. Used when replicate reference data is not available.
 logitMixturePvals <- function(values){
   # Dependencies
   suppressMessages(library(logitnorm))
