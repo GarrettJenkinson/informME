@@ -192,7 +192,11 @@ checkValidCorrection <- function(correction) {
 }
 
 # Perform MH testing: Benjamini & Yekutieli (default) or Benjamini & Hochberg
-multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction){
+multipleHypothesis <- function(nullGRs,altGRs,correction){
+  
+  numNullComp <- length(nullGRs)
+  numAltComp  <- length(altGRs)
+
   # Collapse all pvalues
   x.null <- c()
   x.alt <- c()
@@ -225,8 +229,11 @@ multipleHypothesis <- function(nullGRs,altGRs,numNullComp,numAltComp,correction)
 
 # Function to annotate DMRs
 # CONSIDER: Load dependencies outside the function in common place for dependencies?
-annotateDMRs<- function(GRs,numAltComp,comparisons,outFolder,correction,pAdjThresh,chrsOfInterest=paste("chr",1:22,sep=""),
+annotateDMRs<- function(GRs,comparisons,outFolder,correction,pAdjThresh,chrsOfInterest=paste("chr",1:22,sep=""),
 			genome.version='hg19') {
+
+  numAltComp <- length(GRs)
+
   # Dependencies
   suppressMessages(library('annotatr'))
   suppressMessages(library('ggplot2'))
@@ -553,7 +560,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   # Estimate q-values using Benjamini & Yekutieli or Benjamini & Hochberg. MH is done independently: one procedure for NULL, 
   # and a second one for ALT. 
   write(paste("[",date(),"]: Computing q-values based on",correction), stdout())
-  out <- multipleHypothesis(nullGRs,altGRs,numNullComp,numAltComp,correction)
+  out <- multipleHypothesis(nullGRs,altGRs,correction)
   nullGRs <- out[[1]]
   altGRs <- out[[2]]
 
@@ -599,7 +606,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   
   # DMR annotation
   write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
-  annotateDMRs(altGRthresh,numAltComp,testVrefFiles,outFolder,correction,pAdjThresh)
+  annotateDMRs(altGRthresh,testVrefFiles,outFolder,correction,pAdjThresh)
 
   # Return DMRs in alternative comparison
   altGRthresh
@@ -650,7 +657,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   # GR passed as list so no extra code is required in annotateDMRs (fits structure in replicate case)
   # numAltComp=1 hard-coded)
   write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
-  annotateDMRs(list(GRthresh),1,c(file),outFolder,correction,pAdjThresh)
+  annotateDMRs(list(GRthresh),c(file),outFolder,correction,pAdjThresh)
   
   # Return GR.
   GRthresh
