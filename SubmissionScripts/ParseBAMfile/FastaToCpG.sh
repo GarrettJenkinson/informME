@@ -20,28 +20,29 @@
 
 # FastaToCpG.sh
 
-# last modified 12/09/16
+# last modified 08/25/17
 
 # Shell script to run function FastaToCpG.m in MATLAB
 
 # Get inputs
 FastaFile=$1
 species=$2
-MATLICE=$3
+maxChrNum=$3
+MATLICE=$4
 
-echo "starting command: FastaToCpG('${FastaFile}','species','${species}');"
+echo "starting command: FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);"
 
 # Run MATLAB command
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;FastaToCpG('${FastaFile}','species','${species}');toc, catch, exit(1), end, exit(0);"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);toc, catch, exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?
 if [ $EXITCODE -ne 0 ]
 then
    echo "error in MATLAB"
-   echo "tic;FastaToCpG('${FastaFile}','species','${species}');toc;"
+   echo "tic;FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);toc;"
    exit $EXITCODE
 fi
 
 echo "command successful:"
-echo "tic;FastaToCpG('${FastaFile}','species','${species}');toc;"
+echo "tic;FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);toc;"
