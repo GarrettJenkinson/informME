@@ -20,14 +20,25 @@
 
 # runGenomeAnalysis.sh
 
-# last modified 12/09/16
+# last modified 08/25/17
 
-# Main script to run the script FastaToCpG.sh on the 
+# Main script to run the script FastaToCpG.sh on the
 # Sun Grid Engine cluster
 
 # Get inputs
 FastaFile=$1
 species=$2
+
+# Set values based on input species
+if [ "${species}" = "Chicken" ]; then
+    maxChrNum=28
+elif [ "${species}" = "Mouse" ]; then
+    maxChrNum=19
+elif [ "${species}" = "Opossum" ]; then
+    maxChrNum=8
+else # assume its "Human"
+    maxChrNum=22
+fi
 
 # USER SPECIFIED DIRECTORIES
 # (no trailing slash)
@@ -53,7 +64,7 @@ JOB=`qsub << EOJ
 #$ -l h_fsize=100G
 #$ -o ${SOUTDIR}
 # 
-${SCRIPTDIR}FastaToCpG.sh "${FastaFile}" "${species}" "${MATLICE}"
+${SCRIPTDIR}FastaToCpG.sh "${FastaFile}" "${species}" "${maxChrNum}" "${MATLICE}"
 EOJ
 `
 echo "${JOB} for file ${FastaFile} submitted on `date`"
