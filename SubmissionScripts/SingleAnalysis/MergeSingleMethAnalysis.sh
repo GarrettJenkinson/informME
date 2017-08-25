@@ -36,7 +36,7 @@ MATLICE=$7
 echo "starting command: MergeMethAnalysis(${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors},'ESIflag',${ESIflag},'MCflag',${MCflag});"
 
 # Run MATLAB command
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;MergeMethAnalysis(${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors},'ESIflag',${ESIflag},'MCflag',${MCflag});toc, catch, exit(1), end, exit(0);"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;MergeMethAnalysis(${chr_num},'${phenoName}','species','${species}','totalProcessors',${totalProcessors},'ESIflag',${ESIflag},'MCflag',${MCflag});toc, catch ME, fprintf(2,'Error identifier: ',ME.identifier),fprintf(2,'Error message: ',ME.message), exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?

@@ -33,7 +33,7 @@ MATLICE=$4
 echo "starting command: FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);"
 
 # Run MATLAB command
-matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);toc, catch, exit(1), end, exit(0);"
+matlab -nodesktop -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic;FastaToCpG('${FastaFile}','species','${species}','maxChrNum',$maxChrNum);toc, catch ME, fprintf(2,'Error identifier: ',ME.identifier),fprintf(2,'Error message: ',ME.message), exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?
