@@ -38,7 +38,7 @@ BAMPATH=$9
 echo "starting command: MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');"
 
 # Run MATLAB command
-matlab -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic; MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc, catch ME, fprintf(2,'Error identifier: ',ME.identifier),fprintf(2,'Error message: ',ME.message), exit(1), end, exit(0);"
+matlab -singleCompThread -nosplash -nodisplay -c ${MATLICE} -r "try, disp('Job Running');tic; MatrixFromBAMfile('${bamFilename}', ${chr_num}, 'totalProcessors',${totalProcessors},'processorNum',${processorNum},'species','${species}','includeChrInRef',${includeChrInRef},'numBasesToTrim',${numBasesToTrim},'bamFilePathRoot','${BAMPATH}');toc, catch ME, fprintf(2,'Error identifier: %s',ME.identifier),fprintf(2,'Error message: %s',ME.message), exit(1), end, exit(0);"
 
 # Check if error in MATLAB, otherwise declare success
 EXITCODE=$?
