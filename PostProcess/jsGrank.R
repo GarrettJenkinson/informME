@@ -89,7 +89,7 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
   # Define promoter regions.
   txdb<-TxDb.Hsapiens.UCSC.hg19.knownGene
   genesAll<-transcripts(txdb)
-  genes<-keepSeqlevels(genesAll,chrsOfInterest)
+  genes<-keepSeqlevels(genesAll,chrsOfInterest,pruning.mode="coarse")
   sortSeqlevels(genes)
   proms<-promoters(genes,upstream=upStreamSize,downstream=downStreamSize)
   
@@ -228,7 +228,7 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   # Define promoter regions.
   txdb<-TxDb.Hsapiens.UCSC.hg19.knownGene
   genesAll<-transcripts(txdb)
-  genes<-keepSeqlevels(genesAll,chrsOfInterest)
+  genes<-keepSeqlevels(genesAll,chrsOfInterest,pruning.mode="coarse")
   sortSeqlevels(genes)
   proms<-promoters(genes,upstream=upStreamSize,downstream=downStreamSize)
   
