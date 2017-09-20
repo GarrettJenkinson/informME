@@ -107,13 +107,13 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
     nullGRs[[ind]] <- import.bedGraph(file.path(inFolder,refVrefFiles[ind],fsep=""))
     genome(nullGRs[[ind]]) <- "hg19"
     sortSeqlevels(nullGRs[[ind]])
-    nullGRs[[ind]] <- keepSeqlevels(nullGRs[[ind]],chrsOfInterest)
+    nullGRs[[ind]] <- keepSeqlevels(nullGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
   }
   for(ind in 1:numAltComp){
     altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
     genome(altGRs[[ind]]) <- "hg19"
     sortSeqlevels(altGRs[[ind]])
-    altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest)
+    altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
   }
   
   # Build empirical null distribution.
@@ -243,7 +243,7 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
     altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
     genome(altGRs[[ind]]) <- "hg19"
     sortSeqlevels(altGRs[[ind]])
-    altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest)
+    altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
   }
   
   # Compute the Fisher sum and the degree of freedom used in meta analysis. 
