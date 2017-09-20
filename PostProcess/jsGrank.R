@@ -42,14 +42,14 @@ rankGenes <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,
   
   if(length(refVrefFiles)==0){ # Use JSD to rank the genes.
     result <- rankGenesJSD(testVrefFiles,inFolder,outFolder,tName,rName,
-                           GUsize=150,upStreamSize=2000,downStreamSize=2000,
-                           chrsOfInterest=paste("chr",1:22,sep=""),minGUs=1)
+                           GUsize=GUsize,upStreamSize=upStreamSize,downStreamSize=downStreamSize,
+                           chrsOfInterest=chrsOfInterest,minGUs=minGUs)
     return(result)
   }
   # Else use empirical null distribution to rank the genes. 
   result <- rankGenesEmpNull(refVrefFiles,testVrefFiles,inFolder,outFolder,tName,rName,
-                             GUsize=150,upStreamSize=2000,downStreamSize=2000,
-                             chrsOfInterest=paste("chr",1:22,sep=""),minGUs=1)
+                             GUsize=GUsize,upStreamSize=upStreamSize,downStreamSize=downStreamSize,
+                             chrsOfInterest=chrsOfInterest,minGUs=minGUs)
 }
 
 # Define function that computes the sum of SQS values (stored in numvar)
