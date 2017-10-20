@@ -1,0 +1,4 @@
+track type=bedGraph visibility=full windowingFunction=mean autoScale=off viewLimits=0.0:1.0 name=CAP-estimation_test
+chr1            0          149 0.998472
+chr1          150          299 1.000000
+chr1          300          390 0.999999

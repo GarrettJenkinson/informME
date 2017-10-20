@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+#$ -j y
+#$ -r y
+#$ -S /bin/bash
+#$ -N INFRUN
+#$ -l mem_free=20G
+#$ -l h_vmem=20G
+#$ -l h_fsize=30G
+#$ -l cegs2
+#$ -pe local 4
+#$ -q cegs2.q
+#$ -t 1-5
+
+# Variables
+max_proc=4
+
+# Run
+informME_run.sh -q "$max_proc" -- toy_normal_pe "${SGE_TASK_ID}" "$max_proc"
+informME_run.sh -q "$max_proc" -- toy_cancer_pe "${SGE_TASK_ID}" "$max_proc"

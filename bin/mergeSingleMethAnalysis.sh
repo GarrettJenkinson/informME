@@ -1,0 +1,1 @@
+../src/bash_src/analysis/singleAnalysis/mergeSingleMethAnalysis/mergeSingleMethAnalysis.sh

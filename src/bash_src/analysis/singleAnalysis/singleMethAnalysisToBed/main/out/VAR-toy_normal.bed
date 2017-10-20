@@ -1,0 +1,1 @@
+track type=bedGraph visibility=dense windowingFunction=mean autoScale=off viewLimits=0.0:3.0 name=VAR-toy_normal

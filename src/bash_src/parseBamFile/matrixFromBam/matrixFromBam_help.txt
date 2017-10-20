@@ -1,0 +1,42 @@
+Description:
+    This function processes a BAM file with aligned reads to a reference genome and produces 
+    methylation information for nonoverlapping genomic regions (containing the same number 
+    of base pairs) in a given chromosome. The final output for each genomic region is a matrix 
+    with -1,0,1 values. Each row of the matrix is a methylation read, whereas each column 
+    represents a CpG site within the genomic region. A value of -1 indicates no methylation 
+    information is available for the CPG site, 0 indicates that the CpG site is unmethylated, 
+    and 1 indicates that the CpG site is methylated.
+
+Usage:
+    matrixFromBam.sh  [options]  -- BAM_FILE CHR_NUM TOTAL_PROC PROC_NUM
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
+    -b|--bamdir         BAM file directory. Default: $BAMDIR.
+    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -t|--trim           Number of base to trim. Default: 0.
+    -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+
+Examples:
+    matrixFromBam.sh -r /path/to/cpg/ref/ -b /path/to/bam -d out -c 0 -t 20 -- input.bam 2 20 1 
+
+Output:
+    MATLAB .mat file for a given region of length 3 kb. 
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    fastaToCpg.sh
+
+Downstream:
+    mergeMatrices.sh
+
+Date:
+    10/05/2017
+
+Author:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

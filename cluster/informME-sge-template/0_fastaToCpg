@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+#$ -j y
+#$ -r y
+#$ -S /bin/bash
+#$ -N INFFsToCpG
+#$ -l mem_free=10G
+#$ -l h_vmem=10G
+#$ -l h_fsize=20G
+#$ -l cegs2
+#$ -q cegs2.q
+
+# I/O
+reference="/users/jabantel/data/informME-0.3.0-xargs-testing/reference/toy_genome.fasta"
+
+# Command
+fastaToCpg.sh "$reference"

@@ -1,0 +1,1 @@
+../src/bash_src/parseBamFile/getMatrices/getMatrices.sh

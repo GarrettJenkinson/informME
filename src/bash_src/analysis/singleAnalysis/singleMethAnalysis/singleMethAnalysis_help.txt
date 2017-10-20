@@ -1,0 +1,36 @@
+Description:
+    This function performs methylation analysis of a given chromosome. 
+
+Usage:
+    singleMethAnalysis.sh [options] -- PREFIX CHR_NUM TOTAL_PROC PROC_LABEL
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
+    -e|--estdir         Estimation directory. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+    --MC                Computation of information theory metrics. Default: 0.
+    --ESI               Computation of entropic sensivity index (ESI). Default: 0.
+
+Examples:
+    singleMethAnalysis.sh -d out --MC --ESI -- normal 1 1 1
+
+Output:
+    MATLAB .mat files containing information about the analysis. 
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    mergeEstimation.sh 
+
+Downstream:
+    mergeSingleMethAnalysis.sh 
+
+Date:
+    10/05/2017
+
+Author:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

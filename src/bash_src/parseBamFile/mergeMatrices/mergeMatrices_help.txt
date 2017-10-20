@@ -1,0 +1,39 @@
+Description:
+    This function merges the outputs from matrixFromBam into a single MATLAB MAT file comprised
+    of a single hashtable.
+
+Usage:
+    mergeMatrices.sh [options] -- BAM_FILE CHR_NUM TOTAL_PROC
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
+    -b|--bamdir         BAM file directory. Default: $BAMDIR.
+    -m|--matdir         Matrices directory. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -t|--trim           Number of base to trim. Default: 0.
+    -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+
+Examples:
+    mergeMatrices.sh -r /path/to/reference/ -b /path/to/bam/ -m /path/to/matrices/ \
+	-d out -c 1 -t 10 -- sample_1.bam 1 1
+
+Output:
+    MATLAB .mat file.
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    matrixFromBam.sh
+
+Downstream:
+    estimation.sh
+
+Date:
+    10/05/2017
+
+Author:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

@@ -1,0 +1,4 @@
+track type=bedGraph visibility=full windowingFunction=mean autoScale=on alwaysZero=on name=TURN-estimation_test
+chr1            0          149 42.986357
+chr1          150          299 45.214047
+chr1          300          390 41.887757

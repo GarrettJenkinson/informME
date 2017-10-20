@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+#
+# informME: An information-theoretic pipeline for WGBS data
+# Copyright (C) 2017, Garrett Jenkinson (jenkinson@jhu.edu),
+# and Jordi Abante (jabante1@jhu.edu)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+# or see <http://www.gnu.org/licenses/>.
+#
+
+# Get default locations
+source ~/.informME/informME.config
+
+echo "[$(date)]: Sourcing config file ..."
+
+if [[ "$REFGENEDIR" ]]; then
+        echo "[$(date)]: REFGENEDIR=${REFGENEDIR} ..."
+else
+        echo -e "[$(date)]: \e[31mWARNING: REFGENEDIR not set ...\e[0m"
+fi
+
+if [[ "$BAMDIR" ]]; then
+        echo "[$(date)]: BAMDIR=${BAMDIR} ..."
+else
+        echo -e "[$(date)]: \e[31mWARNING: BAMDIR not set ...\e[0m"
+fi
+
+if [[ "$INTERDIR" ]]; then
+        echo "[$(date)]: INTERDIR=${INTERDIR} ..."
+else
+        echo -e "[$(date)]: \e[31mWARNING: INTERDIR not set ...\e[0m"
+fi
+
+if [[ "$FINALDIR" ]]; then
+        echo "[$(date)]: FINALDIR=${FINALDIR} ..."
+else
+        echo -e "[$(date)]: \e[31mWARNING: FINALDIR not set ...\e[0m"
+fi
+
+if [[ "$MATLICENSE" ]]; then
+        echo "[$(date)]: MATLICENSE=${MATLICENSE} ..."
+else
+        echo -e "[$(date)]: \e[31mWARNING: MATLICENSE not set ...\e[0m"
+fi
+
+# For next release, handle of sratch dir
+#if [[ "$SCRATCHDIR" ]]; then
+#        echo "[$(date)]: SCRATCHDIR=${SCRATCHDIR} ..."
+#else
+#        echo -e "[$(date)]: \e[31mWARNING: SCRATCHDIR not set ...\e[0m"
+#fi

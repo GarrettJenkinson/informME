@@ -1,0 +1,46 @@
+Description:
+    This function makes BED files for the differential methylation analysis results obtained 
+    by means of singleMethAnalysis followed by mergeSingleMethAnalysis.
+       o dMML-phenoName1-VS-phenoName2.bed: differences in mean methylation levels
+       o DMU-phenoName1-VS-phenoName2.bed: differential mean-based classification
+       o dNME-phenoName1-VS-phenoName2.bed: differences in normalized methylation entropies
+       o DEU-phenoName1-VS-phenoName2.bed: differential entropy-based classification
+       o JSD-phenoName1-VS-phenoName2.bed: Jensen-Shannon distances 
+       o dESI-phenoName1-VS-phenoName2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+       o dCAP-phenoName1-VS-phenoName2.bed (if MCflag = 1): differences in channel capacities
+       o dRDE-phenoName1-VS-phenoName2.bed (if MCflag = 1): differences in relative dissipated energies
+
+Usage:
+    makeBedsForDiffMethAnalysis.sh [options] -- PREFIX_1 PREFIX_2 
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
+    -a1|--analdir_1     Analysis directory phenotype 1. Default: $INTERMEDIATE.
+    -a2|--analdir_2     Analysis directory phenotype 2. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $FINALDIR.
+    -t|--threshold      Threshold used in the methylation analysis. Default: 0.4.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+    --min_chr           Minimum chromosome to be included in BED file. Default: 1.
+    --max_chr           Maximum chromosome to be included in BED file. Default: 22.
+    --MC                Computation of information theory metrics. Default: 0.
+    --ESI               Computation of entropic sensivity index (ESI). Default: 0.
+
+Examples:
+    makeBedsForDiffMethAnalysis.sh -d out --MC --ESI -- phenotype_1 phenotype_2 
+                                    
+Output:
+    BED files.
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    mergeSingleMethAnalysis.sh 
+
+Date:
+    10/05/2017
+
+Author:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

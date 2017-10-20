@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+#$ -j y
+#$ -r y
+#$ -S /bin/bash
+#$ -N INFBED
+#$ -l mem_free=40G
+#$ -l h_vmem=40G
+#$ -l h_fsize=60G
+#$ -l cegs2
+#$ -q cegs2.q
+
+# Run Single
+singleMethAnalysisToBed.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal_pe
+singleMethAnalysisToBed.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_cancer_pe
+
+# Run Diff
+makeBedsForDiffMethAnalysis.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal_pe toy_cancer_pe

@@ -1,0 +1,36 @@
+Description:
+    This function merges the output of estimation.sh into a single hashtable.
+
+Usage:
+    mergeEstimation.sh [options] -- CHR_NUM TOTAL_PROC
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
+    -m|--matdir         Matrices directory. Default: $INTERMEDIATE.
+    -e|--estdir         Estimation directory. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -p|--prefix         Prefix of phenotype. Default: ''.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+
+Examples:
+    mergeEstimation.sh -d out -p normal -- 22 1
+
+Output:
+    A MATLAB .mat object with containing the model for the respective chr. 
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    estimation.sh
+
+Downstream:
+    singleMethAnalysis.sh
+
+Date:
+    10/05/2017
+
+Author:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>
