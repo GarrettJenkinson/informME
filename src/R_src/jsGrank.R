@@ -21,103 +21,6 @@
 # Last Modified: 04/17/2017
 # *************************************************************************
 #
-#
-# This is an R script that ranks all Human genes in the 
-# Bioconductor library TxDb.Hsapiens.UCSC.hg19.knownGene using 
-# the Jensen-Shannon distance (JSD) based on the method described 
-# in [1]. It should be run within an R session.
-#
-#  usage (replicate reference data is available):
-#
-#   setwd("path/to/informME/PostProcess/")
-#   source("jsGrank.R")
-#   rankGenes(refVrefFiles,testVrefFiles,inFolder,outFolder,
-#             tName,rName)
-#
-#   # refVrefFiles is a vector of BED files that contain the
-#   # JSD values of a test/reference comparison. 
-#   # For example: if
-#   #
-#   # JSD-lungnormal-1-VS-lungnormal-2.bed 
-#   # JSD-lungcancer-3-VS-lungnormal-1.bed 
-#   # JSD-lungnormal-3-VS-lungnormal-2.bed
-#   # 
-#   # are available, then set 
-#   # 
-#   # textVrefFiles <- c("JSD-lungnormal-1-VS-lungnormal-2.bed",
-#   #                    "JSD-lungnormal-3-VS-lungnormal-1.bed",
-#   #                    "JSD-lungnormal-3-VS-lungnormal-2.bed")
-#   #
-#   # testVrefFiles is a vector of BED files that contain the  
-#   # JSD values of available test/reference comparisons. 
-#   # For example: if 
-#   #
-#   # JSD-lungcancer-1-VS-lungnormal-1.bed  
-#   # JSD-lungcancer-2-VS-lungnormal-2.bed 
-#   # JSD-lungcancer-3-VS-lungnormal-3.bed 
-#   # 
-#   # are available, then set 
-#   # 
-#   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bed",
-#   #                    "JSD-lungcancer-2-VS-lungnormal-2.bed",
-#   #                    "JSD-lungcancer-3-VS-lungnormal-3.bed")
-#   #
-#   # inFolder is the directory that contains the JSD files
-#   # outFolder is the directory used to write the result  
-#   # (a .xlsx file).
-#   # 
-#   # For example:
-#   # 
-#   # inFolder  <- "/path/to/in-folder/"
-#   # outFolder <- "/path/to/out-folder/"
-#   #
-#   # tName and rName are strings providing names for the 
-#   # test and reference phenotypes.
-#   #
-#   # For example: 
-#   #
-#   # tName <- "lungcancer"
-#   # rName <- "lungnormal"
-#
-#  usage (no replicate reference data is available):  
-#
-#   setwd("path/to/informME/PostProcess/")
-#   source("jsGrank.R")
-#   rankGenes(c(),testVrefFiles,inFolder,outFolder,
-#             tName,rName)
-#
-#   # testVrefFiles is a vector of BED files that contain the  
-#   # JSD values of available test/reference comparisons. 
-#   # For example: if 
-#   #
-#   # JSD-lungcancer-1-VS-lungnormal-1.bed 
-#   # JSD-lungcancer-2-VS-lungnormal-2.bed 
-#   # JSD-lungcancer-3-VS-lungnormal-3.bed 
-#   # 
-#   # are available, then set 
-#   # 
-#   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bed",
-#   #                    "JSD-lungcancer-2-VS-lungnormal-2.bed",
-#   #                    "JSD-lungcancer-3-VS-lungnormal-3.bed")
-#   #
-#   # inFolder is the directory that contains the JSD files
-#   # outFolder is the directory used to write the result 
-#   # (a .xlsx file).
-#   # 
-#   # For example:
-#   # 
-#   # inFolder  <- "/path/to/in-folder/"
-#   # outFolder <- "/path/to/out-folder/"
-#   #
-#   # tName and rName are strings providing names for the 
-#   # test and reference phenotypes.
-#   #
-#   # For example: 
-#   #
-#   # tName <- "lungcancer"
-#   # rName <- "lungnormal"
-#
-#
 # REQUIRED PACKAGES:
 library(GenomicFeatures)
 library(GenomicRanges)
@@ -417,4 +320,3 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   # Return value.
   df
 }# End rankGenesJSD.
-
