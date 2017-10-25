@@ -2,6 +2,8 @@
 # informME
 ----------------------------------------------------------------
 
+Push it
+
 An information-theoretic pipeline for methylation analysis of WGBS data.
 
 LATEST RELEASE: v0.3.0
