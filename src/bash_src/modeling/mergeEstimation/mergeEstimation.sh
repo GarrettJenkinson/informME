@@ -52,7 +52,7 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="mergeEstParams"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:d:p:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdir:,prefix:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:m:e:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdir:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -69,7 +69,6 @@ outdir="$INTERDIR"
 matdir="$INTERDIR"
 estdir="$INTERDIR"
 outdir="$INTERDIR"
-prefix=""
 
 # Options
 while true
@@ -97,10 +96,6 @@ do
       ;;
     -d|--outdir)
       outdir="$2"
-      shift 2
-      ;;
-    -p|--prefix)
-      prefix="$2"
       shift 2
       ;;
     -l|--MATLICENSE)
@@ -137,8 +132,10 @@ then
 fi
 
 # Get inputs
-chr_num="$1"
-total_proc="$2"
+mat_files="$1"
+prefix="$2"
+chr_num="$3"
+total_proc="$4"
 
 # Output directory
 mkdir -p "$outdir"
@@ -153,7 +150,7 @@ echo "[$(date)]: Matrices found in: ${matdir}"
 echo "[$(date)]: Estimations found in: ${estdir}" 
 
 # Generate command and options
-cmd="${matlab_function}('$matdir','$refdir','$estdir','$chr_num','$prefix','totalProcessors',$total_proc,'outdir','$outdir')"
+cmd="${matlab_function}('$mat_files','$prefix','$matdir','$refdir','$estdir','$chr_num','totalProcessors',$total_proc,'outdir','$outdir')"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided

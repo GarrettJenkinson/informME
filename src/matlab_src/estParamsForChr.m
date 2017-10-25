@@ -33,14 +33,24 @@
 %
 % USAGE (default):
 %
-% estParamsForChr(matrices_path,reference_path,chr_num,prefix)
+% estParamsForChr(mat_files,prefix,matrices_path,reference_path,chr_num)
 %
 % USAGE (optional):
 % 
 % Example of optional usage with additional input parameters.
-% estParamsForChr(matrices_path,reference_path,chr_num,prefix,'regionSize',2000)
+% estParamsForChr(mat_files,prefix,matrices_path,reference_path,chr_num,...
+%		  'regionSize',2000)
 %
 % MANDATORY INPUTS:
+%
+% mat_files
+%		All the .mat files to be included in the model. This can be a
+% 		single .mat file or multiple files in the form of a comma-sepa-
+%		rated list of files.
+%
+% prefix
+%               A string that specifies the name of the modeled phenotype.
+%		The output files produced will contain this prefix.
 %
 % matrices_path
 %               A string that specifies the path to the directory that 
@@ -60,11 +70,6 @@
 %               performed.
 %		Default: 22.
 %
-% prefix
-%               A string that specifies the name of the modeled phenotype.
-% 		All the files in matrices_path with that prefix will be 
-%		will be included in the model.
-%		Default: ''.
 %
 % OPTIONAL INPUTS: 
 %
@@ -91,13 +96,14 @@
 % a detailed understanding of the code and the methods used. 
 %
 
-function estParamsForChr(matrices_path,reference_path,chr_num,prefix,varargin)
+function estParamsForChr(mat_files,prefix,matrices_path,reference_path,chr_num,varargin)
 % Parse values passed as inputs to the fuction and validate them.
 p = inputParser;
+addRequired(p,'mat_files')
+addRequired(p,'prefix')
 addRequired(p,'matrices_path')
 addRequired(p,'reference_path')
 addRequired(p,'chr_num')
-addRequired(p,'prefix')
 addParameter(p,'totalProcessors',1,@(x)validateattributes(x,{'numeric'},{'nonempty',...
                'integer','positive','scalar'}))
 addParameter(p,'processorNum',1,@(x)validateattributes(x,{'numeric'},{'nonempty',...
@@ -107,7 +113,7 @@ addParameter(p,'outdir',['.' filesep 'results' filesep],@(x)validateattributes(x
 addParameter(p,'regionSize',int64(3000),@(x)validateattributes(x,{'numeric'},{'nonempty',...
                'integer','positive','scalar'}))
 
-parse(p,matrices_path,reference_path,chr_num,prefix,varargin{:})
+parse(p,mat_files,prefix,matrices_path,reference_path,chr_num,varargin{:})
 
 totalProcessors    = p.Results.totalProcessors;
 processorNum       = p.Results.processorNum;
@@ -164,16 +170,14 @@ indexOfProcessor = processorNum:totalProcessors:length(allStartBPs);
 % by this processor.
 thisProcessorStartBPs = allStartBPs(indexOfProcessor);
 
-% Load data for this chromosome from merged .mat files in folder provided.
-i=1;
-mat_files = dir([matrices_path 'chr' chr_num_str filesep prefix '*matrices*.mat']);
-for mat_file = mat_files'
-    name=getfield(mat_file,'name');
-    mat_file_path=[matrices_path 'chr' chr_num_str filesep name];
-    load(mat_file_path,'mapObjData');
-    dataMapObj{i} = mapObjData; %#ok<AGROW>
+% Load data for this chromosome for all matrices provided.
+mat_files = strsplit(mat_files,',');
+for index = 1:length(mat_files)
+    base = char(mat_files(index));
+    file_path = [matrices_path 'chr' chr_num_str filesep base '_matrices.mat']
+    load(file_path,'mapObjData');
+    dataMapObj{index} = mapObjData;
     clear mapObjData;
-    i=i+1;
 end
 
 % Loop through all regions on chromosome designated to this processor.
@@ -192,8 +196,7 @@ for startBP = thisProcessorStartBPs
         
         % Load data for region.
         dataMat=[];
-        i=1;
-        for mat_file = mat_files'
+	for i = 1:length(mat_files)
             if isKey(dataMapObj{i},locationPathName)
                 regionDataStruct = dataMapObj{i}(locationPathName);
                 if isempty(dataMat) % Get values of Dist and density in region.  
@@ -206,7 +209,6 @@ for startBP = thisProcessorStartBPs
                 observedMatrix = full(regionDataStruct.sparseObsMatPlusOne)-1;
                 dataMat = [dataMat;observedMatrix];%#ok<AGROW>
             end
-            i=i+1;
         end
         
         % Estimate parameters.

@@ -33,3 +33,8 @@ echo "Processing cancer..."
 for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
 bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI -- toy_cancer $1 4 $2' argv0 1>/dev/null
 
+# Execute command for pooled toy
+echo "Processing pooled..."
+for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
+bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI -- toy_pooled $1 4 $2' argv0 1>/dev/null
+

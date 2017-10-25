@@ -123,9 +123,10 @@ do
 done
 
 # Get inputs
-prefix="$1"
-chr_num="$2"
-total_proc="$3"
+mat_files="$1"
+prefix="$2"
+chr_num="$3"
+total_proc="$4"
 
 # Output directory
 mkdir -p "$outdir"
@@ -135,7 +136,7 @@ mkdir -p "${outdir}/chr${chr_num}"
 SECONDS=0
 echo "[$(date)]: Call: estimation.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_proc" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm estimation.sh -r '$refdir' -m '$matdir' -d '$estdir' -p '$prefix' -- '$chr_num' '$total_proc' {X}"
+seq "$total_proc" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm estimation.sh -r '$refdir' -m '$matdir' -d '$estdir' -- '$mat_files' '$prefix' '$chr_num' '$total_proc' {X}"
 
 # Check if everything OK
 EXITCODE="$?"
@@ -153,7 +154,7 @@ fi
 # Merge estimation blocks
 echo "[$(date)]: Call: mergeEstimation.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$estdir" -d "$estdir" -p "$prefix" -- "$chr_num" "$total_proc"
+mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$estdir" -d "$estdir" -- "$mat_files" "$prefix" "$chr_num" "$total_proc"
 
 # Check if everything OK
 if [ $? -ne 0 ] 

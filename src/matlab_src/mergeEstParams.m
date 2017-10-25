@@ -30,15 +30,24 @@
 %
 % USAGE (default):
 %
-% mergeEstParams(matrices_path,reference_path,estimation_path,chr_num,prefix)
+% mergeEstParams(mat_files,prefix,matrices_path,reference_path,estimation_path,chr_num)
 %
 % USAGE (optional):
 %
 % Example of optional usage with additional input parameters:
-% mergeEstParams(matrices_path,reference_path,estimation_path,chr_num,prefix,...
+% mergeEstParams(mat_files,prefix,matrices_path,reference_path,estimation_path,chr_num,...
 %	'outdir','/path/to/output')
 %
 % MADATORY INPUTS:
+%
+% mat_files
+%               All the .mat files to be included in the model. This can be a
+%               single .mat file or multiple files in the form of a comma-sepa-
+%               rated list of files.
+%
+% prefix
+%               A string that specifies the name of the modeled phenotype.
+%               The output files produced will contain this prefix.
 %
 % matrices_path
 %               A string that specifies the path to the directory in which  
@@ -61,9 +70,6 @@
 %               chromosome for which statistical estimation must be 
 %               performed.
 %
-% prefix
-%               A string that specifies the name of the phenotype.
-%
 % OPTIONAL INPUTS: 
 %
 % totalProcessors
@@ -82,15 +88,16 @@
 % a detailed understanding of the code and the methods used. 
 %
 
-function mergeEstParams(matrices_path,reference_path,estimation_path,chr_num,prefix,varargin)
+function mergeEstParams(mat_files,prefix,matrices_path,reference_path,estimation_path,chr_num,varargin)
 
 % Parse values passed as inputs to the fuction and validate them.
 p = inputParser;
+addRequired(p,'mat_files')
+addRequired(p,'prefix')
 addRequired(p,'matrices_path')
 addRequired(p,'reference_path')
 addRequired(p,'estimation_path')
 addRequired(p,'chr_num')
-addRequired(p,'prefix')
 addParameter(p,'outdir',['.' filesep 'results' filesep],@(x)validateattributes(x,...
 		{'char'},{'nonempty'}))
 addParameter(p,'totalProcessors',1,@(x)validateattributes(x,{'numeric'},{'nonempty',...
@@ -98,7 +105,7 @@ addParameter(p,'totalProcessors',1,@(x)validateattributes(x,{'numeric'},{'nonemp
 addParameter(p,'regionSize',int64(3000),@(x)validateattributes(x,{'numeric'},{'nonempty',...
                	'integer','positive','scalar'}))
           
-parse(p,matrices_path,reference_path,estimation_path,chr_num,prefix,varargin{:})
+parse(p,mat_files,prefix,matrices_path,reference_path,estimation_path,chr_num,varargin{:})
 totalProcessors     = p.Results.totalProcessors;
 regionSize          = p.Results.regionSize;
 outdir              = p.Results.outdir;
@@ -142,7 +149,7 @@ for processorNum = 1:totalProcessors
         % input values in case user has changed one of the default values.    
         fprintf(2,'WARNING: The following file does not exist and is being processed:');
         fprintf(2,[temp_file '\n']);
-        estParamsForChr(matrices_path,reference_path,chr_num,prefix,'totalProcessors',totalProcessors,...
+        estParamsForChr(mat_files,prefix,matrices_path,reference_path,chr_num,'totalProcessors',totalProcessors,...
                         'processorNum',processorNum,'outdir',estimation_path,'regionSize',regionSize);
     end
 end

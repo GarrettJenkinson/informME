@@ -158,7 +158,7 @@ NOTE: This step must be completed before proceeding with
 D.3. MODEL ESTIMATION & ANALYSIS:
 ---------------------------------
 
-        informME_run.sh [OPTIONS] -- PREFIX CHR_NUM TOTAL_PROC
+        informME_run.sh [OPTIONS] -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC
 
 This step estimates the parameters of the Ising probability 
 distribution used to model methylation within equally sized 

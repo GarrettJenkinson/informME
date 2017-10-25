@@ -14,7 +14,7 @@ Description:
       o the log partition function of the estimated Ising model.
 
 Usage:
-    informME_run.sh  [options]  -- PREFIX CHR_NUM TOTAL_PROC
+    informME_run.sh  [options]  -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC
 
 Options:
     -h|--help           Help.
@@ -28,7 +28,8 @@ Options:
     --time_limit     	Maximum time allowed to each thread to complete in minutes. Default: 60.
 
 Examples:
-    informME_run.sh -c 1 -q 5 -- sample_1 1 5
+    informME_run.sh -c 1 -q 5 -- sample1 pheno_1 1 5
+    informME_run.sh -c 1 -q 5 -- sample2,sample3,sample4 pheno_2 1 5
 
 Output:
     MATLAB .mat file.
@@ -48,7 +49,7 @@ Downstream:
     diffAnalysisToBed.sh
 
 Date:
-    10/05/2017
+    10/25/2017
 
 Author:
     Garrett Jenkinson <jenkinson@jhu.edu>
