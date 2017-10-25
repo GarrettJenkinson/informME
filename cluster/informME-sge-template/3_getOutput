@@ -11,8 +11,8 @@
 #$ -q cegs2.q
 
 # Run Single
-singleMethAnalysisToBed.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal_pe
-singleMethAnalysisToBed.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_cancer_pe
+singleMethAnalysisToBed.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal
+singleMethAnalysisToBed.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_cancer
 
 # Run Diff
-makeBedsForDiffMethAnalysis.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal_pe toy_cancer_pe
+makeBedsForDiffMethAnalysis.sh --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal toy_cancer

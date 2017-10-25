@@ -16,5 +16,5 @@
 max_proc=4
 
 # Run
-informME_run.sh -q "$max_proc" -- toy_normal_pe "${SGE_TASK_ID}" "$max_proc"
-informME_run.sh -q "$max_proc" -- toy_cancer_pe "${SGE_TASK_ID}" "$max_proc"
+informME_run.sh -q "$max_proc" -- toy_normal_pe toy_normal "${SGE_TASK_ID}" "$max_proc"
+informME_run.sh -q "$max_proc" -- toy_cancer_pe toy_cancer "${SGE_TASK_ID}" "$max_proc"
