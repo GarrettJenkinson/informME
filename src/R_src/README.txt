@@ -225,7 +225,7 @@ in [1]. It should be run within an R session.
 REFERENCES
 ----------
 
-[1] Jenkninson, G., Feinberg, A.P., and Goutsias, J. (2017) 
+[1] Jenkninson, G.,Abante, J., Feinberg, A.P., and Goutsias, J. (2017) 
     An informtaion-theoretic approach to the modeling and 
     analysis of whole-genome bisulfite sequencing data, 
     Submitted.

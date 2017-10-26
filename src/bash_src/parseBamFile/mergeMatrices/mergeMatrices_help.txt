@@ -34,6 +34,6 @@ Downstream:
 Date:
     10/05/2017
 
-Author:
+Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
     Jordi Abante <jabante1@jhu.edu>
