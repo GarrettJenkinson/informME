@@ -206,7 +206,7 @@ cd $STARTDIR
 # Make changes to user's .bashrc
 #
 
-printf '\ninformME would like to make the following additions to your .bashrc file\n\n\n#Added by informME installation\nif [ -z "${LD_LIBRARY_PATH}"]; then\n\texport LD_LIBRARY_PATH="'
+printf '\ninformME would like to make the following additions to your .bashrc file\n\n\n#Added by informME installation\nif [ -z "${LD_LIBRARY_PATH}" ]; then\n\texport LD_LIBRARY_PATH="'
 printf "$MPFRDIR/lib"
 printf '"\nelse\n\texport LD_LIBRARY_PATH="'
 printf "$MPFRDIR/lib"
@@ -218,7 +218,7 @@ read -p "Do you want these lines appended to your ~/.bashrc file (y/n)? " -n 1 -
 
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    printf '\n\n\n#Added by informME installation\nif [ -z "${LD_LIBRARY_PATH}"]; then\n\texport LD_LIBRARY_PATH="' >> ~/.bashrc
+    printf '\n\n\n#Added by informME installation\nif [ -z "${LD_LIBRARY_PATH}" ]; then\n\texport LD_LIBRARY_PATH="' >> ~/.bashrc
     printf "$MPFRDIR/lib" >> ~/.bashrc
     printf '"\nelse\n\texport LD_LIBRARY_PATH="' >> ~/.bashrc
     printf "$MPFRDIR/lib" >> ~/.bashrc
