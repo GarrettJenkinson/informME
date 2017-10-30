@@ -1,0 +1,56 @@
+Description:
+    Wrapper that generates the model and runs the analysis on the input with the prefix passed.
+    This step estimates the parameters of the Ising probability distribution used to model 
+    methylation within equally sized (in base pairs) non-overlapping regions of the genome. Each
+    phenoName_fit.mat file contains the following information for each genomic region used in model 
+    estimation:
+      o CpG distances
+      o CpG densities
+      o estimated alpha, beta, and gamma parameters of the Ising
+        model
+      o initial and transition probabilities of the inhomogeneous
+        Markov chain representation of the Ising model
+      o marginal probabilities at each CpG site
+      o the log partition function of the estimated Ising model.
+
+Usage:
+    informME_run.sh  [options]  -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome & CpG location files directory. Default: $REFGENEDIR.
+    -b|--bamdir         BAM file directory. Default: $BAMDIR.
+    -e|--estdir         Modeling directory. Default: $INTERMEDIATE.
+    -a|--analdir        Analysis directory. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -q|--threads        Number of threads used. Default: 1.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+    --time_limit     	Maximum time allowed to each thread to complete in minutes. Default: 60.
+
+Examples:
+    informME_run.sh -c 1 -q 5 -- sample1 pheno_1 1 5
+    informME_run.sh -c 1 -q 5 -- sample2,sample3,sample4 pheno_2 1 5
+
+Output:
+    MATLAB .mat file.
+
+Dependancies:
+    * MATLAB
+    * estimation.sh
+    * mergeEstimation.sh
+    * singleMethAnalysis.sh
+    * mergeSingleMethAnalysis.sh
+
+Upstream:
+    getMatrices.sh
+
+Downstream:
+    singleAnalysisToBed.sh
+    diffAnalysisToBed.sh
+
+Date:
+    10/25/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

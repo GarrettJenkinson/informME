@@ -1,0 +1,3 @@
+track type=bedGraph visibility=dense windowingFunction=mean autoScale=off viewLimits=0.0:3.0 name=VAR-toy_pooled
+chr2         9900         9974 1.000000
+chr3         9900         9988 1.000000

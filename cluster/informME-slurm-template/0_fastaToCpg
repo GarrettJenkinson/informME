@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH -J IME-0.3.0-REF
+#SBATCH -n1 --cpus-per-task=16
+#SBATCH --mem-per-cpu=4000
+#SBATCH --time=05:00:00
+#SBATCH -o IME-0.3.0-REF.out
+#SBATCH -e IME-0.3.0-REF.err
+
+# Dependencies
+module load matlab/R2017a
+module load samtools
+
+# I/O
+reference="/path/to/file.fasta"
+
+# Command
+fastaToCpg.sh "$reference"

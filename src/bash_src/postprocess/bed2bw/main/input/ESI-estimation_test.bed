@@ -1,0 +1,4 @@
+track type=bedGraph visibility=full windowingFunction=mean autoScale=on alwaysZero=on name=ESI-estimation_test
+chr1            0          149 0.628566
+chr1          150          299 0.000000
+chr1          300          390 0.061317
