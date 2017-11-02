@@ -52,7 +52,7 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:d:t:c:l:q: -l help,refdir:,bamdir:,outdir:,trim:,chr_string:,MATLICENSE:,threads:,time_limit: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:d:t:c:l:q: -l help,refdir:,bamdir:,outdir:,trim:,chr_string:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -70,6 +70,7 @@ trim=0
 chr_string=1
 threads=1
 time_limit=60
+total_part=200
 
 # Options
 while true
@@ -116,6 +117,10 @@ do
       time_limit="$2"
       shift 2
       ;;  
+    --total_part)
+      total_part="$2"
+      shift 2
+      ;;  
     --) 
       shift
       break
@@ -130,7 +135,6 @@ done
 # Get inputs
 bam_file="$1"
 chr_num="$2"
-total_proc="$3"
 
 # Get BAM file
 bam_prefix="$(basename "$bam_file" .bam)"
@@ -143,7 +147,7 @@ mkdir -p "${outdir}/chr${chr_num}"
 SECONDS=0
 echo "[$(date)]: Call: matrixFromBam.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_proc" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm matrixFromBam.sh -r '$refdir' -b '$bamdir' -d '$outdir' -c '$chr_string' -t '$trim' -- '$bam_prefix' '$chr_num' '$total_proc' {X}"
+seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm matrixFromBam.sh -r '$refdir' -b '$bamdir' -d '$outdir' -c '$chr_string' -t '$trim' -- '$bam_prefix' '$chr_num' '$total_part' {X}"
  
 # Check if everything OK or the job was interrupted due to excessive length
 EXITCODE="$?"
@@ -161,7 +165,7 @@ fi
 # Merge matrices via mergeMatrices.sh
 echo "[$(date)]: Call: mergeMatrices.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeMatrices.sh -r "$refdir" -b "$bamdir" -m "$outdir" -d "$outdir" -c "$chr_string" -t "$trim" -- "$bam_file" "$chr_num" "$total_proc"
+mergeMatrices.sh -r "$refdir" -b "$bamdir" -m "$outdir" -d "$outdir" -c "$chr_string" -t "$trim" -- "$bam_file" "$chr_num" "$total_part"
 
 # Check if everything OK
 if [ $? -ne 0 ] 

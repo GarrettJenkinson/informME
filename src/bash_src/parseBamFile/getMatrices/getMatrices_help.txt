@@ -7,7 +7,7 @@ Description:
        o CpG locations broken down by region.
 
 Usage:
-    getMatrices.sh  [options]  -- BAM_FILE CHR_NUM TOTAL_PROC
+    getMatrices.sh  [options]  -- BAM_FILE CHR_NUM
 
 Options:
     -h|--help           Help.
@@ -19,12 +19,13 @@ Options:
     -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
     -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
     --time_limit     	Maximum time allowed to each thread to complete in minutes. Default: 60.
+    --total_part     	Number of partitions chromosome CHR_NUM is divided into. Default: 200.
 
 Examples:
     * Trimming 10 on each read and using 5 threads, rest default:
-    	getMatrices.sh -t 10 -q 5 -- sample_1.bam 1 5
+    	getMatrices.sh -t 10 -q 5 -- sample_1.bam 1
     * Trimming different bases on each read, on each read and using 5 threads, with chrX indexing:
-    	getMatrices.sh -d matrices -c 1 -t '[15,20]' -q 5 -- sample_1.bam 1 5
+    	getMatrices.sh -d matrices -c 1 -t '[15,20]' -q 5 -- sample_1.bam 1
 
 Output:
     MATLAB .mat file with suffix *_matrices.mat.

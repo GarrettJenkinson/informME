@@ -25,9 +25,9 @@ rm -rf out
 
 # Process normal
 echo "Processing normal..."
-seq 5 | xargs -I {X} bash -c '../getMatrices.sh -r ../../fastaToCpg/main -b input/ -d out/ -c 1 -t '[10,10]' -q 4 --time_limit 10 -- toy_normal_pe {X} 4'
+seq 5 | xargs -I {X} bash -c '../getMatrices.sh -r ../../fastaToCpg/main -b input/ -d out/ -c 1 -t '[10,10]' -q 4 --time_limit 10 --total_part 4 -- toy_normal_pe {X}'
 
 # Process cancer
 echo "Processing cancer..."
-seq 5 | xargs -I {X} bash -c '../getMatrices.sh -r ../../fastaToCpg/main/ -b input/ -d out/ -c 1 -t '[10,10]' -q 4 --time_limit 10 -- toy_cancer_pe {X} 4'
+seq 5 | xargs -I {X} bash -c '../getMatrices.sh -r ../../fastaToCpg/main/ -b input/ -d out/ -c 1 -t '[10,10]' -q 4 --time_limit 10 --total_part 4 -- toy_cancer_pe {X}'
 
