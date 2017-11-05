@@ -1,17 +1,24 @@
 Description:
     This function makes BED files for the differential methylation analysis results obtained 
     by means of singleMethAnalysis followed by mergeSingleMethAnalysis.
-       o dMML-phenoName1-VS-phenoName2.bed: differences in mean methylation levels
-       o DMU-phenoName1-VS-phenoName2.bed: differential mean-based classification
-       o dNME-phenoName1-VS-phenoName2.bed: differences in normalized methylation entropies
-       o DEU-phenoName1-VS-phenoName2.bed: differential entropy-based classification
-       o JSD-phenoName1-VS-phenoName2.bed: Jensen-Shannon distances 
-       o dESI-phenoName1-VS-phenoName2.bed (if ESIflag = 1): differences in entropic sensitivity indices
-       o dCAP-phenoName1-VS-phenoName2.bed (if MCflag = 1): differences in channel capacities
-       o dRDE-phenoName1-VS-phenoName2.bed (if MCflag = 1): differences in relative dissipated energies
+       o dMML-PHENO1-VS-PHENO2.bed: differences in mean methylation levels
+       o DMU-PHENO1-VS-PHENO2.bed: differential mean-based classification
+       o dNME-PHENO1-VS-PHENO2.bed: differences in normalized methylation entropies
+       o DEU-PHENO1-VS-PHENO2.bed: differential entropy-based classification
+       o JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances 
+       o dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+       o dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
+       o dRDE-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in relative dissipated energies
+    The methylation analysis files will be assumed to be located in INTERDIR, and the
+    output files will be stored in FINALDIR. These directories can be modified through
+    optional arguments that can be passed to the function.
 
 Usage:
     makeBedsForDiffMethAnalysis.sh [options] -- PREFIX_1 PREFIX_2 
+
+Mandatory arguments:
+    o PREFIX_1: prefix of the methylation analysis file 1 (name phenotype 1).
+    o PREFIX_2: prefix of the methylation analysis file 2 (name phenotype 2).
 
 Options:
     -h|--help           Help.
@@ -20,11 +27,11 @@ Options:
     -a2|--analdir_2     Analysis directory phenotype 2. Default: $INTERMEDIATE.
     -d|--outdir         Output directory. Default: $FINALDIR.
     -t|--threshold      Threshold used in the methylation analysis. Default: 0.4.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
     --min_chr           Minimum chromosome to be included in BED file. Default: 1.
     --max_chr           Maximum chromosome to be included in BED file. Default: 22.
     --MC                Computation of information theory metrics. Default: 0.
     --ESI               Computation of entropic sensivity index (ESI). Default: 0.
+    -l|--MATLICENSE     Path to MATLAB's License.
 
 Examples:
     makeBedsForDiffMethAnalysis.sh -d out --MC --ESI -- phenotype_1 phenotype_2 
@@ -39,7 +46,7 @@ Upstream:
     mergeSingleMethAnalysis.sh 
 
 Date:
-    10/05/2017
+    11/02/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>

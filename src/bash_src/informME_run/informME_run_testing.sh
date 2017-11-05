@@ -19,6 +19,7 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 # or see <http://www.gnu.org/licenses/>.
 #
+echo "BEGIN OF INFORMME_RUN"
 
 # Extend regex capabilities
 shopt -s extglob
@@ -27,6 +28,9 @@ shopt -s extglob
 abspath_script="$(readlink -f -e "$0")"
 script_absdir="$(dirname "$abspath_script")"
 script_name="$(basename "$0" .sh)"
+echo "abspath_script:$abspath_script"
+echo "script_absdir:$script_absdir"
+echo "script_name:$script_name"
 
 # Print help if no arguments
 if [ $# -eq 0 ]
@@ -127,78 +131,90 @@ do
   esac
 done
 
+echo "refdir:$refdir"
+echo "bamdir:$bamdir"
+echo "matdir:$matdir"
+echo "estdir:$estdir"
+echo "analdir:$analdir"
+echo "outdir:$outdir"
+
 # Get inputs
 mat_files="$1"
 prefix="$2"
 chr_num="$3"
+echo "mat_files:$mat_files"
+echo "prefix:$prefix"
+echo "chr_num:$chr_num"
 
-# Output directory
+## Output directory
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
 
-# Run estimation on chunks
+echo "Successful mkdir"
+
+## Run estimation on chunks
 SECONDS=0
 echo "[$(date)]: Call: estimation.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm estimation.sh -r '$refdir' -m '$matdir' -d '$estdir' -- '$mat_files' '$prefix' '$chr_num' '$total_part' {X}"
-
-# Check if everything OK
-EXITCODE="$?"
-if [ "$EXITCODE" -ne 0 ]
-then
-  if [ "$EXITCODE" -ne 123 ]
-  then
-    echo "[$(date)]: Terminating" >&2
-    exit 1
-  else
-    echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
-  fi
-fi
-
-# Merge estimation blocks
-echo "[$(date)]: Call: mergeEstimation.sh ..." 
-echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$estdir" -d "$estdir" -- "$mat_files" "$prefix" "$chr_num" "$total_part"
-
-# Check if everything OK
-if [ $? -ne 0 ] 
-then
-  echo "[$(date)]: Terminating..." >&2
-  exit -1
-fi
-
-# Run analysis on chunks
-SECONDS=0
-echo "[$(date)]: Call: singleMethAnalysis.sh ..." 
-echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$analdir' --MC --ESI -- '$prefix' '$chr_num' '$total_part' {X}"
-
-# Check if everything OK
-EXITCODE="$?"
-if [ "$EXITCODE" -ne 0 ]
-then
-  if [ "$EXITCODE" -ne 123 ]
-  then
-    echo "[$(date)]: Terminating" >&2
-    exit 1
-  else
-    echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
-  fi
-fi
-
-# Merge analysis blocks
-echo "[$(date)]: Call: mergeSingleMethAnalysis.sh ..." 
-echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$analdir" -d "$outdir" --MC --ESI -- "$prefix" "$chr_num" "$total_part"
-
-# Check if everything OK
-if [ $? -ne 0 ] 
-then
-  echo "[$(date)]: Terminating..." >&2
-  exit -1
-fi
-
-# Time elapsed after succesful command
-time_elapsed="$SECONDS"
-echo "[$(date)]: Command succesful. Total time elapsed: $(( $time_elapsed / 3600)) h \
-$(( ($time_elapsed / 60) % 60)) m $(( $time_elapsed % 60 )) s."
+#seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm estimation.sh -r '$refdir' -m '$matdir' -d '$estdir' -- '$mat_files' '$prefix' '$chr_num' '$total_part' {X}"
+#
+## Check if everything OK
+#EXITCODE="$?"
+#if [ "$EXITCODE" -ne 0 ]
+#then
+#  if [ "$EXITCODE" -ne 123 ]
+#  then
+#    echo "[$(date)]: Terminating" >&2
+#    exit 1
+#  else
+#    echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
+#  fi
+#fi
+#
+## Merge estimation blocks
+#echo "[$(date)]: Call: mergeEstimation.sh ..." 
+#echo "[$(date)]: Processing chromosome: ${chr_num}" 
+#mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$estdir" -d "$estdir" -- "$mat_files" "$prefix" "$chr_num" "$total_part"
+#
+## Check if everything OK
+#if [ $? -ne 0 ] 
+#then
+#  echo "[$(date)]: Terminating..." >&2
+#  exit -1
+#fi
+#
+## Run analysis on chunks
+#SECONDS=0
+#echo "[$(date)]: Call: singleMethAnalysis.sh ..." 
+#echo "[$(date)]: Processing chromosome: ${chr_num}" 
+#seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$analdir' --MC --ESI -- '$prefix' '$chr_num' '$total_part' {X}"
+#
+## Check if everything OK
+#EXITCODE="$?"
+#if [ "$EXITCODE" -ne 0 ]
+#then
+#  if [ "$EXITCODE" -ne 123 ]
+#  then
+#    echo "[$(date)]: Terminating" >&2
+#    exit 1
+#  else
+#    echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
+#  fi
+#fi
+#
+## Merge analysis blocks
+#echo "[$(date)]: Call: mergeSingleMethAnalysis.sh ..." 
+#echo "[$(date)]: Processing chromosome: ${chr_num}" 
+#mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$analdir" -d "$outdir" --MC --ESI -- "$prefix" "$chr_num" "$total_part"
+#
+## Check if everything OK
+#if [ $? -ne 0 ] 
+#then
+#  echo "[$(date)]: Terminating..." >&2
+#  exit -1
+#fi
+#
+## Time elapsed after succesful command
+#time_elapsed="$SECONDS"
+#echo "[$(date)]: Command succesful. Total time elapsed: $(( $time_elapsed / 3600)) h \
+#$(( ($time_elapsed / 60) % 60)) m $(( $time_elapsed % 60 )) s."

@@ -20,7 +20,7 @@ o Red Hat Enterprise Linux Server Release 6.5 (Santiago) and CentOS release 6.7 
 
 o Sun Grid Engine OGS/GE 2011.11 and Slurm 17.02.3
 
-o MATLAB R2013b 64-bit and MATLAB R2016b 64-bit  with Bioinformatics and Symbolic Math Toolboxes 
+o MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, and MATLAB R2017a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
 
 and by using the following tools:
 
@@ -38,12 +38,11 @@ informME includes the following directories:
 
 informME/bin - contains softlinks to all executable bash scripts
 
-informME/cluster - contains templates for running informME on SGE and SLURM clusters
-
-informME/src - contains all bash wrappers that include (i) help file, and (ii) comprehensive toy example. Also contains the MATLAB, C++, and R informME source codes
+informME/src - contains all bash wrappers as well as the MATLAB, C++, and R code used by informME
 
 informME/third_party - contains third party MATLAB software used by informME
 
+informME/cluster - contains templates for running informME on SGE and SLURM clusters
 
 B. DEPENDENCIES
 ---------------
@@ -56,7 +55,7 @@ https://www.mathworks.com/help/matlab/ref/mex.html
 
 for details.
 
-GMP, MPFR, MPREAL, and Eigen are all C++ dependencies that the installation script will install for you as needed.
+GMP, MPFR, MPREAL, and Eigen are all C++ dependencies that the installation script will install as needed.
 
 A working SAMtools installation needs to be on the system path.
 
@@ -64,17 +63,17 @@ A working SAMtools installation needs to be on the system path.
 C. INSTALLING InformME
 ----------------------
 
-Run install.sh in the informME directory. During the interactive installing process the user will be asked different questions regarding the locations of default directories. Dependencies, such as GMP, MPFR, MPREAL, and Eigen, will be automatically installed during this process if these are not already available, and informME's C++ MEX code will be compiled.
+Run install.sh in the informME directory. During the interactive installing process the user will be asked different questions regarding the locations of default directories. Dependencies, such as GMP, MPFR, MPREAL, and Eigen, will be automatically installed during this process if these are not already available, and the C++ MEX code of informME will be compiled.
 
 Note: the following environment variables will be defined in a configuration file stored in ~/.informME/informME.config and then will be accessed throughout multiple points in the informME pipeline:
 
-o REFGENEDIR: directory where the CpGlocationChrX.mat files are stored
+o REFGENEDIR: directory where the CpGlocationChrX.mat files will be stored
 
 o BAMDIR: directory where the BAM files are stored
 
-o INTERDIR: directory where all the intermediate files are stored
+o INTERDIR: directory where all the intermediate files will be stored
 
-o FINALDIR: directory where the output BED files are stored
+o FINALDIR: directory where the output BED files will be stored
  
 o MATLICENSE: path to MATLAB license
 
@@ -84,14 +83,14 @@ These environment variables can be overwritten through optional arguments when r
 D. RUNNING informME
 -------------------
 
-Run the informME software using the following steps in the indicated order (type the name of the command with no arguments to see help file and instructions in each case).
+Run the informME software using the following steps in the indicated order (type the name of the command with no arguments to see the help file with instructions in each case).
 
 D.1. REFERENCE GENOME ANALYSIS:
 -------------------------------
 	
         fastaToCpg.sh [OPTIONS] -- FASTA_FILE
 
-This step analyzes the reference genome and produces a MATLAB MAT file CpGlocationChr#.mat for each chromosome. Each MAT file contains the following information: 
+This step analyzes the reference genome FASTA\_FILE (in FASTA format) and produces a MATLAB MAT file CpGlocationChr#.mat for each chromosome. Each MAT file produced will be stored by default in REFGENEDIR, and it will contain the following information:
 
 o location of CpG sites 
 
@@ -99,47 +98,45 @@ o CpG density for each CpG site
 
 o distance between neighboring CpG sites
 
-o location of the last CpG site in the chormosome
+o location of the last CpG site in the chromosome
 
 o length of chromosome (in base pairs)
 
-NOTE: This step must be completed before proceeding with the next step, but it is only done once per reference genome. 
 
 D.2. METHYLATION DATA MATRIX GENERATION: 
 ----------------------------------------
 	
-        getMatrices.sh [OPTIONS]  -- BAM_FILE CHR_NUM TOTAL_PROC
+        getMatrices.sh [OPTIONS]  -- BAM\_FILE CHR\_NUM
 
-Wrapper that takes a BAM file as input and generates matrices for informME. Each chromosome subdirectory includes the MATLAB file phenoName_matrices.mat. Each file contains the following information for each genomic region, which will be subsequently used in model estimation:
+This step takes the BAM file BAM\_FILE as input and generates the methylation data matrix for chromosome number CHR\_NUM. The file BAM\_FILE is expected to be in BAMDIR by default. The output produced by this step is stored by default in a subdirectory in INTERDIR named after the chromosome number CHR\_NUM (e.g. if CHR\_NUM is 10, then the output will be stored in INTERDIR/chr10/). The file will preserve the prefix from the file BAM\_FILE and the suffix '\_matrices.mat' will be appended (e.g. if BAM\_FILE is normal\_sample.bam and CHR\_NUM is 10, then the output file will be stored as INTERDIR/chr10/normal\_sample\_matrices.mat). The output file profuced will contain, for each genomic region, the following information which will be subsequently used in model estimation:
 
 o data matrix with -1,0,1 values for methylation status
 
 o CpG locations broken down by region.
 
-NOTE: This step must be completed before proceeding with the next step. 
+NOTE: we recommend taking advantage of the array feature available in SGE and SLURM based clusters to submit an individual job for each chromosome.
+
 
 D.3. MODEL ESTIMATION & ANALYSIS:
 ---------------------------------
 
-        informME_run.sh [OPTIONS] -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC
+        informME_run.sh [OPTIONS] -- MAT\_FILES PHENO CHR_NUM
 
-This step estimates the parameters of the Ising probability distribution used to model methylation within equally sized (in base pairs) non-overlapping regions of the genome. Each phenoName_fit.mat file contains the following information for each genomic region used in model estimation: 
+This step is comprised of two phases. In the first phase, informME learns the parameters of the Ising probability distribution by combining the methylation data matrices provided through the argument MAT\_FILES (comma-separated list) for chromosome number CHR\_NUM. The MAT\_FILES are all expected to be in a subdirectory named after CHR\_NUM in INTERDIR by default. The output generated by this phase will be stored by default in a subdirectory in INTERDIR named after chromosome number CHR\_NUM as well, and will have as prefix PHENO and the suffix '\_fit.mat' will be appended (e.g. if sample\_normal-1,sample\_normal-2,sample\_normal-3 is the list passed as MAT\_FILES, 'normal' is the PHENO passed, and CHR\_NUM is 10, then the output will be stored as INTERDIR/chr10/normal\_fit.mat). The output file will contain the following information:
 
 o CpG distances
 
 o CpG densities
 
-o estimated alpha, beta, and gamma parameters of the Ising 
-model
+o estimated alpha, beta, and gamma parameters of the Ising model
 
-o initial and transition probabilities of the inhomogeneous 
-Markov chain representation of the Ising model
+o initial and transition probabilities of the inhomogeneous Markov chain representation of the Ising model
 
 o marginal probabilities at each CpG site
 
 o the log partition function of the estimated Ising model
 
-This is followed by methylation analysis of a given phenotype by computing a number of statistical summaries of the methylation state, including probability distributions of methylation levels, mean methylation levels, and normalized methylation entropies, as well as mean and entropy based classifications. If desired, this step also computes entropic sensitivity indices, as well information-theoretic quantities associated with methylation channels, such as turnover ratios, channel capacities, and relative dissipated energies. Each chromosome subdirectory contains the MATLAB file phenoName_analysis.mat for each phenotypic methylation sample (lungnormal-1, lungcancer-1,  etc.), with each phenoName_analysis.mat file containing the following information for each genomic region used in model estimation: 
+The second phase of this step consists in analyzing the model learned by computing a number of statistical summaries of the methylation state, including probability distributions of methylation levels, mean methylation levels, and normalized methylation entropies, as well as mean and entropy based classifications. If desired, this step also computes entropic sensitivity indices, as well information-theoretic quantities associated with methylation channels, such as turnover ratios, channel capacities, and relative dissipated energies. The output of this second phase will be stored in the same directory as the otuput of the first phase, and will have the same prefix as well. However, the suffix in this case will be '\_analysis.mat' (e.g. following the previous example, the path of the output file of this second phase will be INTERDIR/chr10/normal\_analysis.mat). The output file will contain the following information:
 
 o The locations of the CpG sites within the genomic region
 
@@ -165,21 +162,57 @@ o Channel capacities (if MCflag = 1)
 
 o Relative dissipated energies (if MCflag = 1)
 
-NOTE: This step must be completed before proceeding with the next step. 
+NOTE: we recommend taking advantage of the array feature available in SGE and SLURM based clusters to submit an individual job for each chromosome.
 
 D.4. GENERATE BED FILES FOR SINGLE ANALYSIS:
 ------------------------------------------
 
-        singleMethAnalysisToBed.sh [OPTIONS] -- PREFIX
+        singleMethAnalysisToBed.sh [OPTIONS] -- PHENO
 
-This function makes BED files for the methylation analysis results obtained after running informME_run.sh for a given phenotype.
+This function makes BED files for the methylation analysis results obtained after running informME\_run.sh for a given phenotype PHENO. The input files (analysis file) are expected to have the path INTERDIR/chr#/PHENO\_analysis.mat by default. The output files will be stored by default in FINALDIR and will have the following names and content:
+
+o MML-PHENO.bed: mean methylation levels
+
+o NME-PHENO.bed: normalized methylation entropy
+    
+o METH-PHENO.bed: methylation-based classification (non-variable)
+    
+o VAR-PHENO.bed: methylation-based classification (variable)
+    
+o ENTR-PHENO.bed: entropy-based classification
+    
+o ESI-PHENO.bed (if ESIflag = 1): entropic sensitivity indices
+    
+o TURN-PHENO.bed (if MCflag = 1): turnover ratios
+    
+o CAP-PHENO.bed (if MCflag = 1): channel capacities
+    
+o RDE-PHENO.bed (if MCflag = 1): relative dissipated energies  
+
 
 D.5. GENERATE BED FILES FOR DIFFERENTIAL ANALYSIS:
 ------------------------------------------------
 
-	makeBedsForDiffMethAnalysis.sh [OPTIONS] -- PREFIX_1 PREFIX_2
+	makeBedsForDiffMethAnalysis.sh [OPTIONS] -- PHENO1 PHENO2
 
-This function makes BED files for the methylation analysis results obtained after running informME_run.sh for two given phenotypes.
+This function makes BED files for the methylation analysis results obtained after running informME\_run.sh for two given phenotypes PHENO1 and PHENO2. The input files (both analysis files) are expected to have the path INTERDIR/chr#/PHENO1\_analysis.mat and INTERDIR/chr#/PHENO2\_analysis.mat by default. The output files will be stored by default in FINALDIR and will have the following names and content:
+
+o dMML-PHENO1-VS-PHENO2.bed: differences in mean methylation levels
+       
+o DMU-PHENO1-VS-PHENO2.bed: differential mean-based classification
+       
+o dNME-PHENO1-VS-PHENO2.bed: differences in normalized methylation entropies
+       
+o DEU-PHENO1-VS-PHENO2.bed: differential entropy-based classification
+       
+o JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances
+       
+o dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+       
+o dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
+       
+o dRDE-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in relative dissipated energies
+
 
 D.6. POST-PROCESSING
 ------------------

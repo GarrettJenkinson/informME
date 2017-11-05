@@ -1,13 +1,20 @@
 Description:
-    Wrapper that takes BAM file as input and generates matrices for informME.
-    Each chromosome subdirectory includes the MATLAB file prefix_matrices.mat. 
-    Each file contains the following information for each genomic region, which 
-    will be subsequently used in model estimation:
-       o data matrix with -1,0,1 values for methylation status
-       o CpG locations broken down by region.
+    This function takes a BAM file as input and generates a methylation data matrix for
+    for a given chromosome. The BAM file is expected to be in BAMDIR, while the output 
+    file will be stored by default in INTERDIR. These directories can be modified via 
+    optional arguments that can be passed to the function. The output file produced will 
+    contain, for each genomic region, the following information which will be subsequently 
+    used in model estimation:
+    o data matrix with -1,0,1 values for methylation status
+    o CpG locations broken down by region.
+    and will have the suffix '_matrices.mat'.
 
 Usage:
     getMatrices.sh  [options]  -- BAM_FILE CHR_NUM
+
+Mandatory arguments:
+    o BAM_FILE: BAM file for which the methylation data matrix will be generated.
+    o CHR_NUM: chromosome to be processed.
 
 Options:
     -h|--help           Help.
@@ -17,9 +24,9 @@ Options:
     -q|--threads        Number of threads used. Default: 1.
     -t|--trim           Number or vector (see example) of bases to trim. Default: 0.
     -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
     --time_limit     	Maximum time allowed to each thread to complete in minutes. Default: 60.
     --total_part     	Number of partitions chromosome CHR_NUM is divided into. Default: 200.
+    -l|--MATLICENSE     Path to MATLAB's License.
 
 Examples:
     * Trimming 10 on each read and using 5 threads, rest default:
@@ -44,7 +51,7 @@ Downstream:
     informME_run.sh
 
 Date:
-    10/13/2017
+    11/02/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>

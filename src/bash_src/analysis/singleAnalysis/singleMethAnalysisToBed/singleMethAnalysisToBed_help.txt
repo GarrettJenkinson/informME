@@ -1,18 +1,24 @@
 Description:
     This function makes BED files for the methylation analysis results obtained by means of 
     singleMethAnalysis followed by mergeSingleMethAnalysis:
-    o MML-phenoName.bed: mean methylation levels
-    o NME-phenoName.bed: normalized methylation entropy
-    o METH-phenoName.bed: methylation-based classification (non-variable)
-    o VAR-phenoName.bed: methylation-based classification (variable)
-    o ENTR-phenoName.bed: entropy-based classification
-    o ESI-phenoName.bed (if ESIflag = 1): entropic sensitivity indices
-    o TURN-phenoName.bed (if MCflag = 1): turnover ratios
-    o CAP-phenoName.bed (if MCflag = 1): channel capacities
-    o RDE-phenoName.bed (if MCflag = 1): relative dissipated energies
+    o MML-PHENO.bed: mean methylation levels
+    o NME-PHENO.bed: normalized methylation entropy
+    o METH-PHENO.bed: methylation-based classification (non-variable)
+    o VAR-PHENO.bed: methylation-based classification (variable)
+    o ENTR-PHENO.bed: entropy-based classification
+    o ESI-PHENO.bed (if ESIflag = 1): entropic sensitivity indices
+    o TURN-PHENO.bed (if MCflag = 1): turnover ratios
+    o CAP-PHENO.bed (if MCflag = 1): channel capacities
+    o RDE-PHENO.bed (if MCflag = 1): relative dissipated energies
+    The methylation analysis files will be assumed to be located in INTERDIR, and the 
+    output files will be stored in FINALDIR. These directories can be modified through
+    optional arguments that can be passed to the function.
 
 Usage:
-    singleMethAnalysisToBed.sh [options] -- PREFIX 
+    singleMethAnalysisToBed.sh [options] -- PREFIX
+
+Mandatory argument:
+    o PREFIX: prefix of the methylation analysis file (name phenotype).
 
 Options:
     -h|--help           Help.
@@ -20,13 +26,13 @@ Options:
     -a|--analdir        Analysis directory. Default: $REFGENEDIR.
     -d|--outdir         Output directory. Default: $FINALDIR.
     -t|--threshold      Threshold used in the methylation analysis. Default: 0.4.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
     --min_chr           Minimum chromosome to be included in BED file. Default: 1.
     --max_chr           Maximum chromosome to be included in BED file. Default: 22.
     --MC                Computation of information theory metrics. Default: 0.
     --ESI               Computation of entropic sensivity index (ESI). Default: 0.
+    -l|--MATLICENSE     Path to MATLAB's License.
 
-Examples:
+Example:
     singleMethAnalysisToBed.sh -d out --min_chr 1 --max_chr 3 --MC --ESI -- normal
 
 Output:
@@ -39,7 +45,7 @@ Upstream:
     mergeSingleMethAnalysis.sh 
 
 Date:
-    10/05/2017
+    11/02/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>

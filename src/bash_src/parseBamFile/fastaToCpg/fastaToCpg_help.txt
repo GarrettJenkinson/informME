@@ -4,23 +4,27 @@ Description:
     each CpG site as well as the distances between neighboring CpG sites. A 1-based 
     coordinate system is used, in which the first base is assigned to position 1 and the 
     location of a CpG site is defined by the position of the C nucleotide on the forward 
-    strand of the reference genome. Each MAT file contains the following information:
-      o location of CpG sites
-      o CpG density for each CpG site
-      o distance between neighboring CpG sites
-      o location of the last CpG site in the chormosome
-      o length of chromosome (in base pairs)
+    strand of the reference genome. Each MAT file produced will be stored by default in 
+    REFGENEDIR, and it will contain the following information:
+    o location of CpG sites
+    o CpG density for each CpG site
+    o distance between neighboring CpG sites
+    o location of the last CpG site in the chormosome
+    o length of chromosome (in base pairs)
 
 Usage:
     fastaToCpg.sh  [options]  -- FASTA_FILE
 
+Mandatory argument:
+    o FASTA_FILE: reference genome in FASTA format.
+
 Options:
     -h|--help           Help.
     -d|--outdir         Output directory. Default: $REFGENEDIR.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+    -l|--MATLICENSE     Path to MATLAB's License.
 
-Examples:
-    fastaToCpg.sh -d out -- /path/to/input.fa
+Example:
+    fastaToCpg.sh -d /path/to/out -- /path/to/input.fa
 
 Output:
     MATLAB .mat file for each entry in FASTA file. 
@@ -35,7 +39,7 @@ Downstream:
     getMatrices.sh
 
 Date:
-    10/05/2017
+    11/02/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
