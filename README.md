@@ -391,9 +391,9 @@ LICENCING
 
 All code authored by Garrett Jenkinson or Jordi Abante in informME is licensed under a GPLv3 license; exceptions to GPL licensing are the files contained in the following directories:
 
-informme/third\_party/global\_optim
+* informme/third\_party/global\_optim
 
-informme/third\_party/maxent
+* informme/third\_party/maxent
 
 These files have their own licensing information in their headers. Thanks to Arnold Neumaier and Ali Mohammad-Djafari for their permissions to modify and distribute their software with informME.
 
