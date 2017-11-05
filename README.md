@@ -2,12 +2,9 @@
 
 # informME
 
------------------------------------------------------------------
+## An information-theoretic pipeline for methylation analysis of WGBS data.
 
-An information-theoretic pipeline for methylation analysis of WGBS data.
-
-LATEST RELEASE: v0.3.0
-
+### LATEST RELEASE: v0.3.0
 -----------------------------------------------------------------
 
 This directory contains the MATLAB, C++ and R software that implements informME, as well as the BASH wrappers and example submission scripts used to run informME on a Sun Grid Engine (SGE) cluster or a SLURM computer cluster. 
@@ -16,19 +13,19 @@ informME is an information-theoretic approach to methylation analysis developed 
 
 The current implementation of informME has been tested within the following environments:
 
-o Red Hat Enterprise Linux Server Release 6.5 (Santiago) and CentOS release 6.7 (Final)
+* Red Hat Enterprise Linux Server Release 6.5 (Santiago) and CentOS release 6.7 (Final)
 
-o Sun Grid Engine OGS/GE 2011.11 and Slurm 17.02.3
+* Sun Grid Engine OGS/GE 2011.11 and Slurm 17.02.3
 
-o MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, and MATLAB R2017a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
+* MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, and MATLAB R2017a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
 
 and by using the following tools:
 
-o Bismark Bisulphite Mapper - v0.13.1 (to make BAM files)
+* Bismark Bisulphite Mapper - v0.13.1 (to make BAM files)
 
-o SAMtools - v0.1.19 (to parse BAM files)
+* SAMtools - v0.1.19 (to parse BAM files)
 
-o gcc/g++ compiler - v4.4.7-4 and v4.9.2 (to compile MATLAB MEX code)
+* gcc/g++ compiler - v4.4.7-4 and v4.9.2 (to compile MATLAB MEX code)
 
 
 A. DIRECTORY STRUCTURE
@@ -36,36 +33,31 @@ A. DIRECTORY STRUCTURE
 
 informME includes the following directories:
 
-informME/bin - contains softlinks to all executable bash scripts
+1. informME/bin - contains softlinks to all executable bash scripts
 
-informME/src - contains all bash wrappers as well as the MATLAB, C++, and R code used by informME
+2. informME/src - contains all bash wrappers as well as the MATLAB, C++, and R code used by informME
 
-informME/third_party - contains third party MATLAB software used by informME
+3. informME/third\_party - contains third party MATLAB software used by informME
 
-informME/cluster - contains templates for running informME on SGE and SLURM clusters
+4. informME/cluster - contains templates for running informME on SGE and SLURM clusters
 
 B. DEPENDENCIES
 ---------------
 
 It is required to properly configure a MATLAB compiler. See:
 
-https://www.mathworks.com/products/compiler.html 
+* https://www.mathworks.com/products/compiler.html 
 
-https://www.mathworks.com/help/matlab/ref/mex.html
+* https://www.mathworks.com/help/matlab/ref/mex.html
 
-for details.
-
-GMP, MPFR, MPREAL, and Eigen are all C++ dependencies that the installation script will install as needed.
-
-A working SAMtools installation needs to be on the system path.
-
+for details. A working SAMtools installation needs to be on the system path as well. The remaining dependencies (GMP, MPFR, MPREAL, and Eigen) are all C++ dependencies that the installation script will install as needed.
 
 C. INSTALLING InformME
 ----------------------
 
 Run install.sh in the informME directory. During the interactive installing process the user will be asked different questions regarding the locations of default directories. Dependencies, such as GMP, MPFR, MPREAL, and Eigen, will be automatically installed during this process if these are not already available, and the C++ MEX code of informME will be compiled.
 
-Note: the following environment variables will be defined in a configuration file stored in ~/.informME/informME.config and then will be accessed throughout multiple points in the informME pipeline:
+Note 1: the following environment variables will be defined in a configuration file stored in ~/.informME/informME.config and then will be accessed throughout multiple points in the informME pipeline:
 
 * REFGENEDIR: directory where the CpGlocationChrX.mat files will be stored
 
@@ -77,7 +69,7 @@ Note: the following environment variables will be defined in a configuration fil
  
 * MATLICENSE: path to MATLAB license
 
-These environment variables can be overwritten through optional arguments when running any part of informME. If these variables are not defined, then the user must pass the corresponding paths as optional arguments.
+Note 2: These environment variables can be overwritten through optional arguments when running any part of informME. If these variables are not defined, then the user must pass the corresponding paths as optional arguments.
 
 
 D. RUNNING informME
