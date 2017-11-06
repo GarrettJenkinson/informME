@@ -1,6 +1,6 @@
 Description:
-    This function makes BED files for the methylation analysis results obtained by means of 
-    singleMethAnalysis followed by mergeSingleMethAnalysis:
+    This function makes BED files for the methylation analysis results obtained after 
+    running informME_run.sh for a given phenotype.
     o MML-PHENO.bed: mean methylation levels
     o NME-PHENO.bed: normalized methylation entropy
     o METH-PHENO.bed: methylation-based classification (non-variable)
@@ -10,15 +10,15 @@ Description:
     o TURN-PHENO.bed (if MCflag = 1): turnover ratios
     o CAP-PHENO.bed (if MCflag = 1): channel capacities
     o RDE-PHENO.bed (if MCflag = 1): relative dissipated energies
-    The methylation analysis files will be assumed to be located in INTERDIR, and the 
-    output files will be stored in FINALDIR. These directories can be modified through
-    optional arguments that can be passed to the function.
+    By default, the methylation analysis files are expected to be located in INTERDIR, 
+    and the output files will be stored in FINALDIR. These directories can be modified 
+    through optional arguments that can be passed to the function.
 
 Usage:
     singleMethAnalysisToBed.sh [options] -- PREFIX
 
 Mandatory argument:
-    o PREFIX: prefix of the methylation analysis file (name phenotype).
+    o PREFIX: prefix of the methylation analysis file (name of phenotype).
 
 Options:
     -h|--help           Help.

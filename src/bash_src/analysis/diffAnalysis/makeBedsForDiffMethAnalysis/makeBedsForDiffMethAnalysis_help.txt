@@ -1,24 +1,24 @@
 Description:
-    This function makes BED files for the differential methylation analysis results obtained 
-    by means of singleMethAnalysis followed by mergeSingleMethAnalysis.
-       o dMML-PHENO1-VS-PHENO2.bed: differences in mean methylation levels
-       o DMU-PHENO1-VS-PHENO2.bed: differential mean-based classification
-       o dNME-PHENO1-VS-PHENO2.bed: differences in normalized methylation entropies
-       o DEU-PHENO1-VS-PHENO2.bed: differential entropy-based classification
-       o JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances 
-       o dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
-       o dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
-       o dRDE-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in relative dissipated energies
-    The methylation analysis files will be assumed to be located in INTERDIR, and the
-    output files will be stored in FINALDIR. These directories can be modified through
+   This function makes BED files for the methylation analysis results obtained after 
+   running informME_run.sh for two given phenotypes.
+    o dMML-PHENO1-VS-PHENO2.bed: differences in mean methylation levels
+    o DMU-PHENO1-VS-PHENO2.bed: differential mean-based classification
+    o dNME-PHENO1-VS-PHENO2.bed: differences in normalized methylation entropies
+    o DEU-PHENO1-VS-PHENO2.bed: differential entropy-based classification
+    o JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances 
+    o dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+    o dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
+    o dRDE-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in relative dissipated energies
+    By default, the methylation analysis files will be assumed to be located in INTERDIR, and 
+    the output files will be stored in FINALDIR. These directories can be modified through
     optional arguments that can be passed to the function.
 
 Usage:
     makeBedsForDiffMethAnalysis.sh [options] -- PREFIX_1 PREFIX_2 
 
 Mandatory arguments:
-    o PREFIX_1: prefix of the methylation analysis file 1 (name phenotype 1).
-    o PREFIX_2: prefix of the methylation analysis file 2 (name phenotype 2).
+    o PREFIX_1: prefix of the methylation analysis file 1 (name of phenotype 1).
+    o PREFIX_2: prefix of the methylation analysis file 2 (name of phenotype 2).
 
 Options:
     -h|--help           Help.

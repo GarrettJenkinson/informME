@@ -7,7 +7,7 @@ Description:
     used in model estimation:
     o data matrix with -1,0,1 values for methylation status
     o CpG locations broken down by region.
-    and will have the suffix '_matrices.mat'.
+    and the filename will have the suffix '_matrices.mat'.
 
 Usage:
     getMatrices.sh  [options]  -- BAM_FILE CHR_NUM
