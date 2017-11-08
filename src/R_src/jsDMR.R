@@ -602,7 +602,7 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,maxSQS
   
   # DMR annotation
   write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
-  annotateDMRs(altGRthresh,testVrefFiles,outFolder,correction,pAdjThresh)
+  annotateDMRs(altGRthresh,testVrefFiles,outFolder,correction,pAdjThresh,chrsOfInterest=chrsOfInterest)
 
   # Return DMRs in alternative comparison
   altGRthresh
@@ -653,7 +653,7 @@ runNoReplicateDMR <- function(file,inFolder,outFolder,maxSQS=250,chrsOfInterest=
   # GR passed as list so no extra code is required in annotateDMRs (fits structure in replicate case)
   # numAltComp=1 hard-coded)
   write(paste("[",date(),"]: Annotating DMRs ..."), stdout())
-  annotateDMRs(list(GRthresh),c(file),outFolder,correction,pAdjThresh)
+  annotateDMRs(list(GRthresh),c(file),outFolder,correction,pAdjThresh,chrsOfInterest=chrsOfInterest)
   
   # Return GR.
   GRthresh
