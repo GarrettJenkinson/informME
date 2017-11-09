@@ -1,41 +1,41 @@
 Description:
     This function takes a BAM file as input and generates a methylation data matrix for
-    for a given chromosome. The BAM file is expected to be in BAMDIR, while the output 
-    file will be stored by default in INTERDIR. These directories can be modified via 
-    optional arguments that can be passed to the function. The output file produced will 
-    contain, for each genomic region, the following information which will be subsequently 
-    used in model estimation:
+    a given chromosome. The BAM file is expected to be in BAMDIR, while the output 
+    file is stored in INTERDIR by default. These directories can be modified via 
+    optional arguments that can be passed to the function. The output file produced 
+    contain the following information for each genomic region which is subsequently 
+    used for model estimation:
     o data matrix with -1,0,1 values for methylation status
     o CpG locations broken down by region.
     and the filename will have the suffix '_matrices.mat'.
 
 Usage:
-    getMatrices.sh  [options]  -- BAM_FILE CHR_NUM
+    getMatrices.sh  [OPTIONS]  -- BAM_FILE CHR_NUM
 
 Mandatory arguments:
-    o BAM_FILE: BAM file for which the methylation data matrix will be generated.
-    o CHR_NUM: chromosome to be processed.
+    o BAM_FILE: BAM file for which the methylation data matrix will be generated
+    o CHR_NUM: chromosome to be processed
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome & CpG location files directory. Default: $REFGENEDIR.
-    -b|--bamdir         BAM file directory. Default: $BAMDIR.
-    -d|--outdir         Output directory. Default: $INTERMEDIATE.
-    -q|--threads        Number of threads used. Default: 1.
-    -t|--trim           Number or vector (see example) of bases to trim. Default: 0.
-    -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
-    --time_limit     	Maximum time allowed to each thread to complete in minutes. Default: 60.
-    --total_part     	Number of partitions chromosome CHR_NUM is divided into. Default: 200.
-    -l|--MATLICENSE     Path to MATLAB's License.
+    -h|--help           help
+    -r|--refdir         directory of reference genome and CpG location files (default: $REFGENEDIR)
+    -b|--bamdir         directory of BAM file (default: $BAMDIR)
+    -d|--outdir         output directory (default: $INTERMEDIATE)
+    -q|--threads        number of threads used (default: 1)
+    -t|--trim           number or vector of bases to trim (default: 0)
+    -c|--c_string       name convention for chromosomes: 0 => 'X'; 1 => 'chrX' (default: 1)
+    --time_limit     	maximum time (in minuttes) allowed for each thread to complete (default: 60)
+    --total_part     	number of partitions of chromosome CHR_NUM (default: 200)
+    -l|--MATLICENSE     path to MATLAB's license
 
 Examples:
-    * Trimming 10 on each read and using 5 threads, rest default:
+    * Trimming 10 bases on each read and using 5 threads:
     	getMatrices.sh -t 10 -q 5 -- sample_1.bam 1
-    * Trimming different bases on each read, on each read and using 5 threads, with chrX indexing:
+    * Trimming different bases on each read, using 5 threads, and chrX naming convention:
     	getMatrices.sh -d matrices -c 1 -t '[15,20]' -q 5 -- sample_1.bam 1
 
 Output:
-    MATLAB .mat file with suffix *_matrices.mat.
+    MATLAB .mat file with suffix *_matrices.mat
 
 Dependancies:
     * MATLAB
@@ -51,8 +51,9 @@ Downstream:
     informME_run.sh
 
 Date:
-    11/02/2017
+    11/09/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
     Jordi Abante <jabante1@jhu.edu>
+

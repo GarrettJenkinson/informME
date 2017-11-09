@@ -1,10 +1,10 @@
 Description:
-    This function learns the parameters of the Ising model and runs the analysis on the input.
+    This function learns the parameters of the Ising model and performs methylation analysis. 
     First, it estimates the parameters of the Ising probability distribution used to model 
     methylation within equally sized (in base pairs) non-overlapping regions of the genome. 
-    The input is expected to be in INTERDIR, and the output will also be stored in INTERDIR by 
-    default. The output file produced in the learning phase contains the following information 
-    for each genomic region used in model estimation:
+    The input is expected to be in INTERDIR, and the output is also stored in INTERDIR by 
+    default. The output file produced in this learning phase contains the following 
+    information for each genomic region used in model estimation:
     o CpG distances
     o CpG densities
     o estimated alpha, beta, and gamma parameters of the Ising model
@@ -12,8 +12,7 @@ Description:
       the Ising model
     o marginal probabilities at each CpG site
     o the log partition function of the estimated Ising model.
-    and the filename will have the suffix '_fit.mat'. The output file produced by the analysis 
-    phase will contain the following information:
+    The output file produced by the analysis phase contains the following information:
     o The locations of the CpG sites within the genomic region
     o Numbers of CpG sites within the analysis subregions
     o Which analysis subregions are modeled and which are not
@@ -26,34 +25,33 @@ Description:
     o Turnover ratios (if MCflag = 1)
     o Channel capacities (if MCflag = 1)
     o Relative dissipated energies (if MCflag = 1)
-    and the filnemae will have in this case the suffix '_analysis.mat'.
 
 Usage:
-    informME_run.sh  [options]  -- MAT_FILES PREFIX CHR_NUM
+    informME_run.sh  [OPTIONS]  -- MAT_FILES PHENO CHR_NUM
 
 Mandatory arguments:
-    o MAT_FILES: comma-separated list of methylation matrices that will be modeled.
-    o PREFIX: prefix of both output files (name of phenotype).
+    o MAT_FILES: list of methylation matrices to be modeled.
+    o PHENO: prefix of output files (name of phenotype).
     o CHR_NUM: chromosome to be processed.
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome & CpG location files directory. Default: $REFGENEDIR.
-    -b|--bamdir         BAM file directory. Default: $BAMDIR.
-    -e|--estdir         Modeling directory. Default: $INTERMEDIATE.
-    -a|--analdir        Analysis directory. Default: $INTERMEDIATE.
-    -d|--outdir         Output directory. Default: $INTERMEDIATE.
-    -q|--threads        Number of threads used. Default: 1.
-    --time_limit     	Maximum time allowed to each thread to complete in minutes. Default: 60.
-    --total_part     	Number of partitions chromosome CHR_NUM is divided into. Default: 200.
-    -l|--MATLICENSE     Path to MATLAB's License.
+    -h|--help           help
+    -r|--refdir         directoty of reference genome and CpG location files (default: $REFGENEDIR)
+    -b|--bamdir         BAM file directory (default: $BAMDIR)
+    -e|--estdir         modeling directory (default: $INTERMEDIATE)
+    -a|--analdir        analysis directory (default: $INTERMEDIATE)
+    -d|--outdir         output directory (default: $INTERMEDIATE)
+    -q|--threads        number of threads used (default: 1)
+    --time_limit     	maximum time (in minutes) allowed for each thread to complete (default: 60)
+    --total_part     	number of partitions of chromosome CHR_NUM (default: 200)
+    -l|--MATLICENSE     path to MATLAB's license
 
 Examples:
     informME_run.sh -c 1 -q 5 -- sample1 pheno_1 1
     informME_run.sh -c 1 -q 5 -- sample2,sample3,sample4 pheno_2 1
 
 Output:
-    MATLAB .mat file.
+    MATLAB .mat file
 
 Dependancies:
     * MATLAB
@@ -70,7 +68,7 @@ Downstream:
     diffAnalysisToBed.sh
 
 Date:
-    11/02/2017
+    11/09/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>

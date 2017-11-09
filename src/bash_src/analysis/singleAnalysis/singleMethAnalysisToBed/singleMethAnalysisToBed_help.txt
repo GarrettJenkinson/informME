@@ -1,36 +1,26 @@
 Description:
     This function makes BED files for the methylation analysis results obtained after 
-    running informME_run.sh for a given phenotype.
-    o MML-PHENO.bed: mean methylation levels
-    o NME-PHENO.bed: normalized methylation entropy
-    o METH-PHENO.bed: methylation-based classification (non-variable)
-    o VAR-PHENO.bed: methylation-based classification (variable)
-    o ENTR-PHENO.bed: entropy-based classification
-    o ESI-PHENO.bed (if ESIflag = 1): entropic sensitivity indices
-    o TURN-PHENO.bed (if MCflag = 1): turnover ratios
-    o CAP-PHENO.bed (if MCflag = 1): channel capacities
-    o RDE-PHENO.bed (if MCflag = 1): relative dissipated energies
-    By default, the methylation analysis files are expected to be located in INTERDIR, 
-    and the output files will be stored in FINALDIR. These directories can be modified 
-    through optional arguments that can be passed to the function.
+    running informME_run.sh for a given phenotype. By default, the input file (analysis 
+    file) is expected to be located in INTERDIR, whereas the output files are stored 
+    in FINALDIR. 
 
 Usage:
-    singleMethAnalysisToBed.sh [options] -- PREFIX
+    singleMethAnalysisToBed.sh [OPTIONS] -- PHENO
 
 Mandatory argument:
-    o PREFIX: prefix of the methylation analysis file (name of phenotype).
+    o PHENO: prefix of the methylation analysis file (name of phenotype)
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
-    -a|--analdir        Analysis directory. Default: $REFGENEDIR.
-    -d|--outdir         Output directory. Default: $FINALDIR.
-    -t|--threshold      Threshold used in the methylation analysis. Default: 0.4.
-    --min_chr           Minimum chromosome to be included in BED file. Default: 1.
-    --max_chr           Maximum chromosome to be included in BED file. Default: 22.
-    --MC                Computation of information theory metrics. Default: 0.
-    --ESI               Computation of entropic sensivity index (ESI). Default: 0.
-    -l|--MATLICENSE     Path to MATLAB's License.
+    -h|--help           help
+    -r|--refdir         directory of reference genome (default: $REFGENEDIR)
+    -a|--analdir        analysis directory (default: $REFGENEDIR)
+    -d|--outdir         output directory (default: $FINALDIR)
+    -t|--threshold      threshold used in the methylation analysis (default: 0.4)
+    --min_chr           minimum chromosome to be included in BED file (default: 1)
+    --max_chr           maximum chromosome to be included in BED file (default: 22)
+    --MC                computation of information theoretic quantities (default: 0)
+    --ESI               computation of entropic sensivity index (ESI) (default: 0)
+    -l|--MATLICENSE     path to MATLAB's license
 
 Example:
     singleMethAnalysisToBed.sh -d out --min_chr 1 --max_chr 3 --MC --ESI -- normal
@@ -45,7 +35,7 @@ Upstream:
     mergeSingleMethAnalysis.sh 
 
 Date:
-    11/02/2017
+    11/09/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
