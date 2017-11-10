@@ -15,7 +15,7 @@ Options:
     -r|--refdir         directory of reference genome (default: $REFGENEDIR)
     -a|--analdir        analysis directory (default: $REFGENEDIR)
     -d|--outdir         output directory (default: $FINALDIR)
-    -t|--threshold      threshold used in the methylation analysis (default: 0.4)
+    -t|--threshold      threshold used in methylation-based classification (default: 0.4)
     --min_chr           minimum chromosome to be included in BED file (default: 1)
     --max_chr           maximum chromosome to be included in BED file (default: 22)
     --MC                computation of information theoretic quantities (default: 0)

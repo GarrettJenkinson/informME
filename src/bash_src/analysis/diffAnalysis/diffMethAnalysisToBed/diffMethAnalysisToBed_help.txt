@@ -17,7 +17,7 @@ Options:
     -a1|--analdir_1     analysis directory for phenotype 1 (default: $INTERMEDIATE)
     -a2|--analdir_2     analysis directory for phenotype 2 (default: $INTERMEDIATE) 
     -d|--outdir         output directory (default: $FINALDIR)
-    -t|--threshold      threshold used in the methylation analysis (default: 0.4)
+    -t|--threshold      threshold used in methylation-based classification (default: 0.4)
     --min_chr           minimum chromosome to be included in BED file (default: 1)
     --max_chr           maximum chromosome to be included in BED file (default: 22)
     --MC                computation of information theoretic quantities (default: 0)

@@ -30,7 +30,7 @@ Examples:
     * Trimming 10 bases on each read and using 5 threads:
     	getMatrices.sh -q 5 -t 10 -- sample_1.bam 1
     * Trimming different bases on each read, using 5 threads, and 'chrX' naming convention:
-    	getMatrices.sh -d matrices -q 5 -t '[15,20]' -c 1 -- sample_1.bam 1
+    	getMatrices.sh -q 5 -t '[15,20]' -c 1 -- sample_1.bam 1
 
 Output:
     MATLAB .mat file with suffix *_matrices.mat

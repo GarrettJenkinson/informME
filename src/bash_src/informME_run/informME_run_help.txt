@@ -43,13 +43,12 @@ Options:
     -d|--outdir         output directory (default: $INTERMEDIATE)
     -q|--threads        number of threads used (default: 1)
     --time_limit     	maximum time (in minutes) allowed for each thread to complete (default: 60)
-    --total_part     	number of partitions of chromosome CHR_NUM (default: 200)
     -l|--MATLICENSE     path to MATLAB's license
 
 Example:
     * Running informME on chromosome 1 using 5 threads:
     	informME_run.sh -q 5 -- sample1 pheno_1 1
-    * Running informME on chromosome 1 using 5 threads and multiple samples:
+    * Running informME on chromosome 1 using 5 threads and 3 samples:
     	informME_run.sh -q 5 -- sample2,sample3,sample4 pheno_2 1
 
 Output:

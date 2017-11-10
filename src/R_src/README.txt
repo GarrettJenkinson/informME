@@ -1,4 +1,4 @@
-Last Modified: 04/22/17
+Last Modified: 08/21/17
 
 ----------------------------------------------------------------
 SUBDIRECTORY PostProcess
@@ -37,14 +37,17 @@ jsDMR.R
 
 This is an R script that performs DMR detection using 
 the Jensen-Shannon distance (JSD) based on the method 
-described in [1]. It should be run within an R session.
+described in [1]. Once DMR detection is done, the script
+generates helpful annotation tables and figures. It should 
+be run within an R session.
 
-  usage (replicate reference data is available): 
+  syntax (replicate reference data is available): 
  
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
-   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder)
-   
+   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
+   correction='XX',pAdjThresh=value) 
+     
    # refVrefFiles is a vector of BED file names that contain  
    # the JSD values of all pairwise reference comparisons. 
    # For example: if 
@@ -60,7 +63,7 @@ described in [1]. It should be run within an R session.
    # file3 <- "JSD-lungnormal-3-VS-lungnormal-2.bed"
    # refVrefFiles <- c(file1,file2,file3)
    #
-   # testVrefFiles is a vector of BED file names that contain  
+   # testVrefFiles is a vector of BED file names that contain 
    # the JSD values of test/reference comparisons.
    # For example: if 
    #
@@ -81,13 +84,36 @@ described in [1]. It should be run within an R session.
    # For example:
    # inFolder <- "/path/to/in-folder/"
    # outFolder <- "/path/to/out-folder/"
+   #
+   # correction is an optional argument that specifies the 
+   # type of multiple hypothesis correction used:
+   #
+   # BY: Benjamini & Yekutieli (default).
+   # BH: Benjamini & Hochberg
+   # 
+   # pAdjThresh is an optional argument that specifies the 
+   # adjusted p-value threshold used (0.01 by default). 
+   #
+   # Examples: 
+   #
+   # Default usage: BY applied with FDR control at 0.01.
+   #   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder)
+   # 
+   # Alternative usage: BY applied with FDR control at 0.05.
+   #   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
+   #                   pAdjThresh=0.05)
+   #
+   # Alternative usage: BH applied with FDR control at 0.05.
+   #   runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
+   #		       correction='BH',pAdjThresh=0.05)
 
-  usage (no replicate reference data is available) 
+  syntax (no replicate reference data is available) 
    
    setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
-   runNoReplicateDMR(JSDfile,inFolder,outFolder)
-   
+   runNoReplicateDMR(JSDfile,inFolder,outFolder,
+                     correction='XX',pAdjThresh=value)
+
    # JSDfile is the name of a BED file that contains 
    # the JSD values of a test/reference comparison. 
    # For example: if 
@@ -104,6 +130,27 @@ described in [1]. It should be run within an R session.
    # For example:
    # inFolder <- "/path/to/in-folder/"
    # outFolder <- "/path/to/out-folder/"
+   #
+   # correction is an optional argument that specifies the 
+   # type of multiple hypothesis correction used:
+   #
+   # BY: Benjamini & Yekutieli (default).
+   # BH: Benjamini & Hochberg
+   # 
+   # pAdjThresh is an optional argument that specifies the 
+   # adjusted p-value threshold used (0.01 by default). 
+   #
+   # Examples: 
+   #
+   # Default usage: BY applied with FDR control at 0.01.
+   #   runNoReplicateDMR(JSDfile,inFolder,outFolder)
+   # 
+   # Alternative usage: BY applied with FDR control at 0.05.
+   #   runNoReplicateDMR(JSDfile,inFolder,outFolder,pAdjThresh=0.05)
+   # 
+   # Alternative usage: BH applied with FDR control at 0.05.
+   #   runNoReplicateDMR(JSDfile,inFolder,outFolder,
+   #		         correction='BH',pAdjThresh=0.05)
 
   requirements: 
 
@@ -111,6 +158,9 @@ described in [1]. It should be run within an R session.
      - rtracklayer
      - logitnorm
      - mixtools 
+     - annotatr
+     - Homo.Sapiens
+     - ggplot2
 
 
 jsGrank.R
@@ -121,7 +171,7 @@ Bioconductor library TxDb.Hsapiens.UCSC.hg19.knownGene using
 the Jensen-Shannon distance (JSD) based on the method described 
 in [1]. It should be run within an R session.
 
-  usage (replicate reference data is available):
+  default usage (replicate reference data is available):
 
    setwd("path/to/informME/PostProcess/")
    source("jsGrank.R")
@@ -173,7 +223,7 @@ in [1]. It should be run within an R session.
    # tName <- "lungcancer"
    # rName <- "lungnormal"
 
-  usage (no replicate reference data is available):  
+  default usage (no replicate reference data is available):  
 
    setwd("path/to/informME/PostProcess/")
    source("jsGrank.R")
@@ -225,10 +275,10 @@ in [1]. It should be run within an R session.
 REFERENCES
 ----------
 
-[1] Jenkninson, G.,Abante, J., Feinberg, A.P., and Goutsias, J. (2017) 
-    An informtaion-theoretic approach to the modeling and 
-    analysis of whole-genome bisulfite sequencing data, 
-    Submitted.
+[1] Jenkninson, G., Abante, J., Feinberg, A.P., and 
+    Goutsias, J. (2017) An information-theoretic approach 
+    to the modeling and analysis of whole-genome bisulfite 
+    sequencing data, Submitted.
 
 
 
