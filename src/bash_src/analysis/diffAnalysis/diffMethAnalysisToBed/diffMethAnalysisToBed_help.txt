@@ -1,11 +1,11 @@
 Description:
-   This function makes BED files for the differential methylation analysis results obtained 
+   This function makes BED files from the differential methylation analysis results obtained 
    after running informME_run.sh for two given phenotypes. By default, the input files 
    (both analysis files) are expected to be located in INTERDIR, whereas the output files 
    are stored in FINALDIR. 
 
 Usage:
-    makeBedsForDiffMethAnalysis.sh [OPTIONS] -- PHENO1 PHENO2 
+    diffMethAnalysisToBed.sh [OPTIONS] -- PHENO1 PHENO2 
 
 Mandatory arguments:
     o PHENO1: prefix of the methylation analysis file 1 (name of phenotype 1)
@@ -25,7 +25,8 @@ Options:
     -l|--MATLICENSE     path to MATLAB's license
 
 Example:
-    makeBedsForDiffMethAnalysis.sh -d out --MC --ESI -- phenotype_1 phenotype_2 
+    * Generating BED files for the differential analysis between phenotype_1 and phenotype_2:
+    	diffMethAnalysisToBed.sh -- phenotype_1 phenotype_2 
                                     
 Output:
     BED files

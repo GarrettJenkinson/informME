@@ -1,5 +1,5 @@
 Description:
-    This function makes BED files for the methylation analysis results obtained after 
+    This function makes BED files from the methylation analysis results obtained after 
     running informME_run.sh for a given phenotype. By default, the input file (analysis 
     file) is expected to be located in INTERDIR, whereas the output files are stored 
     in FINALDIR. 
@@ -23,7 +23,8 @@ Options:
     -l|--MATLICENSE     path to MATLAB's license
 
 Example:
-    singleMethAnalysisToBed.sh -d out --min_chr 1 --max_chr 3 --MC --ESI -- normal
+    * Generating the BED files that include chr1 through chr22 for phenotype normal:
+    	singleMethAnalysisToBed.sh --min_chr 1 --max_chr 22 -- normal
 
 Output:
     BED files

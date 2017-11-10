@@ -3,11 +3,10 @@ Description:
     a given chromosome. The BAM file is expected to be in BAMDIR, while the output 
     file is stored in INTERDIR by default. These directories can be modified via 
     optional arguments that can be passed to the function. The output file produced 
-    contain the following information for each genomic region which is subsequently 
+    contains the following information for each genomic region which is subsequently 
     used for model estimation:
     o data matrix with -1,0,1 values for methylation status
-    o CpG locations broken down by region.
-    and the filename will have the suffix '_matrices.mat'.
+    o CpG locations broken down by region
 
 Usage:
     getMatrices.sh  [OPTIONS]  -- BAM_FILE CHR_NUM
@@ -22,17 +21,16 @@ Options:
     -b|--bamdir         directory of BAM file (default: $BAMDIR)
     -d|--outdir         output directory (default: $INTERMEDIATE)
     -q|--threads        number of threads used (default: 1)
-    -t|--trim           number or vector of bases to trim (default: 0)
+    -t|--trim           number or vector of bases to be trimmed (default: 0)
     -c|--c_string       name convention for chromosomes: 0 => 'X'; 1 => 'chrX' (default: 1)
     --time_limit     	maximum time (in minuttes) allowed for each thread to complete (default: 60)
-    --total_part     	number of partitions of chromosome CHR_NUM (default: 200)
     -l|--MATLICENSE     path to MATLAB's license
 
 Examples:
     * Trimming 10 bases on each read and using 5 threads:
-    	getMatrices.sh -t 10 -q 5 -- sample_1.bam 1
-    * Trimming different bases on each read, using 5 threads, and chrX naming convention:
-    	getMatrices.sh -d matrices -c 1 -t '[15,20]' -q 5 -- sample_1.bam 1
+    	getMatrices.sh -q 5 -t 10 -- sample_1.bam 1
+    * Trimming different bases on each read, using 5 threads, and 'chrX' naming convention:
+    	getMatrices.sh -d matrices -q 5 -t '[15,20]' -c 1 -- sample_1.bam 1
 
 Output:
     MATLAB .mat file with suffix *_matrices.mat

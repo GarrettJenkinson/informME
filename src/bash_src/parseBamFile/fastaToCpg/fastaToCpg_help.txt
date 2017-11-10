@@ -23,8 +23,11 @@ Options:
     -d|--outdir         output directory (default: $REFGENEDIR)
     -l|--MATLICENSE     path to MATLAB's License
 
-Example:
-    fastaToCpg.sh -d /path/to/out -- /path/to/input.fa
+Examples:
+    * Analyzing FASTA file /path/to/input.fa and storing output in REFGENEDIR: 
+    	fastaToCpg.sh -- /path/to/input.fa
+    * Analyzing FASTA file /path/to/input.fa and storing output in directory /path/to/out: 
+    	fastaToCpg.sh -d /path/to/out -- /path/to/input.fa
 
 Output:
     MATLAB .mat file for each entry in FASTA file

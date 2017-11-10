@@ -1,9 +1,9 @@
 Description:
     This function learns the parameters of the Ising model and performs methylation analysis. 
-    First, it estimates the parameters of the Ising probability distribution used to model 
+    It estimates the parameters of the Ising probability distribution used to model 
     methylation within equally sized (in base pairs) non-overlapping regions of the genome. 
     The input is expected to be in INTERDIR, and the output is also stored in INTERDIR by 
-    default. The output file produced in this learning phase contains the following 
+    default. The output file produced by the learning phase contains the following 
     information for each genomic region used in model estimation:
     o CpG distances
     o CpG densities
@@ -11,28 +11,28 @@ Description:
     o initial and transition probabilities of the inhomogeneous Markov chain representation of 
       the Ising model
     o marginal probabilities at each CpG site
-    o the log partition function of the estimated Ising model.
+    o the log partition function of the estimated Ising model
     The output file produced by the analysis phase contains the following information:
-    o The locations of the CpG sites within the genomic region
-    o Numbers of CpG sites within the analysis subregions
-    o Which analysis subregions are modeled and which are not
-    o Estimated parameters of Ising model in genomic region
-    o Methylation level probabilities in modeled subregions
-    o Coarse methylation level probabilities
-    o Mean methylation levels
-    o Normalized methylation entropies
-    o Entropic sensitivity indices (if ESIflag = 1)
-    o Turnover ratios (if MCflag = 1)
-    o Channel capacities (if MCflag = 1)
-    o Relative dissipated energies (if MCflag = 1)
+    o the locations of the CpG sites within the genomic region
+    o numbers of CpG sites within the analysis subregions
+    o which analysis subregions are modeled and which are not
+    o estimated parameters of Ising model in genomic region
+    o methylation level probabilities in modeled subregions
+    o coarse methylation level probabilities
+    o mean methylation levels
+    o normalized methylation entropies
+    o entropic sensitivity indices (if ESIflag = 1)
+    o turnover ratios (if MCflag = 1)
+    o channel capacities (if MCflag = 1)
+    o relative dissipated energies (if MCflag = 1)
 
 Usage:
     informME_run.sh  [OPTIONS]  -- MAT_FILES PHENO CHR_NUM
 
 Mandatory arguments:
-    o MAT_FILES: list of methylation matrices to be modeled.
-    o PHENO: prefix of output files (name of phenotype).
-    o CHR_NUM: chromosome to be processed.
+    o MAT_FILES: list of methylation matrices to be modeled
+    o PHENO: prefix of output files (name of phenotype)
+    o CHR_NUM: chromosome to be processed
 
 Options:
     -h|--help           help
@@ -46,9 +46,11 @@ Options:
     --total_part     	number of partitions of chromosome CHR_NUM (default: 200)
     -l|--MATLICENSE     path to MATLAB's license
 
-Examples:
-    informME_run.sh -c 1 -q 5 -- sample1 pheno_1 1
-    informME_run.sh -c 1 -q 5 -- sample2,sample3,sample4 pheno_2 1
+Example:
+    * Running informME on chromosome 1 using 5 threads:
+    	informME_run.sh -q 5 -- sample1 pheno_1 1
+    * Running informME on chromosome 1 using 5 threads and multiple samples:
+    	informME_run.sh -q 5 -- sample2,sample3,sample4 pheno_2 1
 
 Output:
     MATLAB .mat file
