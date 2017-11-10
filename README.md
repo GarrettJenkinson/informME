@@ -185,7 +185,7 @@ This function makes BED files from the methylation analysis results obtained aft
 D.5. GENERATE BED FILES FOR DIFFERENTIAL ANALYSIS:
 ------------------------------------------------
 
-	makeBedsForDiffMethAnalysis.sh [OPTIONS] -- PHENO1 PHENO2
+	diffMethAnalysisToBed.sh [OPTIONS] -- PHENO1 PHENO2
 
 This function makes BED files for the differential methylation analysis results obtained after running informME\_run.sh for two given phenotypes PHENO1 and PHENO2. By default, the input files (both analysis files) are expected to be located in INTERDIR/chr#/PHENO1\_analysis.mat and INTERDIR/chr#/PHENO2\_analysis.mat respectively. In addition, the output files are stored in FINALDIR and have the following names and content:
 
