@@ -47,7 +47,7 @@ else
 fi
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:a:d:l:q: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:m:e:a:d:l:q: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -63,6 +63,7 @@ bamdir="$BAMDIR"
 matdir="$INTERDIR"
 estdir="$INTERDIR"
 analdir="$INTERDIR"
+tmpdir="$INTERDIR"
 outdir="$INTERDIR"
 threads=1
 time_limit=60
@@ -94,6 +95,10 @@ do
       ;;
     -a|--analdir)
       analdir="$2"
+      shift 2
+      ;;
+    --tmpdir)
+      tmpdir="$2"
       shift 2
       ;;
     -d|--outdir)
@@ -140,7 +145,7 @@ mkdir -p "${outdir}/chr${chr_num}"
 SECONDS=0
 echo "[$(date)]: Call: estimation.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm estimation.sh -r '$refdir' -m '$matdir' -d '$estdir' -- '$mat_files' '$prefix' '$chr_num' '$total_part' {X}"
+seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm estimation.sh -r '$refdir' -m '$matdir' -d '$tmpdir' -- '$mat_files' '$prefix' '$chr_num' '$total_part' {X}"
 
 # Check if everything OK
 EXITCODE="$?"
@@ -158,7 +163,7 @@ fi
 # Merge estimation blocks
 echo "[$(date)]: Call: mergeEstimation.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$estdir" -d "$estdir" -- "$mat_files" "$prefix" "$chr_num" "$total_part"
+mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$tmpdir" -d "$estdir" -- "$mat_files" "$prefix" "$chr_num" "$total_part"
 
 # Check if everything OK
 if [ $? -ne 0 ] 
@@ -171,7 +176,7 @@ fi
 SECONDS=0
 echo "[$(date)]: Call: singleMethAnalysis.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$analdir' --MC --ESI -- '$prefix' '$chr_num' '$total_part' {X}"
+seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$tmpdir' --MC --ESI -- '$prefix' '$chr_num' '$total_part' {X}"
 
 # Check if everything OK
 EXITCODE="$?"
@@ -189,7 +194,7 @@ fi
 # Merge analysis blocks
 echo "[$(date)]: Call: mergeSingleMethAnalysis.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$analdir" -d "$outdir" --MC --ESI -- "$prefix" "$chr_num" "$total_part"
+mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" --MC --ESI -- "$prefix" "$chr_num" "$total_part"
 
 # Check if everything OK
 if [ $? -ne 0 ] 
