@@ -63,6 +63,8 @@ Note 1: the following environment variables will be defined in a configuration f
 
 * BAMDIR: directory where the BAM files are stored
 
+* SCRATCHDIR: directory where all temporary files will be stored
+
 * INTERDIR: directory where all intermediate files will be stored
 
 * FINALDIR: directory where the output BED files will be stored

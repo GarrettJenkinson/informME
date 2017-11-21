@@ -23,7 +23,7 @@ Options:
     -q|--threads        number of threads used (default: 1)
     -t|--trim           number or vector of bases to be trimmed (default: 0)
     -c|--c_string       name convention for chromosomes: 0 => 'X'; 1 => 'chrX' (default: 1)
-    --tmpdir     	directory of intermediate files (default: $INTERMEDIATE) 
+    --tmpdir     	directory of intermediate files (default: $SCRATCHDIR) 
     --time_limit     	maximum time (in minuttes) allowed for each thread to complete (default: 60)
     -l|--MATLICENSE     path to MATLAB's license
 

@@ -42,7 +42,7 @@ Options:
     -a|--analdir        analysis directory (default: $INTERMEDIATE)
     -d|--outdir         output directory (default: $INTERMEDIATE)
     -q|--threads        number of threads used (default: 1)
-    --tmpdir         	temporary directory (default: $INTERMEDIATE)
+    --tmpdir         	temporary directory (default: $SCRATCHDIR)
     --time_limit     	maximum time (in minutes) allowed for each thread to complete (default: 60)
     -l|--MATLICENSE     path to MATLAB's license
 

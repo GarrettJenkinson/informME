@@ -65,7 +65,7 @@ eval set -- "$TEMP"
 # Defaults
 refdir="$REFGENEDIR"
 bamdir="$BAMDIR"
-tmpdir="$INTERDIR"
+tmpdir="$SCRATCHDIR"
 outdir="$INTERDIR"
 trim=0
 chr_string=1
