@@ -39,7 +39,12 @@ doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,
   }
   
   # Load data from file.
-  GRTRACK <- import.bedGraph(file.path(inFolder,file,fsep=""),trackLine=FALSE)
+  if(substr(file,nchar(file),nchar(file))%in% c("w","g","W","G")){
+    GRTRACK <- import.bw(file.path(inFolder,file,fsep=""))
+  }else{
+    GRTRACK <- import.bedGraph(file.path(inFolder,file,fsep=""))
+  }
+
   genome(GRTRACK) <- "hg19"
   GRTRACK <- sortSeqlevels(GRTRACK)
   
