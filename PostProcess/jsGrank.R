@@ -173,10 +173,10 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
   rm(list="proms") 
 
   # Generate merged table. 
-  df <- rankingTabs[[1]]
+  df <- rankingTabs[[1]][,c(2,3)]
   if (numAltComp>1){
     for (ind in 2:numAltComp){
-      df <- merge(df,rankingTabs[[ind]])
+      df <- merge(df,rankingTabs[[ind]][,c(2,3)],all=TRUE)
     }
   }
   
@@ -203,7 +203,6 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
 
   # Reformat table to handle one or more comparisons.  
   if (numAltComp>1){
-    df <- subset(df,select = -TXID)
     df$rankProd <- 1:length(df$rankProd)
   } else{
     df$rank <- df$rank1
@@ -287,10 +286,10 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   rm(list="proms") 
   
   # Generate merged table. 
-  df <- rankingTabs[[1]]
+  df <- rankingTabs[[1]][,c(2,3)]
   if (numAltComp>1){
     for (ind in 2:numAltComp){
-      df <- merge(df,rankingTabs[[ind]])
+      df <- merge(df,rankingTabs[[ind]][,c(2,3)],all=TRUE)
     }
   }
   
@@ -316,8 +315,7 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   }
   
   # Reformat table to handle one or more comparisons.   
-  if (numAltComp>1){
-    df <- subset(df,select = -TXID)  
+  if (numAltComp>1){ 
     df$rankProd <- 1:length(df$rankProd)
   } else{
     df$rank <- df$rank1
