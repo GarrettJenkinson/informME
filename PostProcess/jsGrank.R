@@ -206,7 +206,7 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
     df$rankProd <- 1:length(df$rankProd)
   } else{
     df$rank <- df$rank1
-    df <- subset(df,select = c(-TXID,-rankProd,-rank1))  
+    df <- subset(df,select = c(-rankProd,-rank1))  
   }
   
   # Write results to output.
@@ -319,7 +319,7 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
     df$rankProd <- 1:length(df$rankProd)
   } else{
     df$rank <- df$rank1
-    df <- subset(df,select = c(-TXID,-rankProd,-rank1))  
+    df <- subset(df,select = c(-rankProd,-rank1))  
   }
    
   # Write results to output.
