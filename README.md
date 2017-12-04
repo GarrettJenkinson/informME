@@ -1,7 +1,7 @@
 # informME
 An information-theoretic pipeline for methylation analysis of WGBS data.
 
-LATEST RELEASE: v0.2.1
+LATEST RELEASE: v0.2.2
 
 ----------------------------------------------------------------
 # DIRECTORY informME
@@ -605,6 +605,9 @@ provided utilities.
 
 # VERSION HISTORY
 -----------------
+
+v0.2.2 -    Minor updates in gene ranking and small updates 
+            getting ready for the next major reorganization release.
 
 v0.2.1 -   	Added R utilities for DMR detection and gene ranking
             using the Jensen-Shannon distance (JSD). Various 
