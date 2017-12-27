@@ -105,9 +105,9 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
   # Load files into genomic range lists and arrange the seqlevels.  
   for(ind in 1:numNullComp){
     if(substr(refVrefFiles[ind],nchar(refVrefFiles[ind]),nchar(refVrefFiles[ind]))%in% c("w","g","W","G")){
-      	nullGRs[[ind]] <- import.bw(file.path(inFolder,refVrefFiles[ind],fsep=""))
+      nullGRs[[ind]] <- import.bw(file.path(inFolder,refVrefFiles[ind],fsep=""))
     }else{
-    	nullGRs[[ind]] <- import.bedGraph(file.path(inFolder,refVrefFiles[ind],fsep=""))
+      nullGRs[[ind]] <- import.bedGraph(file.path(inFolder,refVrefFiles[ind],fsep=""))
     }
     genome(nullGRs[[ind]]) <- "hg19"
     sortSeqlevels(nullGRs[[ind]])
@@ -115,9 +115,9 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
   }
   for(ind in 1:numAltComp){
     if(substr(testVrefFiles[ind],nchar(testVrefFiles[ind]),nchar(testVrefFiles[ind]))%in% c("w","g","W","G")){
-    	altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
+      altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
     }else{
-      	altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
+      altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
     }
     genome(altGRs[[ind]]) <- "hg19"
     sortSeqlevels(altGRs[[ind]])
@@ -173,10 +173,10 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
   rm(list="proms") 
 
   # Generate merged table. 
-  df <- rankingTabs[[1]]
+  df <- rankingTabs[[1]][,c(2,3)]
   if (numAltComp>1){
     for (ind in 2:numAltComp){
-      df <- merge(df,rankingTabs[[ind]])
+      df <- merge(df,rankingTabs[[ind]][,c(2,3)],all=TRUE)
     }
   }
   
@@ -203,11 +203,10 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
 
   # Reformat table to handle one or more comparisons.  
   if (numAltComp>1){
-    df <- subset(df,select = -TXID)
     df$rankProd <- 1:length(df$rankProd)
   } else{
     df$rank <- df$rank1
-    df <- subset(df,select = c(-TXID,-rankProd,-rank1))  
+    df <- subset(df,select = c(-rankProd,-rank1))  
   }
   
   # Write results to output.
@@ -249,9 +248,9 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   # Load files into genomic range lists and arrange the seqlevels. 
   for(ind in 1:numAltComp){
     if(substr(testVrefFiles[ind],nchar(testVrefFiles[ind]),nchar(testVrefFiles[ind]))%in% c("w","g","W","G")){
-      	altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
+      altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
     }else{
-      	altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
+      altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
     }
     genome(altGRs[[ind]]) <- "hg19"
     sortSeqlevels(altGRs[[ind]])
@@ -287,10 +286,10 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   rm(list="proms") 
   
   # Generate merged table. 
-  df <- rankingTabs[[1]]
+  df <- rankingTabs[[1]][,c(2,3)]
   if (numAltComp>1){
     for (ind in 2:numAltComp){
-      df <- merge(df,rankingTabs[[ind]])
+      df <- merge(df,rankingTabs[[ind]][,c(2,3)],all=TRUE)
     }
   }
   
@@ -316,12 +315,11 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   }
   
   # Reformat table to handle one or more comparisons.   
-  if (numAltComp>1){
-    df <- subset(df,select = -TXID)  
+  if (numAltComp>1){ 
     df$rankProd <- 1:length(df$rankProd)
   } else{
     df$rank <- df$rank1
-    df <- subset(df,select = c(-TXID,-rankProd,-rank1))  
+    df <- subset(df,select = c(-rankProd,-rank1))  
   }
    
   # Write results to output.
