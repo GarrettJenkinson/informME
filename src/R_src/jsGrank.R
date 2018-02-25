@@ -17,10 +17,6 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 # or see <http://www.gnu.org/licenses/>.
 #
-# *************************************************************************
-# Last Modified: 04/17/2017
-# *************************************************************************
-#
 # REQUIRED PACKAGES:
 library(GenomicFeatures)
 library(GenomicRanges)
