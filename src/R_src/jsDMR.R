@@ -17,61 +17,36 @@
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 # or see <http://www.gnu.org/licenses/>.
 #
-# *************************************************************************
-# Last Modified: 02/10/2017
-# *************************************************************************
-#
 # REQUIRED PACKAGES:
-# rtracklayer
-# logitnorm
-# mixtools
+library(GenomicFeatures)
+library(GenomicRanges)
+library(rtracklayer)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
+library("Homo.sapiens")
 
-# Define smoothing function.
-doSmoothing <- function(file,inFolder,outFolder,chrsOfInterest=paste("chr",1:22,sep=""),bandwidthVal=50000,outflag=FALSE) {
-  library(rtracklayer)
-  
-  # Check folders for trailing slash, add if missing.
-  if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
-    inFolder <- paste(inFolder,.Platform$file.sep,sep="")
-  }
-  if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
-    outFolder <- paste(outFolder,.Platform$file.sep,sep="")
-  }
-  
-  # Load data from file.
-  if(substr(file,nchar(file),nchar(file))%in% c("w","g","W","G")){
-    GRTRACK <- import.bw(file.path(inFolder,file,fsep=""))
-  }else{
-    GRTRACK <- import.bedGraph(file.path(inFolder,file,fsep=""))
-  }
+# Writing large excel files causes errors unless the Java parameters are 
+# changed.
+options(java.parameters = c("-Xmx6g","-XX:-UseConcMarkSweepGC") )
+library("XLConnect")
 
-  genome(GRTRACK) <- "hg19"
-  GRTRACK <- sortSeqlevels(GRTRACK)
+# Define function to rank genes when no replicate reference data is available.
+# Pass empty vector c() to refVrefFiles. 
+rankGenes <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,
+                      tName="test",rName="ref",
+                      GUsize=150,upStreamSize=2000,downStreamSize=2000,
+                      chrsOfInterest=paste("chr",1:22,sep=""),minGUs=1){
   
-  # Go through chromosomes and smooth.
-  gr <- GRTRACK[0]
-  for (chr in chrsOfInterest){
-    gr.chr <- GRTRACK[seqnames(GRTRACK) %in% chr]
-    gr.chr <- sort(gr.chr)
-    gr.chr$scoreOld <- gr.chr$score
-    gr.chr$score <- ksmooth(x=start(gr.chr),
-                            y=gr.chr$score,
-                            kernel="normal",
-                            bandwidth=bandwidthVal,
-                            x.points=start(gr.chr))$y
-    gr <- c(gr,gr.chr)
+  if(length(refVrefFiles)==0){ # Use JSD to rank the genes.
+    result <- rankGenesJSD(testVrefFiles,inFolder,outFolder,tName,rName,
+                           GUsize=GUsize,upStreamSize=upStreamSize,downStreamSize=downStreamSize,
+                           chrsOfInterest=chrsOfInterest,minGUs=minGUs)
+    return(result)
   }
-  gr <- gr[!is.na(gr$score)]
-  
-  if (length(gr)>0 && outflag){ # To output, set outflag=TRUE.
-    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("s",file,sep=""), 
-                       visibility="full",autoScale=FALSE,viewLimits=c(0,1.0))
-    export.bedGraph(gr,file.path(outFolder,paste("s",file,sep=""),fsep = ""),
-                    trackLine=myTrackLine)
-  }
-  
-  gr
-} # End smoothing.
+  # Else use empirical null distribution to rank the genes. 
+  result <- rankGenesEmpNull(refVrefFiles,testVrefFiles,inFolder,outFolder,tName,rName,
+                             GUsize=GUsize,upStreamSize=upStreamSize,downStreamSize=downStreamSize,
+                             chrsOfInterest=chrsOfInterest,minGUs=minGUs)
+}
 
 # Define function that computes the sum of SQS values (stored in numvar)
 # within each DMR (stored in bins) - adapted from previously available 
@@ -93,148 +68,157 @@ binnedSumms <- function(bins, numvar, mcolname)
   bins
 }
 
-# Define thresholding and morphological closing function.
-# This function operates on gr$score. 
-doThreshMorph <- function(gr,file,outFolder,threshVal=50,
-                          bandwidthVal=50000,GUsize=150.0,
-                          requiredPercentBand=0.5){
-  library(rtracklayer)
-  
+# Define function to rank genes when replicate reference data is available. 
+rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName="test",rName="ref",
+                           GUsize=150,upStreamSize=2000,downStreamSize=2000,
+                           chrsOfInterest=paste("chr",1:22,sep=""),minGUs=1,
+                           doRankProd=FALSE){
+
   # Check folders for trailing slash, add if missing.
+  if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
+    inFolder <- paste(inFolder,.Platform$file.sep,sep="")
+  }
   if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
     outFolder <- paste(outFolder,.Platform$file.sep,sep="")
   }
   
-  # Remove non-available (na) and infinite values.
-  gr <- gr[!is.na(gr$score)]
-  gr$score[is.infinite(gr$score)] <- 5*threshVal
+  # Define promoter regions.
+  txdb<-TxDb.Hsapiens.UCSC.hg19.knownGene
+  genesAll<-transcripts(txdb)
+  genes<-keepSeqlevels(genesAll,chrsOfInterest,pruning.mode="coarse")
+  sortSeqlevels(genes)
+  proms<-promoters(genes,upstream=upStreamSize,downstream=downStreamSize)
   
-  # Remove ranges below threshVal.
-  grThresh <- gr[gr$score>threshVal]
+  # Count number of reference/reference comparisons and 
+  # number of test/reference comparisons.
+  numNullComp <- length(refVrefFiles)
+  numAltComp  <- length(testVrefFiles)
   
-  if (length(grThresh)>0){
-    #
-    # Do morphological closing.
-    #
-    strEl <- bandwidthVal
+  # Initialize lists of genomic ranges.
+  nullGRs <- list()
+  altGRs  <- list()
+ 
+  # Load files into genomic range lists and arrange the seqlevels.  
+  for(ind in 1:numNullComp){
+    if(substr(refVrefFiles[ind],nchar(refVrefFiles[ind]),nchar(refVrefFiles[ind]))%in% c("w","g","W","G")){
+      nullGRs[[ind]] <- import.bw(file.path(inFolder,refVrefFiles[ind],fsep=""))
+    }else{
+      nullGRs[[ind]] <- import.bedGraph(file.path(inFolder,refVrefFiles[ind],fsep=""))
+    }
+    genome(nullGRs[[ind]]) <- "hg19"
+    sortSeqlevels(nullGRs[[ind]])
+    nullGRs[[ind]] <- keepSeqlevels(nullGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
+  }
+  for(ind in 1:numAltComp){
+    if(substr(testVrefFiles[ind],nchar(testVrefFiles[ind]),nchar(testVrefFiles[ind]))%in% c("w","g","W","G")){
+      altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
+    }else{
+      altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
+    }
+    genome(altGRs[[ind]]) <- "hg19"
+    sortSeqlevels(altGRs[[ind]])
+    altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
+  }
+  
+  # Build empirical null distribution.
+  nullVals <- c()
+  for (ind in 1:numNullComp){
+    nullVals <- c(nullVals,nullGRs[[ind]]$score)
+  }
+  Fn <- ecdf(nullVals)
+  
+  # Find p-values and summand for Fisher's method.
+  for(ind in 1:numAltComp){
+    altGRs[[ind]]$pVals <- (1-Fn(altGRs[[ind]]$score)) # compute pValue
     
-    # Increase size of intervals by 0.5*strEl on each side.
-    grThreshUp <- flank(grThresh,round(0.5*strEl),start=TRUE)
-    grThreshDown <- flank(grThresh,round(0.5*strEl),start=FALSE)
+    # Correct for pValues smaller than a "reasonable" precision.
+    altGRs[[ind]]$pVals[altGRs[[ind]]$pVals < .Machine$double.eps] <- .Machine$double.eps
     
-    # Compute union.
-    grThresh <- reduce(c(grThresh,grThreshUp,grThreshDown))
+    altGRs[[ind]]$score <- -2*log(altGRs[[ind]]$pVals) # Summand for Fisher's method.
+  }
+  
+  # Compute the Fisher sum and the degree of freedom used in meta analysis.
+  for(ind in 1:numAltComp){
+    # Compute run length encodings of tracks for efficient binnedSumms algorithm.
+    score <- coverage(altGRs[[ind]],weight="score")
+    cov <- coverage(altGRs[[ind]])
     
-    # Shrink size of intervals by 0.5*strEl on each side.
-    grThreshUpSub <- flank(grThresh,round(-0.5*strEl),start=TRUE)
-    grThreshDownSub <- flank(grThresh,round(-0.5*strEl),start=FALSE)
+    # Compute sum over promoters. 
+    proms<-binnedSumms(proms,score,paste("score",ind,sep=""))
+    proms<-binnedSumms(proms,cov,paste("cov",ind,sep=""))
+    mcols(proms)[[paste("score",ind,sep="")]] <- mcols(proms)[[paste("score",ind,sep="")]]/GUsize
+    mcols(proms)[[paste("cov",ind,sep="")]] <- ceiling(mcols(proms)[[paste("cov",ind,sep="")]]/GUsize)
     
-    grThresh <- setdiff(grThresh,grThreshUpSub)
-    grThresh <- setdiff(grThresh,grThreshDownSub)
+    # Compute Fisher's meta analysis pvalue.
+    mcols(proms)[[paste("metaPval",ind,sep="")]] <- pchisq(mcols(proms)[[paste("score",ind,sep="")]],
+                                                           2*mcols(proms)[[paste("cov",ind,sep="")]],
+                                                           lower.tail = FALSE)
+    mcols(proms)[[paste("metaPval",ind,sep="")]][mcols(proms)[[paste("cov",ind,sep="")]]< minGUs] <- NA
+  }
+  
+  # Generate ranked gene lists.
+  rankingTabs <- list()
+  for (ind in 1:numAltComp){
+    sortedIndices <- order(mcols(proms)[[paste("metaPval",ind,sep="")]],decreasing = FALSE)
+    sortedOutput <- select(Homo.sapiens, key=as.character(proms[sortedIndices]$tx_id), keytype="TXID", columns=c("SYMBOL"))
+    sortedOutput <- sortedOutput[(!duplicated(sortedOutput$SYMBOL))&(!is.na(sortedOutput$SYMBOL)),,drop=FALSE]
+    sortedOutput[[paste("rank",ind,sep="")]] <- 1:length(sortedOutput$SYMBOL)
+    rankingTabs[[ind]] <- sortedOutput
+    rm(list=c("sortedIndices","sortedOutput"))
+  }
+  rm(list="proms") 
+
+  # Generate merged table. 
+  df <- rankingTabs[[1]][,c(2,3)]
+  if (numAltComp>1){
+    for (ind in 2:numAltComp){
+      df <- merge(df,rankingTabs[[ind]][,c(2,3)],all=TRUE)
+    }
+  }
+  
+  # Generate rank product.
+  df$rankProd <- 1.0
+  for(ind in 1:numAltComp){
+    df$rankProd <- as.numeric(df$rankProd)*as.numeric(df[[paste("rank",ind,sep="")]])
+  }
     
-    # Make sure everything is still within bounds.
-    grThresh <- trim(grThresh)
+  # Sort by rankproduct.
+  sortedIndices <- order(df$rankProd,decreasing=FALSE)
+  df <- df[sortedIndices,]
+  
+  # Compute pvalues if flag is set. 
+  # Note that this requires the package rankprodbounds.R and an 
+  # independence assumption that is not always valid.
+  if (numAltComp>1 & doRankProd){
+    # Get HesEisBre-14 algorithm for merging ranked lists.
+    source(paste(inFolder,"rankprodbounds.R",sep=""))
     
-    #
-    # Sum values inside the grThresh objects.
-    #
-    score <- coverage(gr,weight="score")
-    cov   <- coverage(gr)
-    grThresh <- binnedSumms(grThresh,score,"score")
-    grThresh$score <- as.numeric(grThresh$score)/GUsize
-    grThresh <- binnedSumms(grThresh,cov,"coverage")
-    
-    # remove DMRs that do not have enough data and get rid of coverage column
-    grThresh <- grThresh[grThresh$coverage >= (bandwidthVal*requiredPercentBand)]
-    grThresh$coverage <- NULL  
-    
-    #
-    # Write output to file.
-    #
-    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("DMR-",file,sep=""), 
-                       visibility="full",autoScale=TRUE)
-    export.bedGraph(grThresh[!is.na(grThresh$score)],file.path(outFolder,paste("DMR-",file,sep=""),fsep = ""),
-                    trackLine=myTrackLine)
+    # Compute pValue.
+    df$pVals<-rankprodbounds(df$rankprod,length(df$rankprod),numAltComp,Delta = 'geometric')
+  }
+
+  # Reformat table to handle one or more comparisons.  
+  if (numAltComp>1){
+    df$rankProd <- 1:length(df$rankProd)
   } else{
-    print("No DMRs - no output file is generated for:")
-    print(file.path(outFolder,paste("DMR-",file,sep=""),fsep=""))
+    df$rank <- df$rank1
+    df <- subset(df,select = c(-rankProd,-rank1))  
   }
   
-  # Return object.
-  grThresh
+  # Write results to output.
+  writeWorksheetToFile(paste(outFolder,"gRankRRD-JSD-",tName,"-VS-",rName,".xlsx",sep=""), 
+                       data = df, sheet = "gRankRRD")
+  gc() # Run garbage collection since dealing with xlsx is memory intensive. 
   
-}# End doThreshMorph function.
+  # Return value.
+  df
+}# End rankGenesEmpNull.
 
-# Make empirical p-value function.
-constructNullPvals <- function(nullValues){
-  # Make null distribution.
-  Fn <- ecdf(nullValues)
-  
-  # Return function to compute p-values.
-  function(x) 1-Fn(x)
-}
-
-# Function to compute p-values from mixture of normals in logit space.
-# Used when replicate refernce data is not available.
-logitMixturePvals <- function(values){
-  library(logitnorm)
-  library(mixtools)
-  
-  # Save 0,1 boundary values for the end.
-  maxVals <- values>=1
-  minVals <- values<=0
-  values[maxVals] <- NA
-  values[minVals] <- NA
-  
-  # Do mixture modeling in logit space.
-  maxiters <- 1000
-  df <- data.frame(sJSDlogit=log((values)/(1-values)))
-  mixmdl <- normalmixEM(df$sJSDlogit[!is.na(df$sJSDlogit)],mu=c(-2.0,0.0),sigma=c(0.5,0.5),maxit = maxiters)
-  
-  mu <- mixmdl$mu
-  sigma <- mixmdl$sigma
-  lambda <- mixmdl$lambda
-  
-  if (length(mixmdl$all.loglik)>=maxiters){ # Mixture modeling not converged.
-                                            # Be on the safe side and use a 
-                                            # conservative model with large 
-                                            # mean/sigma.
-    if (mu[1]>mu[2]){
-      muNull <- mu[1]
-    }else{
-      muNull <- mu[2]
-    }
-    if (sigma[1]>sigma[2]){
-      sigmaNull <- sigma[1]
-    }else{
-      sigmaNull <- sigma[2]
-    }
-  }else{ # Mixture modeling converged. 
-         # Null model comes from mixture component with smaller mean.
-    if (mu[1]<mu[2]){
-      muNull <- mu[1]
-      sigmaNull <- sigma[1]
-    }else{
-      muNull <- mu[2]
-      sigmaNull <- sigma[2]
-    }
-  }
-  
-  # Compute p-values.
-  pVals <- 1 - plogitnorm(values,mu=muNull,sigma=sigmaNull)
-  pVals[maxVals] <- min(pVals,na.rm=TRUE) # 1 value maps to smallest pval.
-  pVals[minVals] <- 1                     # 0 value maps to 1 pval.
-  
-  # Return.
-  pVals
-  
-}# End logitMixturePvals.
-
-# Function to perform DMR detection when replicate reference data 
-# is available. 
-runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder, 
-                            maxSQS = 250, chrsOfInterest=paste("chr",1:22,sep=""), 
-                            bandwidthVal=50000, outflag=FALSE) {
+# Define function to rank genes when no replicate reference data is available.
+rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="ref",
+                             GUsize=150,upStreamSize=2000,downStreamSize=2000,
+                             chrsOfInterest=paste("chr",1:22,sep=""),minGUs=1,
+                             doRankProd=FALSE){
   
   # Check folders for trailing slash, add if missing
   if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
@@ -244,109 +228,101 @@ runReplicateDMR <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,
     outFolder <- paste(outFolder,.Platform$file.sep,sep="")
   }
   
-  # Count number of null (reference/reference) comparisons and 
-  # number of alternative (test/reference) comparisons.
-  numNullComp <- length(refVrefFiles)
+  # Define promoter regions.
+  txdb<-TxDb.Hsapiens.UCSC.hg19.knownGene
+  genesAll<-transcripts(txdb)
+  genes<-keepSeqlevels(genesAll,chrsOfInterest,pruning.mode="coarse")
+  sortSeqlevels(genes)
+  proms<-promoters(genes,upstream=upStreamSize,downstream=downStreamSize)
+  
+  # Count number of test/reference comparisons.
   numAltComp  <- length(testVrefFiles)
   
   # Initialize lists of genomic ranges.
-  nullGRs <- list()
   altGRs  <- list()
   
-  # Do smoothing.
-  for(ind in 1:numNullComp){
-    nullGRs[[ind]] <- doSmoothing(refVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
-  }
+  # Load files into genomic range lists and arrange the seqlevels. 
   for(ind in 1:numAltComp){
-    altGRs[[ind]] <- doSmoothing(testVrefFiles[ind],inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
+    if(substr(testVrefFiles[ind],nchar(testVrefFiles[ind]),nchar(testVrefFiles[ind]))%in% c("w","g","W","G")){
+      altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
+    }else{
+      altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
+    }
+    genome(altGRs[[ind]]) <- "hg19"
+    sortSeqlevels(altGRs[[ind]])
+    altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
   }
   
-  # Find p-value function.
-  nullVals <- vector()
-  for (ind in 1:numNullComp){
-    nullVals <- c(nullVals,nullGRs[[ind]]$score)
-  }
-  pValFn <- constructNullPvals(nullVals)
-  
-  # Find p-values.
-  for(ind in 1:numNullComp){
-    nullGRs[[ind]]$pVals <- pValFn(nullGRs[[ind]]$score)
-    # Correct p-values smaller than machine precision.
-    nullGRs[[ind]]$pVals[nullGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
-  }
+  # Compute the Fisher sum and the degree of freedom used in meta analysis. 
   for(ind in 1:numAltComp){
-    altGRs[[ind]]$pVals <- pValFn(altGRs[[ind]]$score)
-    # Correct p-values smaller than machine precision.
-    altGRs[[ind]]$pVals[altGRs[[ind]]$pVals<.Machine$double.eps] <- .Machine$double.eps
-  }
-  
-  # Write SQS files and DMRs.
-  nullGRthresh <- list()
-  altGRthresh  <- list()
-  for (ind in 1:numNullComp){
-    # Find SQS.
-    nullGRs[[ind]]$sJSD <- nullGRs[[ind]]$score
-    nullGRs[[ind]]$score <-  -10*log10(nullGRs[[ind]]$pVals)
-    nullGRs[[ind]]$score[nullGRs[[ind]]$score>maxSQS] <- maxSQS
+    # Compute run length encodings of tracks for efficient binnedSumms algorithm. 
+    score <- coverage(altGRs[[ind]],weight="score")
+    cov <- coverage(altGRs[[ind]])
     
-    if(outflag){
-      myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",refVrefFiles[ind],sep=""), 
-                       visibility="full",autoScale=TRUE)
-      export.bedGraph(nullGRs[[ind]],file.path(outFolder,paste("SQS-s",refVrefFiles[ind],sep=""),fsep=""))
-    }
-    
-    nullGRthresh[[ind]] <- doThreshMorph(nullGRs[[ind]],refVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
-  }
-  for (ind in 1:numAltComp){
-    # Find SQS.
-    altGRs[[ind]]$sJSD <- altGRs[[ind]]$score
-    altGRs[[ind]]$score <-  -10*log10(altGRs[[ind]]$pVals)
-    altGRs[[ind]]$score[altGRs[[ind]]$score>maxSQS] <- maxSQS
-    if(outflag){
-      myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",testVrefFiles[ind],sep=""), 
-                       visibility="full",autoScale=TRUE)
-      export.bedGraph(altGRs[[ind]],file.path(outFolder,paste("SQS-s",testVrefFiles[ind],sep=""),fsep = ""))
-    }
-    
-    altGRthresh[[ind]] <- doThreshMorph(altGRs[[ind]],testVrefFiles[ind],outFolder,bandwidthVal=bandwidthVal)
-  }
-  
-  # Return DMRs in alternative comparison.
-  altGRthresh
-} 
+    # Compute sum over promoters. 
+    proms<-binnedSumms(proms,score,paste("score",ind,sep=""))
+    proms<-binnedSumms(proms,cov,paste("cov",ind,sep=""))
+    mcols(proms)[[paste("score",ind,sep="")]] <- mcols(proms)[[paste("score",ind,sep="")]]/GUsize
+    mcols(proms)[[paste("cov",ind,sep="")]] <- ceiling(mcols(proms)[[paste("cov",ind,sep="")]]/GUsize)
 
-# Function to perform DMR detection when no replicate reference data 
-# is available. 
-runNoReplicateDMR <- function(file,inFolder,outFolder, maxSQS = 250,
-                              chrsOfInterest=paste("chr",1:22,sep=""),
-                              bandwidthVal=50000, outflag=FALSE) {
-  
-  
-  # Check folders for trailing slash, add if missing.
-  if(substr(inFolder,nchar(inFolder),nchar(inFolder)) != .Platform$file.sep ){
-    inFolder <- paste(inFolder,.Platform$file.sep,sep="")
+    # Remove insufficient data. 
+    mcols(proms)[[paste("score",ind,sep="")]][mcols(proms)[[paste("cov",ind,sep="")]]< minGUs] <- NA
   }
-  if(substr(outFolder,nchar(outFolder),nchar(outFolder)) != .Platform$file.sep ){
-    outFolder <- paste(outFolder,.Platform$file.sep,sep="")
+
+  # Generate ranked gene lists. 
+  rankingTabs <- list()
+  for (ind in 1:numAltComp){
+    sortedIndices <- order(mcols(proms)[[paste("score",ind,sep="")]],decreasing = TRUE)
+    sortedOutput <- select(Homo.sapiens, key=as.character(proms[sortedIndices]$tx_id), keytype="TXID", columns=c("SYMBOL"))
+    sortedOutput <- sortedOutput[(!duplicated(sortedOutput$SYMBOL))&(!is.na(sortedOutput$SYMBOL)),,drop=FALSE]
+    sortedOutput[[paste("rank",ind,sep="")]] <- 1:length(sortedOutput$SYMBOL)
+    rankingTabs[[ind]] <- sortedOutput
+    rm(list=c("sortedIndices","sortedOutput"))
   }
+  rm(list="proms") 
   
-  # Smooth track.
-  GR <- doSmoothing(file,inFolder,outFolder,chrsOfInterest=chrsOfInterest,bandwidthVal=bandwidthVal,outflag=outflag)
-  GR$sJSD <- GR$score
-  
-  # Find p-values.
-  GR$PvalsMix <- logitMixturePvals(GR$sJSD)
-  GR$score <- -10*log10(GR$PvalsMix)
-  GR$score[GR$score>maxSQS] <- maxSQS
-  if(outflag){
-    myTrackLine <- new("GraphTrackLine",type="bedGraph", name=paste("SQS-s",file,sep=""), 
-                       visibility="full",autoScale=TRUE)
-    export.bedGraph(GR[!is.na(GR$score)],file.path(outFolder,paste("SQS-s",file,sep=""),fsep = ""))
+  # Generate merged table. 
+  df <- rankingTabs[[1]][,c(2,3)]
+  if (numAltComp>1){
+    for (ind in 2:numAltComp){
+      df <- merge(df,rankingTabs[[ind]][,c(2,3)],all=TRUE)
+    }
   }
   
-  # Do thresholding.
-  GRthresh <- doThreshMorph(GR,file,outFolder,bandwidthVal=bandwidthVal)
+  # Generate rank product.
+  df$rankProd <- 1.0
+  for(ind in 1:numAltComp){
+    df$rankProd <- as.numeric(df$rankProd)*as.numeric(df[[paste("rank",ind,sep="")]])
+  }
   
-  # Return GR.
-  GRthresh
-}
+  # Sort by rankproduct.
+  sortedIndices <- order(df$rankProd,decreasing=FALSE)
+  df <- df[sortedIndices,]
+  
+  # Compute pvalues if flag is set.
+  # Note that this requires the package rankprodbounds.R and 
+  # an independence assumption that is not always valid.
+  if (numAltComp>1 & doRankProd){
+    # Get HesEisBre-14 algorithm for merging ranked lists
+    source(paste(inFolder,"rankprodbounds.R",sep=""))
+    
+    # Compute pValue.
+    df$pVals<-rankprodbounds(df$rankprod,length(df$rankprod),numAltComp,Delta = 'geometric')
+  }
+  
+  # Reformat table to handle one or more comparisons.   
+  if (numAltComp>1){ 
+    df$rankProd <- 1:length(df$rankProd)
+  } else{
+    df$rank <- df$rank1
+    df <- subset(df,select = c(-rankProd,-rank1))  
+  }
+   
+  # Write results to output.
+  writeWorksheetToFile(paste(outFolder,"gRank-JSD-",tName,"-VS-",rName,".xlsx",sep=""), 
+                       data = df, sheet = "gRank")
+  gc() # Run garbage collection since dealing with xlsx is memory intensive. 
+  
+  # Return value.
+  df
+}# End rankGenesJSD.
