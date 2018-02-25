@@ -322,7 +322,7 @@ REFERENCES
 
 [1] Jenkinson, G., Pujadas, E., Goutsias, J., and Feinberg, A.P. (2017), Potential energy landscapes indentify the information-theoretic nature of the epigenome, Nature Genetics, 49: 719-729.
 
-[2] Jenkinson, G., Abante, J., Feinberg, A.P., and Goutsias, J. (2017), An information-theoretic approach to the modeling and analysis of whole-genome bisulfite sequencing data, Submitted.
+[2] Jenkinson, G., Abante, J., Feinberg, A.P., and Goutsias, J. (2018), An information-theoretic approach to the modeling and analysis of whole-genome bisulfite sequencing data, BMC Bioinformatics, in press.
 
 VERSION HISTORY
 ---------------
