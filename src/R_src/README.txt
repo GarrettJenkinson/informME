@@ -17,7 +17,6 @@ be run within an R session.
 
   syntax (replicate reference data is available): 
  
-   setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
    runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
    correction='XX',pAdjThresh=value) 
@@ -83,7 +82,6 @@ be run within an R session.
 
   syntax (no replicate reference data is available) 
    
-   setwd("/path/to/informME/PostProcess/")
    source("jsDMR.R") 
    runNoReplicateDMR(JSDfile,inFolder,outFolder,
                      correction='XX',pAdjThresh=value)
@@ -147,7 +145,6 @@ in [1]. It should be run within an R session.
 
   default usage (replicate reference data is available):
 
-   setwd("path/to/informME/PostProcess/")
    source("jsGrank.R")
    rankGenes(refVrefFiles,testVrefFiles,inFolder,outFolder,
              tName,rName)
@@ -199,7 +196,6 @@ in [1]. It should be run within an R session.
 
   default usage (no replicate reference data is available):  
 
-   setwd("path/to/informME/PostProcess/")
    source("jsGrank.R")
    rankGenes(c(),testVrefFiles,inFolder,outFolder,
              tName,rName)
