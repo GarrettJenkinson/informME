@@ -329,6 +329,8 @@ VERSION HISTORY
 
 v0.3.0 - Code reorganized into a source and bin directory structure. Wrapper shell scripts added to all user callable functions. I/O directories no longer inside code directories. General UI improvements for easier usage.
 
+v0.2.2 - Minor updates in gene ranking and small updates getting ready for the next major reorganization release.
+
 v0.2.1 - Added R utilities for DMR detection and gene ranking using the Jensen-Shannon distance (JSD). Various documentation improvements.
 
 v0.2.0 - Code reorganized into more specialized directories, streamlined, and general SGE submission scripts provided as a guide. Updated README's. Variable names changed to reflect published notation.
