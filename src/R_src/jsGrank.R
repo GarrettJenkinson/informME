@@ -100,21 +100,13 @@ rankGenesEmpNull <- function(refVrefFiles,testVrefFiles,inFolder,outFolder,tName
  
   # Load files into genomic range lists and arrange the seqlevels.  
   for(ind in 1:numNullComp){
-    if(substr(refVrefFiles[ind],nchar(refVrefFiles[ind]),nchar(refVrefFiles[ind]))%in% c("w","g","W","G")){
-      nullGRs[[ind]] <- import.bw(file.path(inFolder,refVrefFiles[ind],fsep=""))
-    }else{
-      nullGRs[[ind]] <- import.bedGraph(file.path(inFolder,refVrefFiles[ind],fsep=""))
-    }
+    nullGRs[[ind]] <- import.bw(file.path(inFolder,refVrefFiles[ind],fsep=""))
     genome(nullGRs[[ind]]) <- "hg19"
     sortSeqlevels(nullGRs[[ind]])
     nullGRs[[ind]] <- keepSeqlevels(nullGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
   }
   for(ind in 1:numAltComp){
-    if(substr(testVrefFiles[ind],nchar(testVrefFiles[ind]),nchar(testVrefFiles[ind]))%in% c("w","g","W","G")){
-      altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
-    }else{
-      altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
-    }
+    altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
     genome(altGRs[[ind]]) <- "hg19"
     sortSeqlevels(altGRs[[ind]])
     altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest,pruning.mode="coarse")
@@ -243,11 +235,7 @@ rankGenesJSD <- function(testVrefFiles,inFolder,outFolder,tName="test",rName="re
   
   # Load files into genomic range lists and arrange the seqlevels. 
   for(ind in 1:numAltComp){
-    if(substr(testVrefFiles[ind],nchar(testVrefFiles[ind]),nchar(testVrefFiles[ind]))%in% c("w","g","W","G")){
-      altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
-    }else{
-      altGRs[[ind]] <- import.bedGraph(file.path(inFolder,testVrefFiles[ind],fsep=""))
-    }
+    altGRs[[ind]] <- import.bw(file.path(inFolder,testVrefFiles[ind],fsep=""))
     genome(altGRs[[ind]]) <- "hg19"
     sortSeqlevels(altGRs[[ind]])
     altGRs[[ind]] <- keepSeqlevels(altGRs[[ind]],chrsOfInterest,pruning.mode="coarse")

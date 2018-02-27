@@ -21,34 +21,34 @@ be run within an R session.
    runReplicateDMR(refVrefFiles,testVrefFiles,inFolder,outFolder,
    correction='XX',pAdjThresh=value) 
      
-   # refVrefFiles is a vector of BED file names that contain  
+   # refVrefFiles is a vector of BIGWIG file names that contain  
    # the JSD values of all pairwise reference comparisons. 
    # For example: if 
    #
-   # JSD-lungnormal-1-VS-lungnormal-2.bed
-   # JSD-lungnormal-3-VS-lungnormal-1.bed 
-   # JSD-lungnormal-3-VS-lungnormal-2.bed 
+   # JSD-lungnormal-1-VS-lungnormal-2.bw
+   # JSD-lungnormal-3-VS-lungnormal-1.bw 
+   # JSD-lungnormal-3-VS-lungnormal-2.bw 
    #
    # are available, then set
    #
-   # file1 <- "JSD-lungnormal-1-VS-lungnormal-2.bed"
-   # file2 <- "JSD-lungnormal-3-VS-lungnormal-1.bed"
-   # file3 <- "JSD-lungnormal-3-VS-lungnormal-2.bed"
+   # file1 <- "JSD-lungnormal-1-VS-lungnormal-2.bw"
+   # file2 <- "JSD-lungnormal-3-VS-lungnormal-1.bw"
+   # file3 <- "JSD-lungnormal-3-VS-lungnormal-2.bw"
    # refVrefFiles <- c(file1,file2,file3)
    #
-   # testVrefFiles is a vector of BED file names that contain 
+   # testVrefFiles is a vector of BIGWIG file names that contain 
    # the JSD values of test/reference comparisons.
    # For example: if 
    #
-   # JSD-lungcancer-1-VS-lungnormal-1.bed
-   # JSD-lungcancer-2-VS-lungnormal-2.bed 
-   # JSD-lungcancer-3-VS-lungnormal-3.bed 
+   # JSD-lungcancer-1-VS-lungnormal-1.bw
+   # JSD-lungcancer-2-VS-lungnormal-2.bw 
+   # JSD-lungcancer-3-VS-lungnormal-3.bw 
    #
    # are available, then set
    #
-   # file4 <- "JSD-lungcancer-1-VS-lungnormal-1.bed"
-   # file5 <- "JSD-lungcancer-2-VS-lungnormal-2.bed"
-   # file6 <- "JSD-lungcancer-3-VS-lungnormal-3.bed"
+   # file4 <- "JSD-lungcancer-1-VS-lungnormal-1.bw"
+   # file5 <- "JSD-lungcancer-2-VS-lungnormal-2.bw"
+   # file6 <- "JSD-lungcancer-3-VS-lungnormal-3.bw"
    # testVrefFiles <- c(file4,file5,file6)
    #
    # inFolder is the directory that contains all JSD files
@@ -86,15 +86,15 @@ be run within an R session.
    runNoReplicateDMR(JSDfile,inFolder,outFolder,
                      correction='XX',pAdjThresh=value)
 
-   # JSDfile is the name of a BED file that contains 
+   # JSDfile is the name of a BIGWIG file that contains 
    # the JSD values of a test/reference comparison. 
    # For example: if 
    #
-   # JSD-lungcancer-1-VS-lungnormal-1.bed
+   # JSD-lungcancer-1-VS-lungnormal-1.bw
    #
    # is available, then set
    #
-   # JSDfile <- "JSD-lungcancer-1-VS-lungnormal-1.bed"
+   # JSDfile <- "JSD-lungcancer-1-VS-lungnormal-1.bw"
    #
    # inFolder is the directory that contains the JSD file
    # outFolder is the directory used to write the result
@@ -149,33 +149,33 @@ in [1]. It should be run within an R session.
    rankGenes(refVrefFiles,testVrefFiles,inFolder,outFolder,
              tName,rName)
 
-   # refVrefFiles is a vector of BED files that contain the
+   # refVrefFiles is a vector of BIGWIG files that contain the
    # JSD values of a test/reference comparison. 
    # For example: if
    #
-   # JSD-lungnormal-1-VS-lungnormal-2.bed 
-   # JSD-lungcancer-3-VS-lungnormal-1.bed 
-   # JSD-lungnormal-3-VS-lungnormal-2.bed
+   # JSD-lungnormal-1-VS-lungnormal-2.bw 
+   # JSD-lungcancer-3-VS-lungnormal-1.bw 
+   # JSD-lungnormal-3-VS-lungnormal-2.bw
    # 
    # are available, then set 
    # 
-   # textVrefFiles <- c("JSD-lungnormal-1-VS-lungnormal-2.bed",
-   #                    "JSD-lungnormal-3-VS-lungnormal-1.bed",
-   #                    "JSD-lungnormal-3-VS-lungnormal-2.bed")
+   # textVrefFiles <- c("JSD-lungnormal-1-VS-lungnormal-2.bw",
+   #                    "JSD-lungnormal-3-VS-lungnormal-1.bw",
+   #                    "JSD-lungnormal-3-VS-lungnormal-2.bw")
    #
-   # testVrefFiles is a vector of BED files that contain the  
+   # testVrefFiles is a vector of BIGWIG files that contain the  
    # JSD values of available test/reference comparisons. 
    # For example: if 
    #
-   # JSD-lungcancer-1-VS-lungnormal-1.bed  
-   # JSD-lungcancer-2-VS-lungnormal-2.bed 
-   # JSD-lungcancer-3-VS-lungnormal-3.bed 
+   # JSD-lungcancer-1-VS-lungnormal-1.bw  
+   # JSD-lungcancer-2-VS-lungnormal-2.bw 
+   # JSD-lungcancer-3-VS-lungnormal-3.bw 
    # 
    # are available, then set 
    # 
-   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bed",
-   #                    "JSD-lungcancer-2-VS-lungnormal-2.bed",
-   #                    "JSD-lungcancer-3-VS-lungnormal-3.bed")
+   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bw",
+   #                    "JSD-lungcancer-2-VS-lungnormal-2.bw",
+   #                    "JSD-lungcancer-3-VS-lungnormal-3.bw")
    #
    # inFolder is the directory that contains the JSD files
    # outFolder is the directory used to write the result  
@@ -200,19 +200,19 @@ in [1]. It should be run within an R session.
    rankGenes(c(),testVrefFiles,inFolder,outFolder,
              tName,rName)
 
-   # testVrefFiles is a vector of BED files that contain the  
+   # testVrefFiles is a vector of BIGWIG files that contain the  
    # JSD values of available test/reference comparisons. 
    # For example: if 
    #
-   # JSD-lungcancer-1-VS-lungnormal-1.bed 
-   # JSD-lungcancer-2-VS-lungnormal-2.bed 
-   # JSD-lungcancer-3-VS-lungnormal-3.bed 
+   # JSD-lungcancer-1-VS-lungnormal-1.bw 
+   # JSD-lungcancer-2-VS-lungnormal-2.bw 
+   # JSD-lungcancer-3-VS-lungnormal-3.bw 
    # 
    # are available, then set 
    # 
-   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bed",
-   #                    "JSD-lungcancer-2-VS-lungnormal-2.bed",
-   #                    "JSD-lungcancer-3-VS-lungnormal-3.bed")
+   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bw",
+   #                    "JSD-lungcancer-2-VS-lungnormal-2.bw",
+   #                    "JSD-lungcancer-3-VS-lungnormal-3.bw")
    #
    # inFolder is the directory that contains the JSD files
    # outFolder is the directory used to write the result 
@@ -249,9 +249,5 @@ REFERENCES
     Goutsias, J. (2018) An information-theoretic approach 
     to the modeling and analysis of whole-genome bisulfite 
     sequencing data, BMC Bioinformatics, in press.
-
-
-
-
 
 

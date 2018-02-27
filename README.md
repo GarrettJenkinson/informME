@@ -241,9 +241,9 @@ usage (when replicate reference data is available):
 
 where 
 
-* refVrefFiles is a vector of BED file names that contain the JSD values of all pairwise reference comparisons 
+* refVrefFiles is a vector of BIGWIG file names that contain the JSD values of all pairwise reference comparisons 
 
-* testVrefFiles is a vector of BED file names that contain the JSD values of test/reference comparisons
+* testVrefFiles is a vector of BIGWIG file names that contain the JSD values of test/reference comparisons
 
 * inFolder is the directory that contains all JSD files
 
@@ -257,7 +257,7 @@ usage (when no replicate reference data is available)
 
 where
 
-* JSDfile is the name of a BED file that contains the JSD values of a test/reference comparison
+* JSDfile is the name of a BIGWIG file that contains the JSD values of a test/reference comparison
 
 * inFolder is the directory that contains the JSD file
 
@@ -280,9 +280,9 @@ usage (when replicate reference data is available):
 
 where 
 
-* refVrefFiles is a vector of BED files that contain the JSD values of a test/reference comparison
+* refVrefFiles is a vector of BIGWIG files that contain the JSD values of a test/reference comparison
 
-* testVrefFiles is a vector of BED files that contain the JSD values of available test/reference comparisons
+* testVrefFiles is a vector of BIGWIG files that contain the JSD values of available test/reference comparisons
 
 * inFolder is the directory that contains the JSD files
 
@@ -302,7 +302,7 @@ usage (when no replicate reference data is available):
 
 where 
 
-* testVrefFiles is a vector of BED files that contain the JSD values of available test/reference comparisons
+* testVrefFiles is a vector of BIGWIG files that contain the JSD values of available test/reference comparisons
 
 * inFolder is the directory that contains the JSD files
 outFolder is the directory used to write the result in an .xlsx file
