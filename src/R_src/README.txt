@@ -248,6 +248,6 @@ REFERENCES
 [1] Jenkninson, G., Abante, J., Feinberg, A.P., and 
     Goutsias, J. (2018) An information-theoretic approach 
     to the modeling and analysis of whole-genome bisulfite 
-    sequencing data, BMC Bioinformatics, in press.
+    sequencing data, BMC Bioinformatics, https://doi.org/10.1186/s12859-018-2086-5.
 
 
