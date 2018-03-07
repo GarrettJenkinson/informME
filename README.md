@@ -55,7 +55,7 @@ A working SAMtools installation needs to be on the system path as well. The rema
 C. INSTALLING InformME
 ----------------------
 
-Run install.sh in the informME directory. During the interactive installing process the user will be asked different questions regarding the locations of default directories. Dependencies, such as GMP, MPFR, MPREAL, and Eigen, will be automatically installed during this process if these are not already available, and the C++ MEX code of informME will be compiled.
+Run install.sh in the informME directory. During the interactive installation process the user will be asked different questions regarding the locations of default directories. Dependencies, such as GMP, MPFR, MPREAL, and Eigen, will be automatically installed during this process if these are not already available, and the C++ MEX code of informME will be compiled.
 
 Note 1: the following environment variables will be defined in a configuration file stored in ~/.informME/informME.config and then will be accessed throughout multiple points in the informME pipeline:
 
@@ -96,6 +96,7 @@ This step analyzes the reference genome FASTA\_FILE (in FASTA format) and produc
 
 * length of chromosome (in base pairs)
 
+NOTE: This step only needs to be completed one time for a given reference genome. Start analyzing samples at step D.2 if you have previously completed step D.1 for your sample's reference genome.
 
 D.2. METHYLATION DATA MATRIX GENERATION: 
 ----------------------------------------
