@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH -J IME-OUT
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=120G
+#SBATCH --time=24:00:00
+#SBATCH -o IME-OUT.out
+#SBATCH -e IME-OUT.err
+
+# Dependencies
+module load matlab/R2017a
+module load samtools
+
+# Phenotype
+prefix1="$1"
+prefix2="$2"
+
+# Run Single
+singleMethAnalysisToBed.sh --MC --ESI -- "$prefix1"
+singleMethAnalysisToBed.sh --MC --ESI -- "$prefix2"
+
+# Run Diff
+makeBedsForDiffMethAnalysis.sh --MC --ESI -- "$prefix1" "$prefix2"

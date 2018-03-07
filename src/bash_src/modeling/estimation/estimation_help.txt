@@ -1,0 +1,38 @@
+Description:
+    This function takes a list of .mat merged matrix files (which correspond to the 
+    same phenotype) and performs statistical model estimation within a specific 
+    chromosome of interest.
+
+Usage:
+    estimation.sh [options] -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC PROC_NUM
+
+Options:
+    -h|--help           Help.
+    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
+    -b|--bamdir         BAM file directory. Default: $BAMDIR.
+    -m|--matdir         Matrices directory. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+
+Examples:
+    estimation.sh -d out -- normal-1 normal 1 1 1
+    estimation.sh -d out -- normal-1,normal-2 normal 1 1 1
+
+Output:
+    A MATLAB .mat objects with suffix PROC_NUM. 
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    mergeMatrices.sh
+
+Downstream:
+    mergeEstimation.sh
+
+Date:
+    10/25/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

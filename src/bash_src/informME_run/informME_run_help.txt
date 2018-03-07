@@ -1,0 +1,77 @@
+Description:
+    This function learns the parameters of the Ising model and performs methylation analysis. 
+    It estimates the parameters of the Ising probability distribution used to model 
+    methylation within equally sized (in base pairs) non-overlapping regions of the genome. 
+    The input is expected to be in INTERDIR, and the output is also stored in INTERDIR by 
+    default. The output file produced by the learning phase contains the following 
+    information for each genomic region used in model estimation:
+    o CpG distances
+    o CpG densities
+    o estimated alpha, beta, and gamma parameters of the Ising model
+    o initial and transition probabilities of the inhomogeneous Markov chain representation of 
+      the Ising model
+    o marginal probabilities at each CpG site
+    o the log partition function of the estimated Ising model
+    The output file produced by the analysis phase contains the following information:
+    o the locations of the CpG sites within the genomic region
+    o numbers of CpG sites within the analysis subregions
+    o which analysis subregions are modeled and which are not
+    o estimated parameters of Ising model in genomic region
+    o methylation level probabilities in modeled subregions
+    o coarse methylation level probabilities
+    o mean methylation levels
+    o normalized methylation entropies
+    o entropic sensitivity indices (if ESIflag = 1)
+    o turnover ratios (if MCflag = 1)
+    o channel capacities (if MCflag = 1)
+    o relative dissipated energies (if MCflag = 1)
+
+Usage:
+    informME_run.sh  [OPTIONS]  -- MAT_FILES PHENO CHR_NUM
+
+Mandatory arguments:
+    o MAT_FILES: list of methylation matrices to be modeled
+    o PHENO: prefix of output files (name of phenotype)
+    o CHR_NUM: chromosome to be processed
+
+Options:
+    -h|--help           help
+    -r|--refdir         directoty of reference genome and CpG location files (default: $REFGENEDIR)
+    -b|--bamdir         BAM file directory (default: $BAMDIR)
+    -e|--estdir         modeling directory (default: $INTERMEDIATE)
+    -a|--analdir        analysis directory (default: $INTERMEDIATE)
+    -d|--outdir         output directory (default: $INTERMEDIATE)
+    -q|--threads        number of threads used (default: 1)
+    --tmpdir         	temporary directory (default: $SCRATCHDIR)
+    --time_limit     	maximum time (in minutes) allowed for each thread to complete (default: 60)
+    -l|--MATLICENSE     path to MATLAB's license
+
+Example:
+    * Running informME on chromosome 1 using 5 threads:
+    	informME_run.sh -q 5 -- sample1 pheno_1 1
+    * Running informME on chromosome 1 using 5 threads and 3 samples:
+    	informME_run.sh -q 5 -- sample2,sample3,sample4 pheno_2 1
+
+Output:
+    MATLAB .mat file
+
+Dependancies:
+    * MATLAB
+    * estimation.sh
+    * mergeEstimation.sh
+    * singleMethAnalysis.sh
+    * mergeSingleMethAnalysis.sh
+
+Upstream:
+    getMatrices.sh
+
+Downstream:
+    singleAnalysisToBed.sh
+    diffAnalysisToBed.sh
+
+Date:
+    11/16/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

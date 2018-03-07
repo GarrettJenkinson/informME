@@ -1,0 +1,1 @@
+../src/bash_src/parseBamFile/fastaToCpg/fastaToCpg.sh

@@ -1,0 +1,43 @@
+Description:
+    This function makes BED files from the methylation analysis results obtained after 
+    running informME_run.sh for a given phenotype. By default, the input file (analysis 
+    file) is expected to be located in INTERDIR, whereas the output files are stored 
+    in FINALDIR. 
+
+Usage:
+    singleMethAnalysisToBed.sh [OPTIONS] -- PHENO
+
+Mandatory argument:
+    o PHENO: prefix of the methylation analysis file (name of phenotype)
+
+Options:
+    -h|--help           help
+    -r|--refdir         directory of reference genome (default: $REFGENEDIR)
+    -a|--analdir        analysis directory (default: $REFGENEDIR)
+    -d|--outdir         output directory (default: $FINALDIR)
+    -t|--threshold      threshold used in methylation-based classification (default: 0.4)
+    --min_chr           minimum chromosome to be included in BED file (default: 1)
+    --max_chr           maximum chromosome to be included in BED file (default: 22)
+    --MC                computation of information theoretic quantities (default: 0)
+    --ESI               computation of entropic sensivity index (ESI) (default: 0)
+    -l|--MATLICENSE     path to MATLAB's license
+
+Example:
+    * Generating the BED files that include chr1 through chr22 for phenotype normal:
+    	singleMethAnalysisToBed.sh --min_chr 1 --max_chr 22 -- normal
+
+Output:
+    BED files
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    mergeSingleMethAnalysis.sh 
+
+Date:
+    11/09/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

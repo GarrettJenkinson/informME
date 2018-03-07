@@ -1,0 +1,58 @@
+Description:
+    This function takes a BAM file as input and generates a methylation data matrix for
+    a given chromosome. The BAM file is expected to be in BAMDIR, while the output 
+    file is stored in INTERDIR by default. These directories can be modified via 
+    optional arguments that can be passed to the function. The output file produced 
+    contains the following information for each genomic region which is subsequently 
+    used for model estimation:
+    o data matrix with -1,0,1 values for methylation status
+    o CpG locations broken down by region
+
+Usage:
+    getMatrices.sh  [OPTIONS]  -- BAM_FILE CHR_NUM
+
+Mandatory arguments:
+    o BAM_FILE: BAM file for which the methylation data matrix will be generated
+    o CHR_NUM: chromosome to be processed
+
+Options:
+    -h|--help           help
+    -r|--refdir         directory of reference genome and CpG location files (default: $REFGENEDIR)
+    -b|--bamdir         directory of BAM file (default: $BAMDIR)
+    -d|--outdir         output directory (default: $INTERMEDIATE)
+    -q|--threads        number of threads used (default: 1)
+    -t|--trim           number or vector of bases to be trimmed (default: 0)
+    -c|--c_string       name convention for chromosomes: 0 => 'X'; 1 => 'chrX' (default: 1)
+    --tmpdir     	directory of intermediate files (default: $SCRATCHDIR) 
+    --time_limit     	maximum time (in minuttes) allowed for each thread to complete (default: 60)
+    -l|--MATLICENSE     path to MATLAB's license
+
+Examples:
+    * Trimming 10 bases on each read and using 5 threads:
+    	getMatrices.sh -q 5 -t 10 -- sample_1.bam 1
+    * Trimming different bases on each read, using 5 threads, and 'chrX' naming convention:
+    	getMatrices.sh -q 5 -t '[15,20]' -c 1 -- sample_1.bam 1
+
+Output:
+    MATLAB .mat file with suffix *_matrices.mat
+
+Dependancies:
+    * MATLAB
+    * xargs
+    * timeout
+    * matrixFromBam.sh
+    * mergeMatrices.sh
+
+Upstream:
+    fastaTCpG.sh
+
+Downstream: 
+    informME_run.sh
+
+Date:
+    11/16/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>
+

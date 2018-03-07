@@ -1,0 +1,49 @@
+Description:
+    This function is used to analyze a reference genome in order to find and store the 
+    locations of all CpG sites within each chromosome and compute the CpG densities at 
+    each CpG site as well as the distances between neighboring CpG sites. A 1-based 
+    coordinate system is used, in which the first base is assigned to position 1 and the 
+    location of a CpG site is defined by the position of the C nucleotide on the forward 
+    strand of the reference genome. Each MAT file produced will be stored by default in 
+    REFGENEDIR, and it will contain the following information:
+    o location of CpG sites
+    o CpG density for each CpG site
+    o distance between neighboring CpG sites
+    o location of the last CpG site in the chromosome
+    o length of chromosome (in base pairs)
+
+Usage:
+    fastaToCpg.sh  [OPTIONS]  -- FASTA_FILE
+
+Mandatory argument:
+    o FASTA_FILE: reference genome in FASTA format
+
+Options:
+    -h|--help           help
+    -d|--outdir         output directory (default: $REFGENEDIR)
+    -l|--MATLICENSE     path to MATLAB's License
+
+Examples:
+    * Analyzing FASTA file /path/to/input.fa and storing output in REFGENEDIR: 
+    	fastaToCpg.sh -- /path/to/input.fa
+    * Analyzing FASTA file /path/to/input.fa and storing output in directory /path/to/out: 
+    	fastaToCpg.sh -d /path/to/out -- /path/to/input.fa
+
+Output:
+    MATLAB .mat file for each entry in FASTA file
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    NA
+
+Downstream:
+    getMatrices.sh
+
+Date:
+    11/09/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

@@ -1,0 +1,1 @@
+../src/bash_src/parseBamFile/mergeMatrices/mergeMatrices.sh

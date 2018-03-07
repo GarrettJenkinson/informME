@@ -1,0 +1,28 @@
+Description:
+    Compile all .cpp source files and generates .mex binary files to be called by MATLAB.
+
+Usage:
+    mexSource.sh  [options]  -- EIGEN_PATH MPFR_INCLUDE MPFR_LIB
+
+Options:
+    -h|--help           Help.
+    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+
+Examples:
+    mexSource.sh /usr/local/src/eigen-3.3.1/ /usr/local/include/ /usr/local/lib/
+
+Output:
+    Compiled cpp files (.mex) under src/matlab_src/.
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    NA
+
+Date:
+    10/05/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>

@@ -1,0 +1,10 @@
+Instructions to follow prior to run mexSource.sh.
+
+1. Download:
+    * Eigen from http://eigen.tuxfamily.org. Latest version working: 3.3.1.
+    * MPFR from http://www.mpfr.org. Latest version working: 3.6.2.
+    * mpreal.h from http://www.holoborodko.com/pavel/mpfr/#download. Latest working: 3.6.2.
+
+2. Install MPFR following instructions. Locate mprf.h, usually found in /usr/local/include in Unix and Macintosh.
+
+3. Move mpreal.h downloaded to the Eigen folder.

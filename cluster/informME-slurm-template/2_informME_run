@@ -1,0 +1,21 @@
+#!/bin/bash
+#SBATCH --job-name=IME-RUN
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=24
+#SBATCH --mem=120G
+#SBATCH --time=24:00:00
+#SBATCH --array=1-22
+#SBATCH -o IME-RUN_%A_%a.out
+#SBATCH -e IME-RUN_%A_%a.err
+
+# Dependencies
+module load matlab/R2017a
+module load samtools
+
+# Input
+mat_files="$1"
+prefix="$2"
+
+# Run
+informME_run.sh -q 20 --time_limit 30 -- "$mat_files" "$prefix" ${SLURM_ARRAY_TASK_ID}

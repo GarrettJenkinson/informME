@@ -1,0 +1,20 @@
+#!/bin/bash
+#
+#$ -j y
+#$ -r y
+#$ -S /bin/bash
+#$ -N INFMAT
+#$ -l mem_free=20G
+#$ -l h_vmem=20G
+#$ -l h_fsize=30G
+#$ -l cegs2
+#$ -q cegs2.q
+#$ -pe local 4
+#$ -t 1-5
+
+# Variables
+max_proc=4
+
+# Run
+getMatrices.sh -c 1 -t 10 -q "$max_proc" -- toy_normal_pe "${SGE_TASK_ID}"
+getMatrices.sh -c 1 -t 10 -q "$max_proc" -- toy_cancer_pe "${SGE_TASK_ID}"

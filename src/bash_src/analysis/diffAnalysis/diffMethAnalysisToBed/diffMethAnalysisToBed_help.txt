@@ -1,0 +1,45 @@
+Description:
+   This function makes BED files from the differential methylation analysis results obtained 
+   after running informME_run.sh for two given phenotypes. By default, the input files 
+   (both analysis files) are expected to be located in INTERDIR, whereas the output files 
+   are stored in FINALDIR. 
+
+Usage:
+    diffMethAnalysisToBed.sh [OPTIONS] -- PHENO1 PHENO2 
+
+Mandatory arguments:
+    o PHENO1: prefix of the methylation analysis file 1 (name of phenotype 1)
+    o PHENO2: prefix of the methylation analysis file 2 (name of phenotype 2)
+
+Options:
+    -h|--help           help
+    -r|--refdir         reference genome directory (default: $REFGENEDIR)
+    -a1|--analdir_1     analysis directory for phenotype 1 (default: $INTERMEDIATE)
+    -a2|--analdir_2     analysis directory for phenotype 2 (default: $INTERMEDIATE) 
+    -d|--outdir         output directory (default: $FINALDIR)
+    -t|--threshold      threshold used in methylation-based classification (default: 0.4)
+    --min_chr           minimum chromosome to be included in BED file (default: 1)
+    --max_chr           maximum chromosome to be included in BED file (default: 22)
+    --MC                computation of information theoretic quantities (default: 0)
+    --ESI               computation of entropic sensivity index (ESI) (default: 0)
+    -l|--MATLICENSE     path to MATLAB's license
+
+Example:
+    * Generating BED files for the differential analysis between phenotype_1 and phenotype_2:
+    	diffMethAnalysisToBed.sh -- phenotype_1 phenotype_2 
+                                    
+Output:
+    BED files
+
+Dependancies:
+    MATLAB
+
+Upstream:
+    mergeSingleMethAnalysis.sh 
+
+Date:
+    11/09/2017
+
+Authors:
+    Garrett Jenkinson <jenkinson@jhu.edu>
+    Jordi Abante <jabante1@jhu.edu>
