@@ -103,14 +103,15 @@ D.2. METHYLATION DATA MATRIX GENERATION:
 	
         getMatrices.sh [OPTIONS]  -- BAM_FILE CHR_NUM
 
-This step takes the BAM file BAM\_FILE as input and generates the methylation data matrix for chromosome number CHR\_NUM. By default, the file BAM\_FILE is expected to be in BAMDIR, and the output file produced by this step is stored in a subdirectory in INTERDIR named after the chromosome number CHR\_NUM. The output file preserves the prefix from the file BAM\_FILE and the suffix '\_matrices.mat' is appended to it (e.g. if BAM\_FILE is normal\_sample.bam and CHR\_NUM is 10, then the output file is saved as INTERDIR/chr10/normal\_sample\_matrices.mat). The file produced contains the following information for each genomic region, which is subsequently used for model estimation:
+This step takes the BAM file BAM\_FILE as input and generates the methylation data matrix for chromosome number CHR\_NUM. By default, the file BAM\_FILE and its associated index file (with extension .bai) is expected to be in BAMDIR, and the output file produced by this step is stored in a subdirectory in INTERDIR named after the chromosome number CHR\_NUM. The output file preserves the prefix from the file BAM\_FILE and the suffix '\_matrices.mat' is appended to it (e.g. if BAM\_FILE is normal\_sample.bam and CHR\_NUM is 10, then the output file is saved as INTERDIR/chr10/normal\_sample\_matrices.mat). The file produced contains the following information for each genomic region, which is subsequently used for model estimation:
 
 * data matrix with -1,0,1 values for methylation status
 
 * CpG locations broken down by region
 
-NOTE: We recommend taking advantage of the array feature available in SGE and SLURM based clusters to submit an individual job for each chromosome.
+NOTE1: We recommend taking advantage of the array feature available in SGE and SLURM based clusters to submit an individual job for each chromosome.
 
+NOTE2: See reference [1], "Online Methods: Quality control and alignment" for our suggested preprocessing steps when generating a sorted, indexed, deduplicated BAM file to input to informME.  
 
 D.3. MODEL ESTIMATION & ANALYSIS:
 ---------------------------------
