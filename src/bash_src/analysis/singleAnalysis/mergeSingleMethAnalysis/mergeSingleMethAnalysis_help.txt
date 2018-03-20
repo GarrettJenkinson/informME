@@ -27,7 +27,7 @@ Upstream:
     singleMethAnalysis.sh 
 
 Downstream:
-    singleAnalysisToBed.sh
+    singleMethAnalysisToBed.sh
 
 Date:
     10/05/2017
