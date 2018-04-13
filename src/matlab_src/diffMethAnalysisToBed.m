@@ -664,7 +664,7 @@ for chrNum = minChrNum:maxChrNum
                                                            int64(subEndBP-1),2);
                                                        
                                     else 
-                                    % Phenotype 1 is moderately hypermethylated.
+                                    % Phenotype 1 is weakly hypermethylated.
                                         fprintf(bedFileIDDMU,'%s %12u %12u %f\n',...
                                                      chr_str,int64(subStartBP-1),...
                                                            int64(subEndBP-1),1);
