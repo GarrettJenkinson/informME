@@ -146,10 +146,10 @@ if exist([estResultsPathRoot filesep 'chr' chr_num_str filesep ...
       prefix '_params_chr' chr_num_str '_file' num2str(processorNum) '.mat\n']);
     return;
 elseif exist([estResultsPathRoot filesep 'chr' chr_num_str  ...
-               filesep prefix '_chr' chr_num_str '.mat'],'file')
+               filesep prefix '_fit.mat'],'file')
     fprintf(2,'Exiting. Final merged output file already exists:');
     fprintf(2,[estResultsPathRoot filesep 'chr' chr_num_str filesep ...
-                prefix '_fit_chr' chr_num_str '.mat\n']);
+                prefix '_fit.mat\n']);
     return;
 end
 
