@@ -44,13 +44,13 @@ informME includes the following directories:
 B. DEPENDENCIES
 ---------------
 
-It is required to properly configure a MATLAB compiler. For details, see:
-
-* https://www.mathworks.com/products/compiler.html 
+It is required to properly configure a MATLAB C++ mex compiler. For details, see:
 
 * https://www.mathworks.com/help/matlab/ref/mex.html
 
 A working SAMtools installation needs to be on the system path as well. The remaining dependencies (GMP, MPFR, MPREAL, and Eigen) are all C++ dependencies that the installation script will install as needed.
+
+NOTE: The required "mex compiler" is different from the "Matlab compiler SDK". InformME requires the former and not the latter.
 
 C. INSTALLING InformME
 ----------------------
