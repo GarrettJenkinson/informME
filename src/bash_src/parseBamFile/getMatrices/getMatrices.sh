@@ -152,23 +152,23 @@ mkdir -p "${outdir}/chr${chr_num}"
 bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
 if [ ! -r "${bamdir}${bam_file}" ]
 then
-  printf "ERROR: input bam file:\n"
-  printf "${bamdir}${bam_file} \nis not readable\n"
+  echo "ERROR: input bam file:\n" >&2
+  echo "${bamdir}${bam_file} \nis not readable\n" >&2
   exit 3
 fi
 if [ ! -r "${bamdir}${bam_file}.bai" ]
 then
-  printf "ERROR: input bam index file:\n"
-  printf "${bamdir}${bam_file}.bai \nis not readable\n"
+  echo "ERROR: input bam index file:\n" >&2
+  echo "${bamdir}${bam_file}.bai \nis not readable\n" >&2
   exit 3
 fi
 
 # Check that samtools is available
 if [ ! -x "`which samtools`" ]
 then
-  printf "ERROR: samtools not installed:"
-  printf "${exname} is not executable\n"
-  exit 3
+  echo "ERROR: samtools not installed:" >&2
+  echo "${exname} is not executable\n" >&2
+  exit 1
 fi
 
 # Get matrices via matrixFromBam.sh
