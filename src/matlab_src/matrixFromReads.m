@@ -74,6 +74,7 @@ numRawReads    = length(currentReads);
 N              = length(CpGsInRegion);
 observedMatrix = -1*ones(numRawReads,N);
 readNames      = cell(numRawReads,1);
+errorCount     = 0; %count errors to determine response
 
 % Convert reads to (-1,0,1) vectors.
 
@@ -84,9 +85,20 @@ for read_num=1:numRawReads
     readNames{read_num} = processedRead{1}; % Store for later.
     
     % Find start and end of read.
+    try
     startOfRead  = int64(vpa(processedRead{4}));      
                         % 4-th column is start (leftmost base pair) of
                         % read.
+    catch % common errors here due to samtools replying with 
+          % non-sam-formatted string (e.g. error message)
+        fprintf(2,['Error parsing samtools read:\n' currentReads{read_num} '\n']);
+        if errorCount == 0
+          errorCount = errorCount + 1;
+          continue;
+        else
+          error('Second error encountered. Terminating function MatrixFromReads.');
+        end
+    end
     lengthOfRead = int64(length(processedRead{10}));  
                         % 10-th column is the string of base pairs.
     endOfRead    = int64(startOfRead+lengthOfRead-1); 
