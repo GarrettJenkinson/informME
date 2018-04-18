@@ -148,6 +148,29 @@ bam_prefix="$(basename "$bam_file" .bam)"
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
 
+# Check that input files exist
+bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
+if [ ! -r "${bamdir}${bam_file}" ]
+then
+  printf "ERROR: input bam file:\n"
+  printf "${bamdir}${bam_file} \nis not readable\n"
+  exit 3
+fi
+if [ ! -r "${bamdir}${bam_file}.bai" ]
+then
+  printf "ERROR: input bam index file:\n"
+  printf "${bamdir}${bam_file}.bai \nis not readable\n"
+  exit 3
+fi
+
+# Check that samtools is available
+if [ ! -x "`which samtools`" ]
+then
+  printf "ERROR: samtools not installed:"
+  printf "${exname} is not executable\n"
+  exit 3
+fi
+
 # Get matrices via matrixFromBam.sh
 SECONDS=0
 echo "[$(date)]: Call: matrixFromBam.sh ..." 
