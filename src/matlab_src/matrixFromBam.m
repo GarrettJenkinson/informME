@@ -305,6 +305,11 @@ for startBP = thisProcessorStartBPs
         elseif countedNumReads>5000
             fprintf(2,['Too many reads mapped to region: ' region_str '\n']);
             continue;
+        elseif isnan(countedNumReads)
+            fprintf(2,['Error parsing output in region:' region_str '\n']);
+            fprintf(2,['samtools command used: \n' commandCount '\n\n']);
+            fprintf(2,['above command returned following output:\n' countedNumReadsStr '\n']);
+            continue;
         end
 
         % Now run actual SAMtools view command, given that the number of 
