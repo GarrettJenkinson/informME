@@ -154,13 +154,13 @@ if [ ! -r "${bamdir}${bam_file}" ]
 then
   echo "ERROR: input bam file:\n" >&2
   echo "${bamdir}${bam_file} \nis not readable\n" >&2
-  exit 3
+  exit 1
 fi
 if [ ! -r "${bamdir}${bam_file}.bai" ]
 then
   echo "ERROR: input bam index file:\n" >&2
   echo "${bamdir}${bam_file}.bai \nis not readable\n" >&2
-  exit 3
+  exit 1
 fi
 
 # Check that samtools is available
