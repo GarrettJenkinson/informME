@@ -150,17 +150,17 @@ mkdir -p "${outdir}/chr${chr_num}"
 
 # Check that input files exist
 bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
-if [ ! -r "${bamdir}${bam_file}" ]
+if [ ! -r "${bamdir}${bam_prefix}.bam" ]
 then
   echo "ERROR: input bam file:" >&2
-  echo "${bamdir}${bam_file}" >&2
+  echo "${bamdir}${bam_prefix}.bam" >&2
   echo "is not readable" >&2
   exit 1
 fi
-if [ ! -r "${bamdir}${bam_file}.bai" ]
+if [ ! -r "${bamdir}${bam_prefix}.bam.bai" ]
 then
   echo "ERROR: input bam index file:" >&2
-  echo "${bamdir}${bam_file}.bai" >&2
+  echo "${bamdir}${bam_file}.bam.bai" >&2
   echo "is not readable" >&2
   exit 1
 fi
