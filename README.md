@@ -98,7 +98,7 @@ This step analyzes the reference genome FASTA\_FILE (in FASTA format) and produc
 
 NOTE1: This step only needs to be completed one time for a given reference genome. Start analyzing samples at step D.2 if you have previously completed step D.1 for your sample's reference genome.
 
-NOTE2: At this time the statistical model of informME has been designed to work only with autosomes, and so the informME software will not model mitochondrial chromosomes, labmda spike-ins, partial contigs, or sex chromosomes. Also the reference fasta file to which bam files have been aligned is assumed to be sorted so that the somatic chromosomes come first and in the usual order: chr1,chr2,...,chrN. 
+NOTE2: At this time the statistical model of informME has been designed to work only with autosomes, and so the informME software will not model mitochondrial chromosomes, lambda spike-ins, partial contigs, sex chromosomes, et cetera. Also the reference fasta file to which bam files have been aligned is assumed to be sorted so that the somatic chromosomes come first and in the usual order: chr1,chr2,...,chrN. 
 
 D.2. METHYLATION DATA MATRIX GENERATION: 
 ----------------------------------------
