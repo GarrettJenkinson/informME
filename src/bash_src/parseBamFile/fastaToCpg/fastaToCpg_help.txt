@@ -16,7 +16,12 @@ Usage:
     fastaToCpg.sh  [OPTIONS]  -- FASTA_FILE
 
 Mandatory argument:
-    o FASTA_FILE: reference genome in FASTA format
+    o FASTA_FILE: reference genome in FASTA format. Should be ordered to have the
+                  autosomes come first and in numeric order 1,2,3,... And they must
+                  have naming scheme 1,2,3,... or chr1,chr2,chr3,... The log file
+                  here should be examined to ensure compliance and the naming schemes 
+                  should be noted and specified downstream to getMatrices.sh through
+                  its -c argument. 
 
 Options:
     -h|--help           help
