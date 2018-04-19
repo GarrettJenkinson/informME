@@ -14,7 +14,7 @@ Options:
     -h|--help           Help.
     -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
     -b|--bamdir         BAM file directory. Default: $BAMDIR.
-    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -d|--outdir         Output directory. Default: $INTERDIR.
     -t|--trim           Number of base to trim. Default: 0.
     -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
     -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
