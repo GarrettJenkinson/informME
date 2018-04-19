@@ -169,7 +169,7 @@ fi
 if [ ! -x "`which samtools`" ]
 then
   echo "ERROR: samtools not installed:" >&2
-  echo "${exname} is not executable" >&2
+  echo "samtools is not executable on system PATH" >&2
   exit 1
 fi
 
