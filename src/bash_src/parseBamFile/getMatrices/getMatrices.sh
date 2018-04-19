@@ -152,14 +152,16 @@ mkdir -p "${outdir}/chr${chr_num}"
 bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
 if [ ! -r "${bamdir}${bam_file}" ]
 then
-  echo "ERROR: input bam file:\n" >&2
-  echo "${bamdir}${bam_file} \nis not readable\n" >&2
+  echo "ERROR: input bam file:" >&2
+  echo "${bamdir}${bam_file}" >&2
+  echo "is not readable" >&2
   exit 1
 fi
 if [ ! -r "${bamdir}${bam_file}.bai" ]
 then
-  echo "ERROR: input bam index file:\n" >&2
-  echo "${bamdir}${bam_file}.bai \nis not readable\n" >&2
+  echo "ERROR: input bam index file:" >&2
+  echo "${bamdir}${bam_file}.bai" >&2
+  echo "is not readable" >&2
   exit 1
 fi
 
@@ -167,7 +169,7 @@ fi
 if [ ! -x "`which samtools`" ]
 then
   echo "ERROR: samtools not installed:" >&2
-  echo "${exname} is not executable\n" >&2
+  echo "${exname} is not executable" >&2
   exit 1
 fi
 
