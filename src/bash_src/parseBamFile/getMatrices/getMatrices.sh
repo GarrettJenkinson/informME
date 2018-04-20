@@ -106,7 +106,7 @@ do
       chr_string="$2"
       if ([ "$chr_string" -ne "0" ] && [ "$chr_string" -ne "1" ])
       then 
-        echo "Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
+        echo "[$(date)]: Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
         exit -1
       fi
       shift 2
@@ -115,7 +115,7 @@ do
       paired_ends="$2"
       if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
       then
-        echo "Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        echo "[$(date)]: Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
         exit -1
       fi
       shift 2
@@ -141,7 +141,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo "[$(date)]: $script_name.sh:Internal error!"
       exit -1
       ;;  
   esac
@@ -162,24 +162,25 @@ mkdir -p "${outdir}/chr${chr_num}"
 bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
 if [ ! -r "${bamdir}${bam_prefix}.bam" ]
 then
-  echo "ERROR: input bam file:" >&2
-  echo "${bamdir}${bam_prefix}.bam" >&2
-  echo "is not readable" >&2
+  echo "[$(date)]: Input bam file:" >&2
+  echo "[$(date)]: ${bamdir}${bam_prefix}.bam" >&2
+  echo "[$(date)]: is not readable. Terminating..." >&2
   exit 1
 fi
 if [ ! -r "${bamdir}${bam_prefix}.bam.bai" ]
 then
-  echo "ERROR: input bam index file:" >&2
-  echo "${bamdir}${bam_prefix}.bam.bai" >&2
-  echo "is not readable" >&2
+  echo "[$(date)]: Input bam index file:" >&2
+  echo "[$(date)]: ${bamdir}${bam_prefix}.bam.bai" >&2
+  echo "[$(date)]: is not readable. Terminating..." >&2
   exit 1
 fi
 
 # Check that samtools is available
 if [ ! -x "`which samtools`" ]
 then
-  echo "ERROR: samtools not installed:" >&2
-  echo "samtools is not executable on system PATH" >&2
+  echo "[$(date)]: Samtools not installed:" >&2
+  echo "[$(date)]: samtools is not executable on system PATH" >&2
+  echo "[$(date)]: Terminating..." >&2
   exit 1
 fi
 
