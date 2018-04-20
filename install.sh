@@ -181,7 +181,7 @@ else
     fi
 
     cd $EIGDIR
-    if [ ! -w "$EIGDIR/informMEdeps"]
+    if [ ! -w "$EIGDIR/informMEdeps" ]
     then
         mkdir informMEdeps
     fi
