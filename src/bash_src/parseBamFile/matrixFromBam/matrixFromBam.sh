@@ -52,7 +52,7 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:d:t:c:l: -l help,refdir:,bamdir:,outdir:,trim:,chr_string:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:d:t:c:p:l: -l help,refdir:,bamdir:,outdir:,trim:,chr_string:,paired_ends:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -68,6 +68,7 @@ bamdir="$BAMDIR"
 outdir="$INTERDIR"
 trim=0
 chr_string=1
+paired_ends=1
 
 # Options
 while true
@@ -102,6 +103,15 @@ do
       fi
       shift 2
       ;;  
+    -p|--paired_ends)
+      paired_ends="$2"
+      if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
+      then
+        echo "Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        exit -1
+      fi
+      shift 2
+      ;;
     -l|--MATLICENSE)
       MATLICENSE="$2"
       shift 2
@@ -153,7 +163,7 @@ echo "[$(date)]: Starting ..."
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
 
 # Generate command and options
-cmd="${matlab_function}('$bam_prefix','$chr_num','CpGlocationPathRoot','$refdir','totalProcessors',$total_proc,'processorNum',$proc_num,'bamFilePathRoot','$bamdir','outdir','$outdir','includeChrInRef',$chr_string,'numBasesToTrim',$trim)"
+cmd="${matlab_function}('$bam_prefix','$chr_num','CpGlocationPathRoot','$refdir','totalProcessors',$total_proc,'processorNum',$proc_num,'bamFilePathRoot','$bamdir','outdir','$outdir','includeChrInRef',$chr_string,'numBasesToTrim',$trim,'pairedEnds',$paired_ends)"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided

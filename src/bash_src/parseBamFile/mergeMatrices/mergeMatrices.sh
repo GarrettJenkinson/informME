@@ -69,6 +69,7 @@ outdir="$INTERDIR"
 matdir="$INTERDIR"
 trim=0
 chr_string=1
+paired_ends=1
 
 # Options
 while true
@@ -107,6 +108,15 @@ do
       fi
       shift 2
       ;;  
+    -p|--paired_ends)
+      paired_ends="$2"
+      if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
+      then
+        echo "Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        exit -1
+      fi
+      shift 2
+      ;;
     -l|--MATLICENSE)
       MATLICENSE="$2"
       shift 2
@@ -158,7 +168,7 @@ echo "[$(date)]: Starting ..."
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
 
 # Generate command and options
-cmd="${matlab_function}('$bam_prefix','$chr_num','CpGlocationPathRoot','$refdir','totalProcessors',$total_proc,'bamFilePathRoot','$bamdir','outdir','$outdir','matricesPathRoot','$matdir','includeChrInRef',$chr_string,'numBasesToTrim',$trim)"
+cmd="${matlab_function}('$bam_prefix','$chr_num','CpGlocationPathRoot','$refdir','totalProcessors',$total_proc,'bamFilePathRoot','$bamdir','outdir','$outdir','matricesPathRoot','$matdir','includeChrInRef',$chr_string,'numBasesToTrim',$trim,'pairedEnds',$paired_ends)"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided
