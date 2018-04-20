@@ -160,7 +160,7 @@ fi
 if [ ! -r "${bamdir}${bam_prefix}.bam.bai" ]
 then
   echo "ERROR: input bam index file:" >&2
-  echo "${bamdir}${bam_file}.bam.bai" >&2
+  echo "${bamdir}${bam_prefix}.bam.bai" >&2
   echo "is not readable" >&2
   exit 1
 fi
