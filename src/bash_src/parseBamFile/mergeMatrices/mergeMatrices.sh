@@ -52,11 +52,11 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:d:t:c:l: -l help,refdir:,bamdir:matdir:,outdir:,trim:,chr_string:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:m:d:t:c:p:l: -l help,refdir:,bamdir:matdir:,outdir:,trim:,chr_string:,paired_ends:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
-  echo "Terminating..." >&2
+  echo "[$(date)]: Terminating..." >&2
   exit -1
 fi
 
@@ -103,7 +103,7 @@ do
       chr_string="$2"
       if ([ "$chr_string" -ne "0" ] && [ "$chr_string" -ne "1" ])
       then 
-        echo "Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
+        echo "[$(date)]: Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
         exit -1
       fi
       shift 2
@@ -112,7 +112,7 @@ do
       paired_ends="$2"
       if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
       then
-        echo "Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        echo "[$(date)]: Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
         exit -1
       fi
       shift 2
@@ -126,7 +126,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo "[$(date)]: $script_name.sh:Internal error!"
       exit -1
       ;;  
   esac
