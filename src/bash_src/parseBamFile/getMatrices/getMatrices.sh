@@ -52,7 +52,7 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:d:t:c:l:q: -l help,refdir:,bamdir:,tmpdir:,outdir:,trim:,chr_string:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:d:t:c:p:l:q: -l help,refdir:,bamdir:,tmpdir:,outdir:,trim:,chr_string:,paired_ends:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -69,6 +69,7 @@ tmpdir="$SCRATCHDIR"
 outdir="$INTERDIR"
 trim=0
 chr_string=1
+paired_ends=1
 threads=1
 time_limit=60
 total_part=200
@@ -105,11 +106,20 @@ do
       chr_string="$2"
       if ([ "$chr_string" -ne "0" ] && [ "$chr_string" -ne "1" ])
       then 
-        echo "Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
+        echo "[$(date)]: Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
         exit -1
       fi
       shift 2
       ;;  
+    -p|--paired_ends)
+      paired_ends="$2"
+      if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
+      then
+        echo "[$(date)]: Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        exit -1
+      fi
+      shift 2
+      ;;
     -l|--MATLICENSE)
       MATLICENSE="$2"
       shift 2
@@ -131,7 +141,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo "[$(date)]: $script_name.sh:Internal error!"
       exit -1
       ;;  
   esac
@@ -148,11 +158,37 @@ bam_prefix="$(basename "$bam_file" .bam)"
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
 
+# Check that input files exist
+bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
+if [ ! -r "${bamdir}${bam_prefix}.bam" ]
+then
+  echo "[$(date)]: Input bam file:" >&2
+  echo "[$(date)]: ${bamdir}${bam_prefix}.bam" >&2
+  echo "[$(date)]: is not readable. Terminating..." >&2
+  exit 1
+fi
+if [ ! -r "${bamdir}${bam_prefix}.bam.bai" ]
+then
+  echo "[$(date)]: Input bam index file:" >&2
+  echo "[$(date)]: ${bamdir}${bam_prefix}.bam.bai" >&2
+  echo "[$(date)]: is not readable. Terminating..." >&2
+  exit 1
+fi
+
+# Check that samtools is available
+if [ ! -x "`which samtools`" ]
+then
+  echo "[$(date)]: Samtools not installed:" >&2
+  echo "[$(date)]: samtools is not executable on system PATH" >&2
+  echo "[$(date)]: Terminating..." >&2
+  exit 1
+fi
+
 # Get matrices via matrixFromBam.sh
 SECONDS=0
 echo "[$(date)]: Call: matrixFromBam.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm matrixFromBam.sh -r '$refdir' -b '$bamdir' -d '$tmpdir' -c '$chr_string' -t '$trim' -- '$bam_prefix' '$chr_num' '$total_part' {X}"
+seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm matrixFromBam.sh -r '$refdir' -b '$bamdir' -d '$tmpdir' -c '$chr_string' -p '$paired_ends' -t '$trim' -- '$bam_prefix' '$chr_num' '$total_part' {X}"
  
 # Check if everything OK or the job was interrupted due to excessive length
 EXITCODE="$?"
@@ -170,7 +206,7 @@ fi
 # Merge matrices via mergeMatrices.sh
 echo "[$(date)]: Call: mergeMatrices.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeMatrices.sh -r "$refdir" -b "$bamdir" -m "$tmpdir" -d "$outdir" -c "$chr_string" -t "$trim" -- "$bam_file" "$chr_num" "$total_part"
+mergeMatrices.sh -r "$refdir" -b "$bamdir" -m "$tmpdir" -d "$outdir" -c "$chr_string" -p "$paired_ends" -t "$trim" -- "$bam_file" "$chr_num" "$total_part"
 
 # Check if everything OK
 if [ $? -ne 0 ] 

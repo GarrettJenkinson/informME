@@ -13,6 +13,7 @@ Options:
     -d|--outdir         Output directory. Default: $INTERMEDIATE.
     -t|--trim           Number of base to trim. Default: 0.
     -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
+    -p|--paired_ends    Type of reads: 0 => single-ends;1 => paired-ends. Default: 1.
     -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
 
 Examples:
@@ -30,9 +31,6 @@ Upstream:
 
 Downstream:
     estimation.sh
-
-Date:
-    10/05/2017
 
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>

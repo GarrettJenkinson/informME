@@ -52,11 +52,11 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:d:t:c:l: -l help,refdir:,bamdir:matdir:,outdir:,trim:,chr_string:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:m:d:t:c:p:l: -l help,refdir:,bamdir:matdir:,outdir:,trim:,chr_string:,paired_ends:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
-  echo "Terminating..." >&2
+  echo "[$(date)]: Terminating..." >&2
   exit -1
 fi
 
@@ -69,6 +69,7 @@ outdir="$INTERDIR"
 matdir="$INTERDIR"
 trim=0
 chr_string=1
+paired_ends=1
 
 # Options
 while true
@@ -102,11 +103,20 @@ do
       chr_string="$2"
       if ([ "$chr_string" -ne "0" ] && [ "$chr_string" -ne "1" ])
       then 
-        echo "Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
+        echo "[$(date)]: Not a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
         exit -1
       fi
       shift 2
       ;;  
+    -p|--paired_ends)
+      paired_ends="$2"
+      if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
+      then
+        echo "[$(date)]: Not a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        exit -1
+      fi
+      shift 2
+      ;;
     -l|--MATLICENSE)
       MATLICENSE="$2"
       shift 2
@@ -116,7 +126,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo "[$(date)]: $script_name.sh:Internal error!"
       exit -1
       ;;  
   esac
@@ -158,7 +168,7 @@ echo "[$(date)]: Starting ..."
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
 
 # Generate command and options
-cmd="${matlab_function}('$bam_prefix','$chr_num','CpGlocationPathRoot','$refdir','totalProcessors',$total_proc,'bamFilePathRoot','$bamdir','outdir','$outdir','matricesPathRoot','$matdir','includeChrInRef',$chr_string,'numBasesToTrim',$trim)"
+cmd="${matlab_function}('$bam_prefix','$chr_num','CpGlocationPathRoot','$refdir','totalProcessors',$total_proc,'bamFilePathRoot','$bamdir','outdir','$outdir','matricesPathRoot','$matdir','includeChrInRef',$chr_string,'numBasesToTrim',$trim,'pairedEnds',$paired_ends)"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided

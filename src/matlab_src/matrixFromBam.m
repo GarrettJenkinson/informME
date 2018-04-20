@@ -281,7 +281,7 @@ for startBP = thisProcessorStartBPs
         else 
             command      = ['samtools view -q 30 -F 3329 ' ...
                              bamFile ' ' region_str];
-            commandCount = ['samtools view -q 30 -F 3329 ' ...
+            commandCount = ['samtools view -c -q 30 -F 3329 ' ...
                              bamFile ' ' region_str];
                             % Ignore -f since no paired ends.
                             % Add (2^0) to -F to exclude a paired end read.
@@ -304,6 +304,11 @@ for startBP = thisProcessorStartBPs
             continue;
         elseif countedNumReads>5000
             fprintf(2,['Too many reads mapped to region: ' region_str '\n']);
+            continue;
+        elseif isnan(countedNumReads)
+            fprintf(2,['Error parsing output in region:' region_str '\n']);
+            fprintf(2,['samtools command used: \n' commandCount '\n\n']);
+            fprintf(2,['above command returned following output:\n' countedNumReadsStr '\n']);
             continue;
         end
 

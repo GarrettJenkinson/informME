@@ -86,7 +86,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo "[$(date)]: $script_name.sh:Internal error!"
       exit -1
       ;;  
   esac
@@ -113,7 +113,15 @@ SECONDS=0
 echo "[$(date)]: Starting ..." 
 
 # Get number of entries in FASTA input
-num_entries="$(zcat -f "${fasta_file}" | grep '^>' | wc -l)" 
+entries="$(zcat -f "${fasta_file}" | grep '^>' | sed -s 's/>//')"
+echo "[$(date)]: InformME should only be used to model the autosomes,"
+echo "[$(date)]: and expects them to come first in the fasta file and"
+echo "[$(date)]: to be ordered in numerical order 1,2,..."
+echo "[$(date)]: The FASTA file contains the following chromosome ordering:"
+echo "$entries"
+
+num_entries="$(printf "$entries\n" |wc -l)"
+
 echo "[$(date)]: Number of chromosomes found: ${num_entries}" 
 
 # Generate command and options

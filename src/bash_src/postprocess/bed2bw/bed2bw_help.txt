@@ -23,9 +23,6 @@ Dependancies:
 Upstream:
     singleMethAnalysisToBed.sh or makeBedsForDiffMethAnalysis.sh.
 
-Date:
-    10/05/2017
-
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
     Jordi Abante <jabante1@jhu.edu>
