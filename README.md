@@ -329,7 +329,7 @@ REFERENCES
 VERSION HISTORY
 ---------------
 
-v0.3.1 - More informative error messages. Fix UI to expose ability to model paired-end sequencing reads. Documentation improvements.
+v0.3.1 - More informative error messages. Fix UI to expose ability to model single-ended sequencing reads. Documentation improvements.
 
 v0.3.0 - Code reorganized into a source and bin directory structure. Wrapper shell scripts added to all user callable functions. I/O directories no longer inside code directories. General UI improvements for easier usage.
 
