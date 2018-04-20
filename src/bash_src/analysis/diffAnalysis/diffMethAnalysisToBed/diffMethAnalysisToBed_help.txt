@@ -37,9 +37,6 @@ Dependancies:
 Upstream:
     mergeSingleMethAnalysis.sh 
 
-Date:
-    11/09/2017
-
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
     Jordi Abante <jabante1@jhu.edu>

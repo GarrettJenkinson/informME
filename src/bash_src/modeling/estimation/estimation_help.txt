@@ -30,9 +30,6 @@ Upstream:
 Downstream:
     mergeEstimation.sh
 
-Date:
-    10/25/2017
-
 Authors:
     Garrett Jenkinson <jenkinson@jhu.edu>
     Jordi Abante <jabante1@jhu.edu>
