@@ -4,7 +4,7 @@
 
 ## An information-theoretic pipeline for methylation analysis of WGBS data
 
-### LATEST RELEASE: v0.3.1
+### LATEST RELEASE v0.3.0 <!--LATEST RELEASE: v0.3.1-->
 -----------------------------------------------------------------
 
 This directory contains the MATLAB, C++ and R software that implements informME, as well as the BASH wrappers and example submission scripts used to run informME on a Sun Grid Engine (SGE) cluster or a SLURM computer cluster. 
@@ -331,8 +331,9 @@ REFERENCES
 VERSION HISTORY
 ---------------
 
+<!--
 v0.3.1 - More informative error messages. Fix UI to expose ability to model single-ended sequencing reads. Documentation improvements.
-
+-->
 v0.3.0 - Code reorganized into a source and bin directory structure. Wrapper shell scripts added to all user callable functions. I/O directories no longer inside code directories. General UI improvements for easier usage.
 
 v0.2.2 -    Minor updates in gene ranking and small updates getting ready for the next major reorganization release.
