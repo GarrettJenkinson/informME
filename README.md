@@ -267,7 +267,7 @@ where
 
 * outFolder is the directory used to write the result
 
-NOTE 1: More information about this utilities can be found in informME/src/R\_src/postprocess/README.txt
+NOTE 1: More information about these utilities can be found in informME/src/R\_src/postprocess/README.txt
 
 NOTE 2: For this utilities, the following tools must be installed in R: rtracklayer, logitnorm, mixtools, annotatr, and Homo.sapiens
 
