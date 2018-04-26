@@ -29,6 +29,8 @@ Options:
     -l|--MATLICENSE     path to MATLAB's license
 
 Examples:
+    * Usage keeping default options (e.g., no trimming or multithreading):
+        getMatrices.sh -- sample_1.bam 1
     * Trimming 10 bases on each read and using 5 threads:
     	getMatrices.sh -q 5 -t 10 -- sample_1.bam 1
     * Trimming different bases on each read, using 5 threads, and 'chrX' naming convention:
