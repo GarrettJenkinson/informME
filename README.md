@@ -57,7 +57,7 @@ C. INSTALLING InformME
 
 Run install.sh in the informME directory. During the interactive installation process the user will be asked different questions regarding the locations of default directories. Dependencies, such as GMP, MPFR, MPREAL, and Eigen, will be automatically installed during this process if these are not already available, and the C++ MEX code of informME will be compiled.
 
-Note 1: the following environment variables will be defined in a configuration file stored in ~/.informME/informME.config and then will be accessed throughout multiple points in the informME pipeline:
+Note 1: the following environment variables will optionally be defined in a configuration file stored in ~/.informME/informME.config and then will be accessed throughout multiple points in the informME pipeline:
 
 * REFGENEDIR: directory where the CpGlocationChr#.mat files will be stored
 
