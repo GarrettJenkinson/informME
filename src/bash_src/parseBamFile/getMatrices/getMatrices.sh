@@ -184,6 +184,15 @@ then
   exit 1
 fi
 
+#check if final output already exists
+if [ -r "${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat" ]
+then
+  echo "[$(date)]: Final output file:" >&2
+  echo "[$(date)]: ${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat" >&2
+  echo "[$(date)]: already exists. Terminating..." >&2
+  exit 1
+fi
+
 # Get matrices via matrixFromBam.sh
 SECONDS=0
 echo "[$(date)]: Call: matrixFromBam.sh ..." 
