@@ -56,7 +56,7 @@ TEMP="$(getopt -o hr:b:d:t:c:p:l:q: -l help,refdir:,bamdir:,tmpdir:,outdir:,trim
 
 if [ $? -ne 0 ] 
 then
-  echo -e "[$(date)]: \e[31mError in getting inputs. Terminating..." >&2
+  echo -e "[$(date)]: \e[31mError in getting inputs. Terminating...\e[0m" >&2
   exit -1
 fi
 
@@ -106,7 +106,7 @@ do
       chr_string="$2"
       if ([ "$chr_string" -ne "0" ] && [ "$chr_string" -ne "1" ])
       then 
-        echo -e "[$(date)]: \e[31mNot a valid choice of -c option, must be either 0 or 1. Terminating..." >&2
+        echo -e "[$(date)]: \e[31mNot a valid choice of -c option, must be either 0 or 1. Terminating...\e[0m" >&2
         exit -1
       fi
       shift 2
@@ -115,7 +115,7 @@ do
       paired_ends="$2"
       if ([ "$paired_ends" -ne "0" ] && [ "$paired_ends" -ne "1" ])
       then
-        echo -e "[$(date)]: \e[31mNot a valid choice of -p option, must be either 0 or 1. Terminating..." >&2
+        echo -e "[$(date)]: \e[31mNot a valid choice of -p option, must be either 0 or 1. Terminating...\e[0m" >&2
         exit -1
       fi
       shift 2
@@ -141,7 +141,7 @@ do
       break
       ;;  
     *)  
-      echo -e "[$(date)]:\e[31m $script_name.sh:Internal error!"
+      echo -e "[$(date)]:\e[31m $script_name.sh:Internal error!\e[0m"
       exit -1
       ;;  
   esac
@@ -162,35 +162,35 @@ mkdir -p "${outdir}/chr${chr_num}"
 bamdir="$(readlink -f "`eval echo ${bamdir//>}`")/"
 if [ ! -r "${bamdir}${bam_prefix}.bam" ]
 then
-  echo -e "[$(date)]: \e[31mInput bam file:" >&2
-  echo -e "[$(date)]:\e[31m ${bamdir}${bam_prefix}.bam" >&2
-  echo -e "[$(date)]:\e[31m is not readable. Terminating..." >&2
+  echo -e "[$(date)]: \e[31mInput bam file:\e[0m" >&2
+  echo -e "[$(date)]:\e[31m ${bamdir}${bam_prefix}.bam\e[0m" >&2
+  echo -e "[$(date)]:\e[31m is not readable. Terminating...\e[0m" >&2
   exit 1
 fi
 if [ ! -r "${bamdir}${bam_prefix}.bam.bai" ]
 then
-  echo -e "[$(date)]:\e[31m Input bam index file:" >&2
-  echo -e "[$(date)]:\e[31m ${bamdir}${bam_prefix}.bam.bai" >&2
-  echo -e "[$(date)]:\e[31m is not readable. Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Input bam index file:\e[0m" >&2
+  echo -e "[$(date)]:\e[31m ${bamdir}${bam_prefix}.bam.bai\e[0m" >&2
+  echo -e "[$(date)]:\e[31m is not readable. Terminating...\e[0m" >&2
   exit 1
 fi
 
 # Check that samtools is available
 if [ ! -x "`which samtools`" ]
 then
-  echo -e "[$(date)]:\e[31m Samtools not installed:" >&2
-  echo -e "[$(date)]:\e[31m samtools is not executable on system PATH" >&2
-  echo -e "[$(date)]:\e[31m Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Samtools not installed:\e[0m" >&2
+  echo -e "[$(date)]:\e[31m samtools is not executable on system PATH\e[0m" >&2
+  echo -e "[$(date)]:\e[31m Terminating...\e[0m" >&2
   exit 1
 fi
 
 #check if final output already exists
 if [ -r "${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat" ]
 then
-  echo -e "[$(date)]:\e[31m Warning: Final output file:" >&2
-  echo -e "[$(date)]:\e[31m ${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat" >&2
-  echo -e "[$(date)]:\e[31m already exists. Delete file and rerun if you wish to overwrite." >&2
-  echo -e "[$(date)]:\e[31m Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Warning: Final output file:\e[0m" >&2
+  echo -e "[$(date)]:\e[31m ${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat\e[0m" >&2
+  echo -e "[$(date)]:\e[31m already exists. Delete file and rerun if you wish to overwrite.\e[0m" >&2
+  echo -e "[$(date)]:\e[31m Terminating...\e[0m" >&2
   exit 0
 fi
 
@@ -206,7 +206,7 @@ if [ "$EXITCODE" -ne 0 ]
 then
   if [ "$EXITCODE" -ne 123 ]
   then 
-    echo -e "[$(date)]: \e[31m Error in exit code matrixFromBam.sh. Terminating" >&2
+    echo -e "[$(date)]: \e[31m Error in exit code matrixFromBam.sh. Terminating\e[0m" >&2
     exit 1
   else
     echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
@@ -221,7 +221,7 @@ mergeMatrices.sh -r "$refdir" -b "$bamdir" -m "$tmpdir" -d "$outdir" -c "$chr_st
 # Check if everything OK
 if [ $? -ne 0 ] 
 then
-  echo -e "[$(date)]:\e[31m Error in exit code at mergeMatrices.sh. Terminating" >&2
+  echo -e "[$(date)]:\e[31m Error in exit code at mergeMatrices.sh. Terminating\e[0m" >&2
   exit -1
 fi
 
