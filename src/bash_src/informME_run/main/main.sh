@@ -21,9 +21,9 @@
 #
 
 # Remove previous results
-#rm -rf out
-#rm -rf intermediate
-#rm -rf tmp
+rm -rf out
+rm -rf intermediate
+rm -rf tmp
 
 # Process normal
 echo "Processing normal..."
