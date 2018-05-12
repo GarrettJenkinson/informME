@@ -7,8 +7,8 @@ Usage:
 Options:
     -h|--help           Help.
     -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
-    -e|--estdir         Estimation directory. Default: $INTERMEDIATE.
-    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -e|--estdir         Estimation directory. Default: $INTERDIR.
+    -d|--outdir         Output directory. Default: $INTERDIR.
     -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
     --MC                Computation of information theory metrics. Default: 0.
     --ESI               Computation of entropic sensivity index (ESI). Default: 0.

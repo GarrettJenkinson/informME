@@ -19,7 +19,7 @@ Options:
     -h|--help           help
     -r|--refdir         directory of reference genome and CpG location files (default: $REFGENEDIR)
     -b|--bamdir         directory of BAM file (default: $BAMDIR)
-    -d|--outdir         output directory (default: $INTERMEDIATE)
+    -d|--outdir         output directory (default: $INTERDIR)
     -q|--threads        number of threads used (default: 1)
     -t|--trim           number or vector of bases to be trimmed (default: 0)
     -c|--c_string       name convention for chromosomes: 0 => 'X'; 1 => 'chrX' (default: 1)
