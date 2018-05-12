@@ -37,6 +37,7 @@ Mandatory arguments:
 Options:
     -h|--help           help
     -r|--refdir         directoty of reference genome and CpG location files (default: $REFGENEDIR)
+    -m|--matdir         matrices directory (default: $INTERDIR)
     -e|--estdir         modeling directory (default: $INTERDIR)
     -d|--outdir         output analysis directory (default: $INTERDIR)
     -q|--threads        number of threads used (default: 1)
