@@ -136,7 +136,8 @@ if [ -r "${outdir}/chr${chr_num}/${prefix}_analysis.mat" ]
 then
   echo "[$(date)]: Warning: Final output file:" >&2
   echo "[$(date)]: ${outdir}/chr${chr_num}/${prefix}_analysis.mat" >&2
-  echo "[$(date)]: already exists. Terminating..." >&2
+  echo "[$(date)]: already exists. Delete file and rerun if you wish to overwrite." >&2 
+  echo "[$(date)]: Terminating..." >&2
   exit 0
 fi
 
