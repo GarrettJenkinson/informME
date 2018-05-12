@@ -51,7 +51,7 @@ TEMP="$(getopt -o hr:m:e:d:l:q: -l help,refdir:,matdir:,estdir:,tmpdir:,outdir:,
 
 if [ $? -ne 0 ] 
 then
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Error in input args. Terminating..." >&2
   exit -1
 fi
 
@@ -116,7 +116,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo -e "\e[31m $script_name.sh:Internal error parsing args. Terminating..." >&2
       exit -1
       ;;  
   esac
@@ -134,10 +134,10 @@ mkdir -p "${outdir}/chr${chr_num}"
 #check if output already exists
 if [ -r "${outdir}/chr${chr_num}/${prefix}_analysis.mat" ]
 then
-  echo "[$(date)]: Warning: Final output file:" >&2
-  echo "[$(date)]: ${outdir}/chr${chr_num}/${prefix}_analysis.mat" >&2
-  echo "[$(date)]: already exists. Delete file and rerun if you wish to overwrite." >&2 
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Warning: Final output file:" >&2
+  echo -e "[$(date)]:\e[31m ${outdir}/chr${chr_num}/${prefix}_analysis.mat" >&2
+  echo -e "[$(date)]:\e[31m already exists. Delete file and rerun if you wish to overwrite." >&2 
+  echo -e "[$(date)]:\e[31m Terminating..." >&2
   exit 0
 fi
 
@@ -153,7 +153,7 @@ if [ "$EXITCODE" -ne 0 ]
 then
   if [ "$EXITCODE" -ne 123 ]
   then
-    echo "[$(date)]: Terminating" >&2
+    echo -e "[$(date)]:\e[31m Exit code error from estimation.sh. Terminating" >&2
     exit 1
   else
     echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
@@ -168,7 +168,7 @@ mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$tmpdir" -d "$estdir" -- "$mat_
 # Check if everything OK
 if [ $? -ne 0 ] 
 then
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Nonzero exit code from mergeEstimation.sh Terminating..." >&2
   exit -1
 fi
 
@@ -184,7 +184,7 @@ if [ "$EXITCODE" -ne 0 ]
 then
   if [ "$EXITCODE" -ne 123 ]
   then
-    echo "[$(date)]: Terminating" >&2
+    echo -e "[$(date)]:\e[31m Nonzero exit code in singleMethAnalysis.sh. Terminating" >&2
     exit 1
   else
     echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
@@ -199,7 +199,7 @@ mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" -
 # Check if everything OK
 if [ $? -ne 0 ] 
 then
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Nonzero exit code in mergeSingleMethAnalysis.sh. Terminating..." >&2
   exit -1
 fi
 
