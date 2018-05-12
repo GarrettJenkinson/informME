@@ -47,7 +47,7 @@ else
 fi
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:a:d:l:q: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:m:e:d:l:q: -l help,refdir:,matdir:,estdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -59,10 +59,8 @@ eval set -- "$TEMP"
 
 # Defaults
 refdir="$REFGENEDIR"
-bamdir="$BAMDIR"
 matdir="$INTERDIR"
 estdir="$INTERDIR"
-analdir="$INTERDIR"
 tmpdir="$SCRATCHDIR"
 outdir="$INTERDIR"
 threads=1
@@ -81,20 +79,12 @@ do
       refdir="$2"
       shift 2
       ;;
-    -b|--bamdir)
-      bamdir="$2"
-      shift 2
-      ;;
     -m|--matdir)
       matdir="$2"
       shift 2
       ;;
     -e|--estdir)
       estdir="$2"
-      shift 2
-      ;;
-    -a|--analdir)
-      analdir="$2"
       shift 2
       ;;
     --tmpdir)
@@ -140,6 +130,15 @@ chr_num="$3"
 # Output directory
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
+
+#check if output already exists
+if [ -r "${outdir}/chr${chr_num}/${prefix}_analysis.mat" ]
+then
+  echo "[$(date)]: Warning: Final output file:" >&2
+  echo "[$(date)]: ${outdir}/chr${chr_num}/${prefix}_analysis.mat" >&2
+  echo "[$(date)]: already exists. Terminating..." >&2
+  exit 0
+fi
 
 # Run estimation on chunks
 SECONDS=0

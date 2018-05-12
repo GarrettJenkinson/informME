@@ -187,10 +187,11 @@ fi
 #check if final output already exists
 if [ -r "${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat" ]
 then
-  echo "[$(date)]: Final output file:" >&2
+  echo "[$(date)]: Warning: Final output file:" >&2
   echo "[$(date)]: ${outdir}/chr${chr_num}/${bam_prefix}_matrices.mat" >&2
-  echo "[$(date)]: already exists. Terminating..." >&2
-  exit 1
+  echo "[$(date)]: already exists. Delete file and rerun if you wish to overwrite." >&2
+  echo "[$(date)]: Terminating..." >&2
+  exit 0
 fi
 
 # Get matrices via matrixFromBam.sh

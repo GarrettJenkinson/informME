@@ -37,10 +37,8 @@ Mandatory arguments:
 Options:
     -h|--help           help
     -r|--refdir         directoty of reference genome and CpG location files (default: $REFGENEDIR)
-    -b|--bamdir         BAM file directory (default: $BAMDIR)
-    -e|--estdir         modeling directory (default: $INTERMEDIATE)
-    -a|--analdir        analysis directory (default: $INTERMEDIATE)
-    -d|--outdir         output directory (default: $INTERMEDIATE)
+    -e|--estdir         modeling directory (default: $INTERDIR)
+    -d|--outdir         output analysis directory (default: $INTERDIR)
     -q|--threads        number of threads used (default: 1)
     --tmpdir         	temporary directory (default: $SCRATCHDIR)
     --time_limit     	maximum time (in minutes) allowed for each thread to complete (default: 60)
@@ -49,7 +47,7 @@ Options:
 Example:
     * Running informME on chromosome 1 using 5 threads:
     	informME_run.sh -q 5 -- sample1 pheno_1 1
-    * Running informME on chromosome 1 using 5 threads and 3 samples:
+    * Running informME on chromosome 1 using 5 threads and 3 samples pooled into one model:
     	informME_run.sh -q 5 -- sample2,sample3,sample4 pheno_2 1
 
 Output:
