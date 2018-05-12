@@ -47,11 +47,11 @@ else
 fi
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:a:d:l:q: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:m:e:d:l:q: -l help,refdir:,matdir:,estdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Error in input args. Terminating...\e[0m" >&2
   exit -1
 fi
 
@@ -59,10 +59,8 @@ eval set -- "$TEMP"
 
 # Defaults
 refdir="$REFGENEDIR"
-bamdir="$BAMDIR"
 matdir="$INTERDIR"
 estdir="$INTERDIR"
-analdir="$INTERDIR"
 tmpdir="$SCRATCHDIR"
 outdir="$INTERDIR"
 threads=1
@@ -81,20 +79,12 @@ do
       refdir="$2"
       shift 2
       ;;
-    -b|--bamdir)
-      bamdir="$2"
-      shift 2
-      ;;
     -m|--matdir)
       matdir="$2"
       shift 2
       ;;
     -e|--estdir)
       estdir="$2"
-      shift 2
-      ;;
-    -a|--analdir)
-      analdir="$2"
       shift 2
       ;;
     --tmpdir)
@@ -126,7 +116,7 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo -e "\e[31m $script_name.sh:Internal error parsing args. Terminating...\e[0m" >&2
       exit -1
       ;;  
   esac
@@ -141,6 +131,16 @@ chr_num="$3"
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
 
+#check if output already exists
+if [ -r "${outdir}/chr${chr_num}/${prefix}_analysis.mat" ]
+then
+  echo -e "[$(date)]:\e[31m Warning: Final output file:\e[0m" >&2
+  echo -e "[$(date)]:\e[31m ${outdir}/chr${chr_num}/${prefix}_analysis.mat\e[0m" >&2
+  echo -e "[$(date)]:\e[31m already exists. Delete file and rerun if you wish to overwrite.\e[0m" >&2 
+  echo -e "[$(date)]:\e[31m Terminating...\e[0m" >&2
+  exit 0
+fi
+
 # Run estimation on chunks
 SECONDS=0
 echo "[$(date)]: Call: estimation.sh ..." 
@@ -153,7 +153,7 @@ if [ "$EXITCODE" -ne 0 ]
 then
   if [ "$EXITCODE" -ne 123 ]
   then
-    echo "[$(date)]: Terminating" >&2
+    echo -e "[$(date)]:\e[31m Exit code error from estimation.sh. Terminating\e[0m" >&2
     exit 1
   else
     echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
@@ -168,7 +168,7 @@ mergeEstimation.sh -r "$refdir" -m "$matdir" -e "$tmpdir" -d "$estdir" -- "$mat_
 # Check if everything OK
 if [ $? -ne 0 ] 
 then
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Nonzero exit code from mergeEstimation.sh Terminating...\e[0m" >&2
   exit -1
 fi
 
@@ -184,7 +184,7 @@ if [ "$EXITCODE" -ne 0 ]
 then
   if [ "$EXITCODE" -ne 123 ]
   then
-    echo "[$(date)]: Terminating" >&2
+    echo -e "[$(date)]:\e[31m Nonzero exit code in singleMethAnalysis.sh. Terminating\e[0m" >&2
     exit 1
   else
     echo -e "[$(date)]: \e[31mWARNING: Thread ran over time limit, will be re-processed in merging step...\e[0m" >&2
@@ -199,7 +199,7 @@ mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" -
 # Check if everything OK
 if [ $? -ne 0 ] 
 then
-  echo "[$(date)]: Terminating..." >&2
+  echo -e "[$(date)]:\e[31m Nonzero exit code in mergeSingleMethAnalysis.sh. Terminating...\e[0m" >&2
   exit -1
 fi
 

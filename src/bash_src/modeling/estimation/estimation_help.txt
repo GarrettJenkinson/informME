@@ -10,8 +10,8 @@ Options:
     -h|--help           Help.
     -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
     -b|--bamdir         BAM file directory. Default: $BAMDIR.
-    -m|--matdir         Matrices directory. Default: $INTERMEDIATE.
-    -d|--outdir         Output directory. Default: $INTERMEDIATE.
+    -m|--matdir         Matrices directory. Default: $INTERDIR.
+    -d|--outdir         Output directory. Default: $INTERDIR.
     -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
 
 Examples:

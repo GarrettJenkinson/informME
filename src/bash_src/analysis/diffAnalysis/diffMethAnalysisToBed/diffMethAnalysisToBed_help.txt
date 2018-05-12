@@ -14,8 +14,8 @@ Mandatory arguments:
 Options:
     -h|--help           help
     -r|--refdir         reference genome directory (default: $REFGENEDIR)
-    -a1|--analdir_1     analysis directory for phenotype 1 (default: $INTERMEDIATE)
-    -a2|--analdir_2     analysis directory for phenotype 2 (default: $INTERMEDIATE) 
+    -a1|--analdir_1     analysis directory for phenotype 1 (default: $INTERDIR)
+    -a2|--analdir_2     analysis directory for phenotype 2 (default: $INTERDIR) 
     -d|--outdir         output directory (default: $FINALDIR)
     -t|--threshold      threshold used in methylation-based classification (default: 0.4)
     --min_chr           minimum chromosome to be included in BED file (default: 1)
