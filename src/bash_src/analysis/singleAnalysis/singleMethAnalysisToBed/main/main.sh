@@ -33,9 +33,9 @@ echo "Processing normal..."
 ../singleMethAnalysisToBed.sh -r "$reference" -a "$analysis" -e "$estimation" -d out --min_chr 1 --max_chr 5 --MC --ESI -- toy_normal 1>/dev/null
 
 # Execute command for cancer toy
-echo "Processing cancer..."
-../singleMethAnalysisToBed.sh -r "$reference" -a "$analysis" -e "$estimation" -d out --min_chr 1 --max_chr 5 --MC --ESI -- toy_cancer 1>/dev/null
-
-# Execute command for pooled toy
-echo "Processing pooled..."
-../singleMethAnalysisToBed.sh -r "$reference" -a "$analysis" -e "$estimation" -d out --min_chr 1 --max_chr 5 --MC --ESI -- toy_pooled 1>/dev/null
+#echo "Processing cancer..."
+#../singleMethAnalysisToBed.sh -r "$reference" -a "$analysis" -e "$estimation" -d out --min_chr 1 --max_chr 5 --MC --ESI -- toy_cancer 1>/dev/null
+#
+## Execute command for pooled toy
+#echo "Processing pooled..."
+#../singleMethAnalysisToBed.sh -r "$reference" -a "$analysis" -e "$estimation" -d out --min_chr 1 --max_chr 5 --MC --ESI -- toy_pooled 1>/dev/null

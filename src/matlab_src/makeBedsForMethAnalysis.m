@@ -386,8 +386,9 @@ for chrNum = minChrNum:maxChrNum
                             end
                             
                             % Print MML, ESI, TURN, CAP, and RDE.
+			    formatSpec = '%s\t%u\t%u\t%f\n';
                             if MMLregion<inf
-                                fprintf(bedFileIDMML,'%s %12u %12u %f\n',...
+                                fprintf(bedFileIDMML,formatSpec,...
                                              chr_str,int64(subStartBP-1),...
                                              int64(subEndBP-1),MMLregion);
                             end
