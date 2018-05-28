@@ -149,9 +149,6 @@ thresh          = p.Results.thresh;
 regionSize      = p.Results.regionSize;
 subregionSize   = p.Results.subregionSize;
 
-% Output BED format
-formatSpec = '%s\t%u\t%u\t%f\n';
-
 % Manual checks/corrections of inputs.
 if analysis_path(end)~=filesep
     analysis_path=[analysis_path filesep];
@@ -163,7 +160,11 @@ if outdir(end)~=filesep
     outdir=[outdir filesep];
 end
 
+% Output BED format
+formatSpec = '%s\t%u\t%u\t%f\n';
+
 % Define hard coded options.
+
 % MML
 hardCodedOptionsMML = 'track type=bedGraph visibility=full windowingFunction=mean autoScale=off viewLimits=0.0:1.0 name=MML-';
 % NME
