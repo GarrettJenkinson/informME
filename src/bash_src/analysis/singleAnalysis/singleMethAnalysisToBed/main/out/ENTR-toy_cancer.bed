@@ -1,4 +1,4 @@
-track type=bedGraph visibility=dense windowingFunction=mean autoScale=off viewLimits=-2.0:2.0 name=ENTR-toy_normal
+track type=bedGraph visibility=dense windowingFunction=mean autoScale=off viewLimits=-2.0:2.0 name=ENTR-toy_cancer
 chr1	0	149	0.000000
 chr1	150	299	0.000000
 chr1	300	449	0.000000
@@ -266,7 +266,7 @@ chr4	9300	9449	0.000000
 chr4	9450	9599	0.000000
 chr4	9600	9749	0.000000
 chr4	9750	9899	0.000000
-chr4	9900	9972	-1.000000
+chr4	9900	9972	0.000000
 chr5	0	149	0.000000
 chr5	150	299	0.000000
 chr5	300	449	0.000000
