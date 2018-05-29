@@ -17,7 +17,7 @@ The current implementation of informME has been tested within the following envi
 
 * Sun Grid Engine OGS/GE 2011.11 and Slurm 17.02.3
 
-* MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, MATLAB R2017a, and MATLAB R2018a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
+* MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, MATLAB R2017a 64-bit, and MATLAB R2018a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
 
 and by using the following tools:
 
