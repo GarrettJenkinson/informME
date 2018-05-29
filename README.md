@@ -13,11 +13,11 @@ informME is an information-theoretic approach to methylation analysis developed 
 
 The current implementation of informME has been tested within the following environments:
 
-* Red Hat Enterprise Linux Server Release 6.5 (Santiago) and CentOS release 6.7 (Final)
+* Red Hat Enterprise Linux Server Release 6.5 (Santiago), CentOS release 6.7 (Final) and Ubuntu 16.04 (xenial)
 
 * Sun Grid Engine OGS/GE 2011.11 and Slurm 17.02.3
 
-* MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, and MATLAB R2017a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
+* MATLAB R2013b 64-bit, MATLAB R2016b 64-bit, MATLAB R2017a, and MATLAB R2018a 64-bit with Bioinformatics and Symbolic Math Toolboxes 
 
 and by using the following tools:
 
@@ -25,7 +25,7 @@ and by using the following tools:
 
 * SAMtools - v0.1.19 (to parse BAM files)
 
-* gcc/g++ compiler - v4.4.7-4 and v4.9.2 (to compile MATLAB MEX code)
+* gcc/g++ compiler - v4.4.7-4, v4.9.2, v6.3.0 (to compile MATLAB MEX code, version must be compatible with corresponding MATLAB release, see section B below)
 
 
 A. DIRECTORY STRUCTURE
