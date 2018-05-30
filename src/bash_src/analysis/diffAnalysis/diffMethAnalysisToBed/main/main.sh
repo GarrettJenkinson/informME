@@ -31,4 +31,4 @@ analysis="../../../singleAnalysis/mergeSingleMethAnalysis/main/out/"
 reference="../../../../parseBamFile/fastaToCpg/main/"
 
 # Execute command
-../diffMethAnalysisToBed.sh -r "$reference" --analdir_1 "$analysis" --analdir_2 "$analysis" -d out --min_chr 1 --max_chr 5 --MC --ESI -- "$prefix_1" "$prefix_2" #1>/dev/null
+../diffMethAnalysisToBed.sh -r "$reference" --analdir_1 "$analysis" --analdir_2 "$analysis" -d out --min_chr 1 --max_chr 5 --MC --ESI -- "$prefix_1" "$prefix_2" 1>/dev/null

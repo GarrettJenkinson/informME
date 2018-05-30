@@ -31,3 +31,5 @@ seq 5 | xargs -I {X} bash -c '../getMatrices.sh -r ../../fastaToCpg/main -b inpu
 echo "Processing cancer..."
 seq 5 | xargs -I {X} bash -c '../getMatrices.sh -r ../../fastaToCpg/main/ -b input/ --tmpdir tmp/ -d out/ -c 1 -t '[10,10]' -q 4 --time_limit 10 --total_part 4 --paired_ends 1 -- toy_cancer_pe {X}' 1>/dev/null
 
+# Remove previous results
+rm -rf tmp
