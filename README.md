@@ -4,7 +4,7 @@
 
 ## An information-theoretic pipeline for methylation analysis of WGBS data
 
-### LATEST RELEASE: v0.3.1
+### LATEST RELEASE: v0.3.2
 -----------------------------------------------------------------
 
 This directory contains the MATLAB, C++ and R software that implements informME, as well as the BASH wrappers and example submission scripts used to run informME on a Sun Grid Engine (SGE) cluster or a SLURM computer cluster. 
@@ -152,13 +152,15 @@ The second phase of this step consists in analyzing the model learned by computi
 
 * normalized methylation entropies
 
-* entropic sensitivity indices (if ESIflag = 1)
+* entropic sensitivity indices 
 
-* turnover ratios (if MCflag = 1)
+* methylation sensitivity indices
 
-* channel capacities (if MCflag = 1)
+* turnover ratios
 
-* relative dissipated energies (if MCflag = 1)
+* channel capacities
+
+* relative dissipated energies
 
 NOTE: We recommend taking advantage of the array feature available in SGE and SLURM based clusters to submit an individual job for each chromosome.
 
@@ -180,6 +182,8 @@ This function makes BED files from the methylation analysis results obtained aft
 * ENTR-PHENO.bed: entropy-based classification
     
 * ESI-PHENO.bed (if ESIflag = 1): entropic sensitivity indices
+
+* MSI-PHENO.bed (if MSIflag = 1): methylation sensitivity indices
     
 * TURN-PHENO.bed (if MCflag = 1): turnover ratios
     
@@ -206,6 +210,8 @@ This function makes BED files for the differential methylation analysis results 
 * JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances
        
 * dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+
+* dMSI-PHENO1-VS-PHENO2.bed (if MSIflag = 1): differences in methylation sensitivity indices
        
 * dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
        
@@ -336,15 +342,15 @@ See [our wiki](https://github.com/GarrettJenkinson/informME/wiki) for additional
 VERSION HISTORY
 ---------------
 
-current (master) - Improved checking of user inputs to catch errors early. Tabulate output bedGraph files. Documentation improvements.
+v0.3.2 - Added methylation sensitivity index (MSI) to output. Improved checking of user inputs to catch errors early. Tabulate output bedGraph files. Documentation improvements.
 
 v0.3.1 - More informative error messages. Fix UI to expose ability to model single-ended sequencing reads. Documentation improvements.
 
 v0.3.0 - Code reorganized into a source and bin directory structure. Wrapper shell scripts added to all user callable functions. I/O directories no longer inside code directories. General UI improvements for easier usage.
 
-v0.2.2 -    Minor updates in gene ranking and small updates getting ready for the next major reorganization release.
+v0.2.2 - Minor updates in gene ranking and small updates getting ready for the next major reorganization release.
 
-v0.2.1 -   	Added R utilities for DMR detection and gene ranking using the Jensen-Shannon distance (JSD). Various documentation improvements.
+v0.2.1 - Added R utilities for DMR detection and gene ranking using the Jensen-Shannon distance (JSD). Various documentation improvements.
 
 v0.2.0 - Code reorganized into more specialized directories, streamlined, and general SGE submission scripts provided as a guide. Updated README's. Variable names changed to reflect published notation.
 
