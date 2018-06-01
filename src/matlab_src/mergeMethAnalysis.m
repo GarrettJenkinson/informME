@@ -82,6 +82,13 @@
 %               1: allow ESI computation.
 %               Default value: 0
 %
+% MSIflag
+%               Flag that determines whether this function performs 
+%               computation of the methylation sensitivity index (MSI). 
+%               0: no MSI computation. 
+%               1: allow MSI computation.
+%               Default value: 0
+%
 % MCflag
 %               Flag that determines whether this function performs 
 %               computation of turnover ratios, CpG entropies, capacities, 
@@ -130,6 +137,8 @@ addParameter(p,'subregionSize',int64(150),@(x)validateattributes(x,{'numeric'},.
 		{'nonempty','integer','positive','scalar'}))
 addParameter(p,'ESIflag',0,@(x)validateattributes(x,{'numeric'},{'nonempty',...
 		'scalar'}))
+addParameter(p,'MSIflag',0,@(x)validateattributes(x,{'numeric'},{'nonempty',...
+		'scalar'}))
 addParameter(p,'MCflag',0,@(x)validateattributes(x,{'numeric'},{'nonempty',...
 		'scalar'}))
            
@@ -140,6 +149,7 @@ totalProcessors     = p.Results.totalProcessors;
 regionSize          = p.Results.regionSize;
 subregionSize       = p.Results.subregionSize;
 ESIflag             = p.Results.ESIflag;
+MSIflag             = p.Results.MSIflag;
 MCflag              = p.Results.MCflag;
 
 % Manual checks/corrections of inputs.
@@ -183,8 +193,8 @@ for processorNum = 1:totalProcessors
         % values in case user has changed one of the default values.
         methAnalysisForChr(prefix,chr_num,reference_path,estimation_path,...
                            'outdir',analysis_path,'totalProcessors',totalProcessors,...
-                           'processorNum',processorNum,'ESIflag',ESIflag,'MCflag',MCflag,...
-			   'regionSize',regionSize,'subregionSize',subregionSize);
+                           'processorNum',processorNum,'ESIflag',ESIflag,'MSIflag',MSIflag,...
+			   'MCflag',MCflag,'regionSize',regionSize,'subregionSize',subregionSize);
     end
     
 end
