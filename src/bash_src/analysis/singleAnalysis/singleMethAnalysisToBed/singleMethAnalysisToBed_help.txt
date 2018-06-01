@@ -20,6 +20,7 @@ Options:
     --max_chr           maximum chromosome to be included in BED file (default: 22)
     --MC                computation of information theoretic quantities (default: 0)
     --ESI               computation of entropic sensivity index (ESI) (default: 0)
+    --MSI               computation of methylation sensivity index (MSI) (default: 0)
     -l|--MATLICENSE     path to MATLAB's license
 
 Example:
