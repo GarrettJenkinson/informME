@@ -12,9 +12,10 @@ Options:
     -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
     --MC                Computation of information theory metrics. Default: 0.
     --ESI               Computation of entropic sensivity index (ESI). Default: 0.
+    --MSI               Computation of methylation sensivity index (MSI). Default: 0.
 
 Examples:
-    singleMethAnalysis.sh -d out --MC --ESI -- normal 1 1 1
+    singleMethAnalysis.sh -d out --MC --ESI --MSI -- normal 1 1 1
 
 Output:
     MATLAB .mat files containing information about the analysis. 

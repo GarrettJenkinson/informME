@@ -52,7 +52,7 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="methAnalysisForChr"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdir:,ESI,MC,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:m:e:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdir:,ESI,MSI,MC,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -69,6 +69,7 @@ matdir="$INTERDIR"
 estdir="$INTERDIR"
 outdir="$INTERDIR"
 ESI=0
+MSI=0
 MC=0
 
 # Options
@@ -101,6 +102,10 @@ do
       ;;
     --ESI)
       ESI=1
+      shift 1
+      ;;  
+    --MSI)
+      MSI=1
       shift 1
       ;;  
     --MC)
@@ -158,10 +163,11 @@ echo "[$(date)]: Processing chromosome: ${chr_num}"
 echo "[$(date)]: Reference found in: ${refdir}" 
 echo "[$(date)]: Model found in: ${estdir}" 
 echo "[$(date)]: ESI flag: ${ESI}" 
+echo "[$(date)]: MSI flag: ${MSI}" 
 echo "[$(date)]: MC flag: ${MC}" 
 
 # Generate command and options
-cmd="${matlab_function}('$prefix','$chr_num','$refdir','$estdir','outdir','$outdir','ESI',$ESI,'MC',$MC,'totalProcessors',$total_proc,'processorNum',$proc_num)"
+cmd="${matlab_function}('$prefix','$chr_num','$refdir','$estdir','outdir','$outdir','ESI',$ESI,'MSI',$MSI,'MC',$MC,'totalProcessors',$total_proc,'processorNum',$proc_num)"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided
