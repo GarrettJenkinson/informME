@@ -22,7 +22,7 @@
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
 %%%%%%%%                makeBEDsForMethAnalysis.m                  %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 12/08/2016                  %%%%%%%%
+%%%%%%%%                Last Modified: 06/01/2018                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function makes BED files for the methylation analysis results 

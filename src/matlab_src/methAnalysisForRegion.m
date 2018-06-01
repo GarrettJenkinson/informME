@@ -22,7 +22,7 @@
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
 %%%%%%%%                 MethAnalysisForRegion.m                   %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 08/15/2017                  %%%%%%%%
+%%%%%%%%                Last Modified: 06/01/2018                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function performs methylation analysis of a genomic region used 

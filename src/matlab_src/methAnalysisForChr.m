@@ -22,7 +22,7 @@
 %%%%%%%%  informME: Information-Theoretic analysis of Methylation  %%%%%%%%
 %%%%%%%%                   methAnalysisForChr.m                    %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 12/08/2016                  %%%%%%%%
+%%%%%%%%                Last Modified: 06/01/2018                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function performs methylation analysis of a given chromosome in a 
