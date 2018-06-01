@@ -338,9 +338,7 @@ for chrNum = minChrNum:maxChrNum
                             fclose(bedFileIDMETH);
                             fclose(bedFileIDVAR);
                             fclose(bedFileIDENTR);
-                            if ESIflag
-                                fclose(bedFileIDESI);
-                            end
+                            fclose(bedFileIDESI);
                             if MSIflag
                                 fclose(bedFileIDMSI);
                             end
@@ -365,11 +363,9 @@ for chrNum = minChrNum:maxChrNum
                             fclose(bedFileIDMETH);
                             fclose(bedFileIDVAR);
                             fclose(bedFileIDENTR);
+                            fclose(bedFileIDMSI);
                             if ESIflag
                                 fclose(bedFileIDESI);
-                            end
-                            if MSIflag
-                                fclose(bedFileIDMSI);
                             end
                             if MCflag
                                 fclose(bedFileIDTURN);
@@ -394,16 +390,14 @@ for chrNum = minChrNum:maxChrNum
                             fclose(bedFileIDMETH);
                             fclose(bedFileIDVAR);
                             fclose(bedFileIDENTR);
+                            fclose(bedFileIDTURN);
+                            fclose(bedFileIDCAP);
+                            fclose(bedFileIDRDE);
                             if ESIflag
                                 fclose(bedFileIDESI);
                             end
                             if MSIflag
                                 fclose(bedFileIDMSI);
-                            end
-                            if MCflag
-                                fclose(bedFileIDTURN);
-                                fclose(bedFileIDCAP);
-                                fclose(bedFileIDRDE);
                             end
                             return;
                         end

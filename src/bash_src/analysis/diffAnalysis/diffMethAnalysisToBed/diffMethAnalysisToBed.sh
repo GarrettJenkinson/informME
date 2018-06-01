@@ -52,7 +52,7 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir_1:,estdir_2:,analdir_1:,analdir_2:,outdir:,ESI,MC,min_chr:,max_chr:,threshold:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -o hr:b:m:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir_1:,estdir_2:,analdir_1:,analdir_2:,outdir:,ESI,MSI,MC,min_chr:,max_chr:,threshold:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
@@ -75,6 +75,7 @@ min_chr=1
 max_chr=22
 threshold=0.4
 ESI=0
+MSI=0
 MC=0
 
 # Options
@@ -119,6 +120,10 @@ do
       ;;  
     --ESI)
       ESI=1
+      shift 1
+      ;;  
+    --MSI)
+      MSI=1
       shift 1
       ;;  
     --MC)
@@ -185,12 +190,13 @@ echo "[$(date)]: Analysis 1 found in: ${analdir_1}"
 echo "[$(date)]: Analysis 2 found in: ${analdir_2}" 
 echo "[$(date)]: Including chromosomes: ${min_chr}-${max_chr}" 
 echo "[$(date)]: ESI flag: ${ESI}" 
+echo "[$(date)]: MSI flag: ${MSI}" 
 echo "[$(date)]: MC flag: ${MC}" 
 echo "[$(date)]: Threshold for classification: ${threshold}" 
 echo "[$(date)]: Looking for prefixes: ${prefix_1} and ${prefix_2}" 
 
 # Generate command and options
-cmd="${matlab_function}('$prefix_1','$prefix_2','$analdir_1','$analdir_2','$refdir','outdir','$outdir','minChrNum',$min_chr,'maxChrNum',$max_chr,'ESI',$ESI,'MC',$MC,'thresh',$threshold)"
+cmd="${matlab_function}('$prefix_1','$prefix_2','$analdir_1','$analdir_2','$refdir','outdir','$outdir','minChrNum',$min_chr,'maxChrNum',$max_chr,'ESI',$ESI,'MSI',$MSI,'MC',$MC,'thresh',$threshold)"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided
