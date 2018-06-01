@@ -176,7 +176,7 @@ fi
 SECONDS=0
 echo "[$(date)]: Call: singleMethAnalysis.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$tmpdir' --MC --ESI -- '$prefix' '$chr_num' '$total_part' {X}"
+seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$tmpdir' --MC --ESI --MSI -- '$prefix' '$chr_num' '$total_part' {X}"
 
 # Check if everything OK
 EXITCODE="$?"
@@ -194,7 +194,7 @@ fi
 # Merge analysis blocks
 echo "[$(date)]: Call: mergeSingleMethAnalysis.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" --MC --ESI -- "$prefix" "$chr_num" "$total_part"
+mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" --MC --ESI --MSI -- "$prefix" "$chr_num" "$total_part"
 
 # Check if everything OK
 if [ $? -ne 0 ] 

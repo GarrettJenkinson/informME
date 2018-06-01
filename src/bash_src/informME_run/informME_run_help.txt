@@ -21,10 +21,11 @@ Description:
     o coarse methylation level probabilities
     o mean methylation levels
     o normalized methylation entropies
-    o entropic sensitivity indices (if ESIflag = 1)
-    o turnover ratios (if MCflag = 1)
-    o channel capacities (if MCflag = 1)
-    o relative dissipated energies (if MCflag = 1)
+    o entropic sensitivity indices
+    o methylation sensitivity indices
+    o turnover ratios
+    o channel capacities
+    o relative dissipated energies
 
 Usage:
     informME_run.sh  [OPTIONS]  -- MAT_FILES PHENO CHR_NUM
