@@ -329,6 +329,7 @@ for subRegStartBP = subRegStartBPlist
             
             % Do sensitivity calculations.
             if ESIflag || MSIflag
+                LProbs = [1-margProbs(lower_index);margProbs(lower_index)];
                 LProbsa = [1-margProbsa(lower_index);margProbsa(lower_index)];
 	    end
 	    % ESI calculations.
