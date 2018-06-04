@@ -36,11 +36,13 @@ if [ $# -eq 0 ]
 fi
 
 # Getopt command
-TEMP=$(getopt -o hd: -l help,outdir: -n "$script_name.sh" -- "$@")
+TEMP=$(getopt -q -o hd: -l help,outdir: -n "$script_name.sh" -- "$@")
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo "Terminating..." >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  cat "$script_absdir"/${script_name}_help.txt
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -65,26 +67,37 @@ do
       shift
       break
       ;;  
-    *)  
-      echo "$script_name.sh:Internal error!"
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      cat "$script_absdir"/${script_name}_help.txt
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
+
+# Check number of arguments and copy them
+if [ "$#" -ne 2 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   cat "$script_absdir"/${script_name}_help.txt
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+bed_dir="$1"
+bed_path="$(readlink -f -e "$bed_dir")"
+genome="$2"
+
+# Check valid outdir
+if [ -z "$outdir" ];then
+   echo -e "[$(date)]: \e[31mERROR: Output directory is empty string ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+mkdir -p "$outdir"
 
 # Start time
 SECONDS=0
 echo "[$(date)]: Starting ..." 
-
-# Inputs
-bed_dir="$1"
-genome="$2"
-
-# Get abs path
-bed_path="$(readlink -f -e "$bed_dir")"
-
-# Output directory
-mkdir -p "$outdir"
 
 # Fetch chromosome sizes
 echo "[$(date)]: Fetching chromosome sizes ..." 

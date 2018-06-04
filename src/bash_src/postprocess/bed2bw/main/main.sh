@@ -20,16 +20,15 @@
 # or see <http://www.gnu.org/licenses/>.
 #
 
-
-# Show commands
-set -x
-
 # Remove previous results
 rm -rf out
 
 # Refresh input
-bed_dir="../../../analysis/singleAnalysis/singleMethAnalysisToBed/main/out/*"
+bed_dir="../../../analysis/singleAnalysis/singleMethAnalysisToBed/main/out"
 cp -r "$bed_dir" input
 
 # Execute command
 ../bed2bw.sh -d out -- input hg19
+
+# Removed copied files
+rm -rf input

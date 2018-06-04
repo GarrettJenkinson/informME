@@ -57,6 +57,7 @@ TEMP="$(getopt -q -o hr:b:m:e:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdi
 if [ $? -ne 0 ]
 then
   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  cat "$script_absdir"/${script_name}_help.txt
   echo "[$(date)]: Terminating" >&2
   exit -1
 fi
@@ -123,6 +124,7 @@ do
       ;;  
     *)
       echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      cat "$script_absdir"/${script_name}_help.txt
       echo "[$(date)]: Terminating" >&2
       exit -1
       ;;
@@ -132,6 +134,7 @@ done
 # Check number of arguments and copy them
 if [ "$#" -ne 4 ]; then
    echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   cat "$script_absdir"/${script_name}_help.txt
    echo "[$(date)]: Terminating" >&2
    exit -1
 fi
