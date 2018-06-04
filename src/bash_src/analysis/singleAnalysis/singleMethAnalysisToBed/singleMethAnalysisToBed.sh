@@ -169,7 +169,7 @@ fi
 
 # Check number of arguments and copy them
 if [ "$#" -ne 1 ]; then
-   echo -e "[$(date)]: \e[31mERROR: Illegal number of arguments ...\e[0m" >&2
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
    echo "[$(date)]: Terminating" >&2
    exit -1
 fi
