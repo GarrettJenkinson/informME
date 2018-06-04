@@ -52,10 +52,11 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="makeBedsForMethAnalysis"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:a:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,outdir:,ESI,MSI,MC,min_chr:,max_chr:,threshold:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hr:b:m:e:a:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,outdir:,ESI,MSI,MC,min_chr:,max_chr:,threshold:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
 if [ $? -ne 0 ] 
 then
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
   echo "[$(date)]: Terminating" >&2
   exit -1
 fi
@@ -141,7 +142,7 @@ do
       break
       ;;  
     *)  
-      echo -e "[$(date)]: \e[31mERROR: Internal error ...\e[0m" >&2
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
       echo "[$(date)]: Terminating" >&2
       exit -1
       ;;  
