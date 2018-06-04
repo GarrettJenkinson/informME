@@ -52,12 +52,13 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hd:l: -l help,outdir:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hd:l: -l help,outdir:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-   echo "[$(date)]: Terminating" >&2
-   exit -1
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  echo "[$(date)]: Terminating" >&2
+  exit -1
 fi
 
 eval set -- "$TEMP"
@@ -85,12 +86,22 @@ do
       shift
       break
       ;;  
-    *)  
-      echo "[$(date)]: $script_name.sh:Internal error!"
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
+
+# Check number of arguments and copy them
+if [ "$#" -ne 1 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+fasta_file="$1"
+fasta_file="$(readlink -f -e "$fasta_file")"
 
 # Check valid outdir
 if [ -z "$outdir" ];then
@@ -98,14 +109,6 @@ if [ -z "$outdir" ];then
    echo "[$(date)]: Terminating" >&2
    exit -1
 fi
-
-# Get inputs
-fasta_file="$1"
-
-# Get absolute path FASTA file
-fasta_file="$(readlink -f -e "$fasta_file")"
-
-# Output directory
 mkdir -p "$outdir"
 
 # Set start time and message
@@ -119,9 +122,7 @@ echo "[$(date)]: and expects them to come first in the fasta file and"
 echo "[$(date)]: to be ordered in numerical order 1,2,..."
 echo "[$(date)]: The FASTA file contains the following chromosome ordering:"
 echo "$entries"
-
 num_entries="$(printf "$entries\n" |wc -l)"
-
 echo "[$(date)]: Number of chromosomes found: ${num_entries}" 
 
 # Generate command and options
