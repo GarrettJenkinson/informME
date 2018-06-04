@@ -181,15 +181,15 @@ This function makes BED files from the methylation analysis results obtained aft
     
 * ENTR-PHENO.bed: entropy-based classification
     
-* ESI-PHENO.bed (if ESIflag = 1): entropic sensitivity indices
+* ESI-PHENO.bed (if --ESI flag passed): entropic sensitivity indices
 
-* MSI-PHENO.bed (if MSIflag = 1): methylation sensitivity indices
+* MSI-PHENO.bed (if --MSI flag passed): methylation sensitivity indices
     
-* TURN-PHENO.bed (if MCflag = 1): turnover ratios
+* TURN-PHENO.bed (if --MC flag passed): turnover ratios
     
-* CAP-PHENO.bed (if MCflag = 1): channel capacities
+* CAP-PHENO.bed (if --MC flag passed): channel capacities
     
-* RDE-PHENO.bed (if MCflag = 1): relative dissipated energies  
+* RDE-PHENO.bed (if --MC flag passed): relative dissipated energies  
 
 
 D.5. GENERATE BED FILES FOR DIFFERENTIAL ANALYSIS:
@@ -209,13 +209,13 @@ This function makes BED files for the differential methylation analysis results 
        
 * JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances
        
-* dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+* dESI-PHENO1-VS-PHENO2.bed (if --ESI flag passed): differences in entropic sensitivity indices
 
-* dMSI-PHENO1-VS-PHENO2.bed (if MSIflag = 1): differences in methylation sensitivity indices
+* dMSI-PHENO1-VS-PHENO2.bed (if --MSI flag passed): differences in methylation sensitivity indices
        
-* dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
+* dCAP-PHENO1-VS-PHENO2.bed (if --MC flag passed): differences in channel capacities
        
-* dRDE-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in relative dissipated energies
+* dRDE-PHENO1-VS-PHENO2.bed (if --MC flag passed): differences in relative dissipated energies
 
 
 D.6. POST-PROCESSING
