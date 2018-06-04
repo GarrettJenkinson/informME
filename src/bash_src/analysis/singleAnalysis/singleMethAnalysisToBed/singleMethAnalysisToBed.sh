@@ -56,7 +56,7 @@ TEMP="$(getopt -o hr:b:m:e:a:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir:,anal
 
 if [ $? -ne 0 ] 
 then
-  echo "Terminating..." >&2
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -141,7 +141,8 @@ do
       break
       ;;  
     *)  
-      echo "$script_name.sh:Internal error!"
+      echo -e "[$(date)]: \e[31mERROR: Internal error ...\e[0m" >&2
+      echo "[$(date)]: Terminating" >&2
       exit -1
       ;;  
   esac
@@ -165,7 +166,12 @@ then
    exit -1
 fi
 
-# Get inputs
+# Check number of arguments and copy them
+if [ "$#" -ne 1 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Illegal number of arguments ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
 prefix="$1"
 
 # Output directory
