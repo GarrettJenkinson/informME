@@ -10,9 +10,9 @@ Options:
     -e|--estdir         estimation directory (default: $INTERDIR)
     -d|--outdir         output directory (default: $INTERDIR)
     -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
-    --MC                computation of information theory metrics
-    --ESI               computation of entropic sensivity index (ESI)
-    --MSI               computation of methylation sensivity index (MSI)
+    --MC                do computation of information theory metrics
+    --ESI               do computation of entropic sensivity index (ESI)
+    --MSI               do computation of methylation sensivity index (MSI)
 
 Examples:
     singleMethAnalysis.sh -d out --MC --ESI --MSI -- normal 1 1 1

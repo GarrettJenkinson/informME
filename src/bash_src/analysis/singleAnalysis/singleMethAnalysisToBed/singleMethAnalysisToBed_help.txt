@@ -18,15 +18,15 @@ Options:
     -t|--threshold      threshold used in methylation-based classification (default: 0.4)
     --min_chr           minimum chromosome to be included in BED file (default: 1)
     --max_chr           maximum chromosome to be included in BED file (default: 22)
-    --MC                computation of information theoretic quantities
-    --ESI               computation of entropic sensivity index (ESI) 
-    --MSI               computation of methylation sensivity index (MSI)
+    --MC                do computation of information theoretic quantities
+    --ESI               do computation of entropic sensivity index (ESI) 
+    --MSI               do computation of methylation sensivity index (MSI)
     -l|--MATLICENSE     path to MATLAB's license
 
 Example:
     * Generating the BED files that include chr1 through chr10 for phenotype normal:
     	singleMethAnalysisToBed.sh --min_chr 1 --max_chr 10 -- normal
-    * Generating the BED files including MC, ESI, and MSI for phenotype normal:
+    * Generating the BED files including MC, ESI, and MSI quantities for phenotype normal:
     	singleMethAnalysisToBed.sh --MC --ESI --MSI -- normal
 
 Output:
