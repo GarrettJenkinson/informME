@@ -52,11 +52,12 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="mergeEstParams"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdir:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hr:b:m:e:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,outdir:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo "Terminating..." >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -107,11 +108,23 @@ do
       break
       ;;
     *)
-      echo "$script_name.sh:Internal error!"
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      echo "[$(date)]: Terminating" >&2
       exit -1
       ;;
   esac
 done
+
+# Check number of arguments and copy them
+if [ "$#" -ne 4 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+mat_files="$1"
+prefix="$2"
+chr_num="$3"
+total_proc="$4"
 
 # Check valid outdir
 if [ -z "$outdir" ];then
@@ -130,12 +143,6 @@ then
    echo "[$(date)]: Terminating" >&2
    exit -1
 fi
-
-# Get inputs
-mat_files="$1"
-prefix="$2"
-chr_num="$3"
-total_proc="$4"
 
 # Output directory
 mkdir -p "$outdir"

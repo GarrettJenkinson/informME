@@ -25,15 +25,15 @@ rm -rf out
 
 # Process normal
 echo "Processing normal..."
-seq 5 | xargs -I {X} --max-proc 1 bash -c '../informME_run.sh -r ../../parseBamFile/fastaToCpg/main/ -m ../../parseBamFile/mergeMatrices/main/out/ -e intermediate --tmp tmp -d out -q 4 --time_limit 2 --total_part 4 -- toy_normal_pe toy_normal {X} 4' 1>/dev/null
+seq 5 | xargs -I {X} --max-proc 1 bash -c '../informME_run.sh -r ../../parseBamFile/fastaToCpg/main/ -m ../../parseBamFile/mergeMatrices/main/out/ -e intermediate --tmp tmp -d out -q 4 --time_limit 2 --total_part 4 -- toy_normal_pe toy_normal {X}' 1>/dev/null
 
 # Process cancer
 echo "Processing cancer..."
-seq 5 | xargs -I {X} --max-proc 1 bash -c '../informME_run.sh -r ../../parseBamFile/fastaToCpg/main/ -m ../../parseBamFile/mergeMatrices/main/out/ -e intermediate --tmp tmp -d out -q 4 --time_limit 2 --total_part 4 -- toy_cancer_pe toy_cancer {X} 4' 1>/dev/null
+seq 5 | xargs -I {X} --max-proc 1 bash -c '../informME_run.sh -r ../../parseBamFile/fastaToCpg/main/ -m ../../parseBamFile/mergeMatrices/main/out/ -e intermediate --tmp tmp -d out -q 4 --time_limit 2 --total_part 4 -- toy_cancer_pe toy_cancer {X}' 1>/dev/null
 
 # Process pooled
 echo "Processing pooled..."
-seq 5 | xargs -I {X} --max-proc 1 bash -c '../informME_run.sh -r ../../parseBamFile/fastaToCpg/main/ -m ../../parseBamFile/mergeMatrices/main/out/ -e intermediate --tmp tmp -d out -q 4 --time_limit 2 --total_part 4 -- toy_normal_pe,toy_cancer_pe toy_pooled {X} 4' 1>/dev/null
+seq 5 | xargs -I {X} --max-proc 1 bash -c '../informME_run.sh -r ../../parseBamFile/fastaToCpg/main/ -m ../../parseBamFile/mergeMatrices/main/out/ -e intermediate --tmp tmp -d out -q 4 --time_limit 2 --total_part 4 -- toy_normal_pe,toy_cancer_pe toy_pooled {X}' 1>/dev/null
 
 # Remove intermediate and temporary files
 rm -rf intermediate

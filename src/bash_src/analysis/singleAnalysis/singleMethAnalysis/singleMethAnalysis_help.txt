@@ -5,14 +5,14 @@ Usage:
     singleMethAnalysis.sh [options] -- PREFIX CHR_NUM TOTAL_PROC PROC_LABEL
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
-    -e|--estdir         Estimation directory. Default: $INTERDIR.
-    -d|--outdir         Output directory. Default: $INTERDIR.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
-    --MC                Computation of information theory metrics. Default: 0.
-    --ESI               Computation of entropic sensivity index (ESI). Default: 0.
-    --MSI               Computation of methylation sensivity index (MSI). Default: 0.
+    -h|--help           help.
+    -r|--refdir         reference genome directory (default: $REFGENEDIR)
+    -e|--estdir         estimation directory (default: $INTERDIR)
+    -d|--outdir         output directory (default: $INTERDIR)
+    -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
+    --MC                computation of information theory metrics
+    --ESI               computation of entropic sensivity index (ESI)
+    --MSI               computation of methylation sensivity index (MSI)
 
 Examples:
     singleMethAnalysis.sh -d out --MC --ESI --MSI -- normal 1 1 1

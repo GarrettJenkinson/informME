@@ -5,12 +5,12 @@ Usage:
     mergeEstimation.sh [options] -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
-    -m|--matdir         Matrices directory. Default: $INTERDIR.
-    -e|--estdir         Estimation directory. Default: $INTERDIR.
-    -d|--outdir         Output directory. Default: $INTERDIR.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+    -h|--help           help.
+    -r|--refdir         reference genome directory (default: $REFGENEDIR)
+    -m|--matdir         matrices directory (default: $INTERDIR)
+    -e|--estdir         estimation directory (default: $INTERDIR)
+    -d|--outdir         output directory (default: $INTERDIR)
+    -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
 
 Examples:
     mergeEstimation.sh -d out -- normal-1 normal-1 1 1

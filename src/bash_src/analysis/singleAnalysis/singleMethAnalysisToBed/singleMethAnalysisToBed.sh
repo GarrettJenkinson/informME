@@ -149,6 +149,14 @@ do
   esac
 done
 
+# Check number of arguments and copy them
+if [ "$#" -ne 1 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+prefix="$1"
+
 # Check valid outdir
 if [ -z "$outdir" ];then
    echo -e "[$(date)]: \e[31mERROR: Output directory is empty string ...\e[0m" >&2
@@ -166,14 +174,6 @@ then
    echo "[$(date)]: Terminating" >&2
    exit -1
 fi
-
-# Check number of arguments and copy them
-if [ "$#" -ne 1 ]; then
-   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
-   echo "[$(date)]: Terminating" >&2
-   exit -1
-fi
-prefix="$1"
 
 # Output directory
 mkdir -p "$outdir"

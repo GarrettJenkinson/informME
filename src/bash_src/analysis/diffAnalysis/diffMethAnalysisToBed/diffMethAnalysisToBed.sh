@@ -52,11 +52,12 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir_1:,estdir_2:,analdir_1:,analdir_2:,outdir:,ESI,MSI,MC,min_chr:,max_chr:,threshold:,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hr:b:m:d:t:l: -l help,refdir:,bamdir:,matdir:,estdir_1:,estdir_2:,analdir_1:,analdir_2:,outdir:,ESI,MSI,MC,min_chr:,max_chr:,threshold:,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo "Terminating..." >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -150,12 +151,22 @@ do
       shift
       break
       ;;  
-    *)  
-      echo "$script_name.sh:Internal error!"
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
+
+# Check number of arguments and copy them
+if [ "$#" -ne 2 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+prefix_1="$1"
+prefix_2="$2"
 
 # Check valid outdir
 if [ -z "$outdir" ];then
@@ -174,10 +185,6 @@ then
    echo "[$(date)]: Terminating" >&2
    exit -1
 fi
-
-# Get inputs
-prefix_1="$1"
-prefix_2="$2"
 
 # Output directory
 mkdir -p "$outdir"

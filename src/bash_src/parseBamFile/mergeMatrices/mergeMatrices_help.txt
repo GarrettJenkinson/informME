@@ -6,15 +6,15 @@ Usage:
     mergeMatrices.sh [options] -- BAM_FILE CHR_NUM TOTAL_PROC
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
-    -b|--bamdir         BAM file directory. Default: $BAMDIR.
-    -m|--matdir         Matrices directory. Default: $INTERDIR.
-    -d|--outdir         Output directory. Default: $INTERDIR.
-    -t|--trim           Number of base to trim. Default: 0.
-    -c|--c_string       Name convention for chromosomes: 0 => 'X';1 => 'chrX'. Default: 1.
-    -p|--paired_ends    Type of reads: 0 => single-ends;1 => paired-ends. Default: 1.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
+    -h|--help           help
+    -r|--refdir         reference genome directory (default: $REFGENEDIR)
+    -b|--bamdir         BAM file directory (default: $BAMDIR)
+    -m|--matdir         matrices directory (default: $INTERDIR)
+    -d|--outdir         output directory (default: $INTERDIR)
+    -t|--trim           number of base to trim (default: 0)
+    -c|--c_string       name convention for chromosomes: 0 => 'X';1 => 'chrX' (default: 1)
+    -p|--paired_ends    type of reads: 0 => single-ends;1 => paired-ends (default: 1)
+    -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
 
 Examples:
     mergeMatrices.sh -r /path/to/reference/ -b /path/to/bam/ -m /path/to/matrices/ \
