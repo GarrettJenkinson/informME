@@ -5,7 +5,7 @@ Description:
    are stored in FINALDIR. 
 
 Usage:
-    diffMethAnalysisToBed.sh [OPTIONS] -- PHENO1 PHENO2 
+    diffMethAnalysisToBed.sh [OPTIONS] PHENO1 PHENO2 
 
 Mandatory arguments:
     o PHENO1: prefix of the methylation analysis file 1 (name of phenotype 1)
@@ -28,10 +28,10 @@ Options:
 Example:
     * Generating BED files for differential analysis between phenotype_1 and phenotype_2 
       between chr1-10:
-        diffMethAnalysisToBed.sh --min_chr 1 --max_chr 10 -- phenotype_1 phenotype_2 
+        diffMethAnalysisToBed.sh --min_chr 1 --max_chr 10 phenotype_1 phenotype_2 
     * Generating BED files including ESI, MSI, and MC computations for differential analysis 
       between phenotype_1 and phenotype_2:
-        diffMethAnalysisToBed.sh --ESI --MSI --MC -- phenotype_1 phenotype_2 
+        diffMethAnalysisToBed.sh --ESI --MSI --MC phenotype_1 phenotype_2 
                                     
 Output:
     BED files

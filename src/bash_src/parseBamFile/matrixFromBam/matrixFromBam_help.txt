@@ -8,7 +8,7 @@ Description:
     and 1 indicates that the CpG site is methylated.
 
 Usage:
-    matrixFromBam.sh  [options]  -- BAM_FILE CHR_NUM TOTAL_PROC PROC_NUM
+    matrixFromBam.sh  [options]  BAM_FILE CHR_NUM TOTAL_PROC PROC_NUM
 
 Options:
     -h|--help           help.
@@ -21,7 +21,7 @@ Options:
     -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
 
 Examples:
-    matrixFromBam.sh -r /path/to/cpg/ref/ -b /path/to/bam -d out -c 0 -t 20 -- input.bam 2 20 1 
+    matrixFromBam.sh -r /path/to/cpg/ref/ -b /path/to/bam -d out -c 0 -t 20 input.bam 2 20 1 
 
 Output:
     MATLAB .mat file for a given region of length 3 kb. 

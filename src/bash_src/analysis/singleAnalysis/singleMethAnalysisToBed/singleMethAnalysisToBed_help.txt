@@ -5,7 +5,7 @@ Description:
     in FINALDIR. 
 
 Usage:
-    singleMethAnalysisToBed.sh [OPTIONS] -- PHENO
+    singleMethAnalysisToBed.sh [OPTIONS] PHENO
 
 Mandatory argument:
     o PHENO: prefix of the methylation analysis file (name of phenotype)
@@ -25,9 +25,9 @@ Options:
 
 Example:
     * Generating the BED files that include chr1 through chr10 for phenotype normal:
-    	singleMethAnalysisToBed.sh --min_chr 1 --max_chr 10 -- normal
+    	singleMethAnalysisToBed.sh --min_chr 1 --max_chr 10 normal
     * Generating the BED files including MC, ESI, and MSI quantities for phenotype normal:
-    	singleMethAnalysisToBed.sh --MC --ESI --MSI -- normal
+    	singleMethAnalysisToBed.sh --MC --ESI --MSI normal
 
 Output:
     BED files

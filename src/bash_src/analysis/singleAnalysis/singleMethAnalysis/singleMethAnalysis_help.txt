@@ -2,7 +2,7 @@ Description:
     This function performs methylation analysis of a given chromosome. 
 
 Usage:
-    singleMethAnalysis.sh [options] -- PREFIX CHR_NUM TOTAL_PROC PROC_LABEL
+    singleMethAnalysis.sh [options] PREFIX CHR_NUM TOTAL_PROC PROC_LABEL
 
 Options:
     -h|--help           help.
@@ -15,7 +15,7 @@ Options:
     --MSI               do computation of methylation sensivity index (MSI)
 
 Examples:
-    singleMethAnalysis.sh -d out --MC --ESI --MSI -- normal 1 1 1
+    singleMethAnalysis.sh -d out --MC --ESI --MSI normal 1 1 1
 
 Output:
     MATLAB .mat files containing information about the analysis. 

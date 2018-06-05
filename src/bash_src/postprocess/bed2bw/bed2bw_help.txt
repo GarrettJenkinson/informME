@@ -2,14 +2,14 @@ Description:
     Convert all BED files in input directory into bigWig files.
 
 Usage:
-    bed2bw.sh  [options]  -- BED_DIR GENOME
+    bed2bw.sh  [OPTIONS]  BED_DIR GENOME
 
 Options:
     -h|--help           Help.
     -d|--outdir         Output directory. Default: $PWD.
 
 Examples:
-    bed2bw.sh -d out -- input_bed_files/ hg19
+    bed2bw.sh -d out input_bed_files/ hg19
 
 Output:
     A .bw file for each BED file.
