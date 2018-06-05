@@ -2,7 +2,7 @@ Description:
     This function merges the output of singleMethAnalysis into a single hashtable.
 
 Usage:
-    mergeSingleMethAnalysis.sh [options] PREFIX CHR_NUM TOTAL_PROC
+    mergeSingleMethAnalysis.sh [options] PHENO CHR_NUM TOTAL_PROC
 
 Options:
     -h|--help           help

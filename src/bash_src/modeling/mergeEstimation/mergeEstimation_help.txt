@@ -2,7 +2,7 @@ Description:
     This function merges the output of estimation.sh into a single hashtable.
 
 Usage:
-    mergeEstimation.sh [options] MAT_FILES PREFIX CHR_NUM TOTAL_PROC
+    mergeEstimation.sh [options] MAT_FILES PHENO CHR_NUM TOTAL_PROC
 
 Options:
     -h|--help           help.

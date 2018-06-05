@@ -4,7 +4,7 @@ Description:
     chromosome of interest.
 
 Usage:
-    estimation.sh [options] MAT_FILES PREFIX CHR_NUM TOTAL_PROC PROC_NUM
+    estimation.sh [options] MAT_FILES PHENO CHR_NUM TOTAL_PROC PROC_NUM
 
 Options:
     -h|--help           help.
