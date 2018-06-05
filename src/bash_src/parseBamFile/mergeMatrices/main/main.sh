@@ -28,11 +28,11 @@ rm -rf out
 
 # Process normal
 echo "Processing normal..."
-seq 5 | xargs -I {X} bash -c '../mergeMatrices.sh -r ../../fastaToCpg/main/ -b ../../matrixFromBam/main/input/ -m input/ -d out/ -c 1 -t 10 --paired_ends 1 -- toy_normal_pe {X} 4' 1>/dev/null
+seq 5 | xargs -I {X} bash -c '../mergeMatrices.sh -r ../../fastaToCpg/main/ -b ../../matrixFromBam/main/input/ -m input/ -d out/ -c 1 -t 10 --paired_ends 1 toy_normal_pe {X} 4' 1>/dev/null
 
 # Process cancer
 echo "Processing cancer..."
-seq 5 | xargs -I {X} bash -c '../mergeMatrices.sh -r ../../fastaToCpg/main/ -b ../../matrixFromBam/main/input/ -m input/ -d out/ -c 1 -t 10 --paired_ends 1 -- toy_cancer_pe {X} 4' 1>/dev/null
+seq 5 | xargs -I {X} bash -c '../mergeMatrices.sh -r ../../fastaToCpg/main/ -b ../../matrixFromBam/main/input/ -m input/ -d out/ -c 1 -t 10 --paired_ends 1 toy_cancer_pe {X} 4' 1>/dev/null
 
 # Remove input
 rm -rf input/
