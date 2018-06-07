@@ -23,4 +23,4 @@
 # Remove previous results
 rm -rf *mat
 # Execute command
-../fastaToCpg.sh -d ./ -- toy_genome.fa 1>/dev/null
+../fastaToCpg.sh -d $PWD toy_genome.fa 1>/dev/null

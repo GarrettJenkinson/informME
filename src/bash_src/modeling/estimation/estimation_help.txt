@@ -4,7 +4,7 @@ Description:
     chromosome of interest.
 
 Usage:
-    estimation.sh [options] -- MAT_FILES PREFIX CHR_NUM TOTAL_PROC PROC_NUM
+    estimation.sh [options] MAT_FILES PHENO CHR_NUM TOTAL_PROC PROC_NUM
 
 Options:
     -h|--help           help.
@@ -15,8 +15,8 @@ Options:
     -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
 
 Examples:
-    estimation.sh -d out -- normal-1 normal 1 1 1
-    estimation.sh -d out -- normal-1,normal-2 normal 1 1 1
+    estimation.sh -d out normal-1 normal 1 1 1
+    estimation.sh -d out normal-1,normal-2 normal 1 1 1
 
 Output:
     A MATLAB .mat objects with suffix PROC_NUM. 

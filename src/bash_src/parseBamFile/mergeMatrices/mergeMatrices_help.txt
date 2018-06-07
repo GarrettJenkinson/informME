@@ -3,7 +3,7 @@ Description:
     of a single hashtable.
 
 Usage:
-    mergeMatrices.sh [options] -- BAM_FILE CHR_NUM TOTAL_PROC
+    mergeMatrices.sh [options] BAM_FILE CHR_NUM TOTAL_PROC
 
 Options:
     -h|--help           help
@@ -18,7 +18,7 @@ Options:
 
 Examples:
     mergeMatrices.sh -r /path/to/reference/ -b /path/to/bam/ -m /path/to/matrices/ \
-	-d out -c 1 -t 10 -- sample_1.bam 1 1
+	-d out -c 1 -t 10 sample_1.bam 1 1
 
 Output:
     MATLAB .mat file.

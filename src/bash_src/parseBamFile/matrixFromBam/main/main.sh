@@ -25,9 +25,9 @@ rm -rf out
 # Execute command for normal toy
 echo "Processing normal..."
 for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
-bash -c '../matrixFromBam.sh -r ../../fastaToCpg/main/ -b input/ -d out/ -c 1 -t 10 --paired_ends 1 -- toy_normal_pe.bam $1 4 $2' argv0 1>/dev/null
+bash -c '../matrixFromBam.sh -r ../../fastaToCpg/main/ -b input/ -d out/ -c 1 -t 10 --paired_ends 1 toy_normal_pe.bam $1 4 $2' argv0 1>/dev/null
 # Execute command for cancer toy
 echo "Processing cancer..."
 for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
-bash -c '../matrixFromBam.sh -r ../../fastaToCpg/main/ -b input/ -d out/ -c 1 -t 10 --paired_ends 1 -- toy_cancer_pe.bam $1 4 $2' argv0 1>/dev/null
+bash -c '../matrixFromBam.sh -r ../../fastaToCpg/main/ -b input/ -d out/ -c 1 -t 10 --paired_ends 1 toy_cancer_pe.bam $1 4 $2' argv0 1>/dev/null
 

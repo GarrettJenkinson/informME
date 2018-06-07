@@ -28,7 +28,7 @@ bed_dir="../../../analysis/singleAnalysis/singleMethAnalysisToBed/main/out"
 cp -r "$bed_dir" input
 
 # Execute command
-../bed2bw.sh -d out -- input hg19
+../bed2bw.sh -d out input hg19
 
 # Removed copied files
 rm -rf input

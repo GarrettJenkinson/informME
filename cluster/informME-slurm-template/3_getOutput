@@ -17,8 +17,8 @@ prefix1="$1"
 prefix2="$2"
 
 # Run Single
-singleMethAnalysisToBed.sh --MC --ESI -- "$prefix1"
-singleMethAnalysisToBed.sh --MC --ESI -- "$prefix2"
+singleMethAnalysisToBed.sh --MC --ESI --MSI "$prefix1"
+singleMethAnalysisToBed.sh --MC --ESI --MSI "$prefix2"
 
 # Run Diff
-makeBedsForDiffMethAnalysis.sh --MC --ESI -- "$prefix1" "$prefix2"
+makeBedsForDiffMethAnalysis.sh --MC --ESI --MSI "$prefix1" "$prefix2"

@@ -82,7 +82,7 @@ Run the informME software using the following steps in the indicated order (type
 D.1. REFERENCE GENOME ANALYSIS:
 -------------------------------
 	
-        fastaToCpg.sh [OPTIONS] -- FASTA_FILE
+        fastaToCpg.sh [OPTIONS] FASTA_FILE
 
 This step analyzes the reference genome FASTA\_FILE (in FASTA format) and produces a MATLAB MAT file CpGlocationChr#.mat for each chromosome, which is stored by default in REFGENEDIR, and contains the following information:
 
@@ -103,7 +103,7 @@ NOTE2: At this time the statistical model of informME has been designed to work 
 D.2. METHYLATION DATA MATRIX GENERATION: 
 ----------------------------------------
 	
-        getMatrices.sh [OPTIONS]  -- BAM_FILE CHR_NUM
+        getMatrices.sh [OPTIONS] BAM_FILE CHR_NUM
 
 This step takes the BAM file BAM\_FILE as input and generates the methylation data matrix for chromosome number CHR\_NUM. By default, the file BAM\_FILE and its associated index file (with extension .bai) is expected to be in BAMDIR, and the output file produced by this step is stored in a subdirectory in INTERDIR named after the chromosome number CHR\_NUM. The output file preserves the prefix from the file BAM\_FILE and the suffix '\_matrices.mat' is appended to it (e.g. if BAM\_FILE is normal\_sample.bam and CHR\_NUM is 10, then the output file is saved as INTERDIR/chr10/normal\_sample\_matrices.mat). The file produced contains the following information for each genomic region, which is subsequently used for model estimation:
 
@@ -118,7 +118,7 @@ NOTE2: See reference [1], "Online Methods: Quality control and alignment" for ou
 D.3. MODEL ESTIMATION & ANALYSIS:
 ---------------------------------
 
-        informME_run.sh [OPTIONS] -- MAT_FILES PHENO CHR_NUM
+        informME_run.sh [OPTIONS] MAT_FILES PHENO CHR_NUM
 
 This step is comprised of two phases. During the first phase, informME learns the parameters of the Ising probability distribution by combining the methylation data matrices provided through the argument MAT\_FILES (comma-separated list) for chromosome number CHR\_NUM. By default, the MAT\_FILES are expected to be in a subdirectory named after CHR\_NUM in INTERDIR. The output generated during this phase is also stored in a subdirectory in INTERDIR named after chromosome number CHR\_NUM. The output file has as prefix PHENO and the suffix '\_fit.mat' appended to it (e.g. if 'normal' is the PHENO, and CHR\_NUM is 10, then the output is stored as INTERDIR/chr10/normal\_fit.mat). The file produced contains the following information:
 
@@ -167,7 +167,7 @@ NOTE: We recommend taking advantage of the array feature available in SGE and SL
 D.4. GENERATE BED FILES FOR SINGLE ANALYSIS:
 ------------------------------------------
 
-        singleMethAnalysisToBed.sh [OPTIONS] -- PHENO
+        singleMethAnalysisToBed.sh [OPTIONS] PHENO
 
 This function makes BED files from the methylation analysis results obtained after running informME\_run.sh for a given phenotype PHENO. By default, the input file (analysis file) is expected to be located in INTERDIR/chr#/PHENO\_analysis.mat. In addition, the output files are stored in FINALDIR and have the following names and content:
 
@@ -195,7 +195,7 @@ This function makes BED files from the methylation analysis results obtained aft
 D.5. GENERATE BED FILES FOR DIFFERENTIAL ANALYSIS:
 ------------------------------------------------
 
-	diffMethAnalysisToBed.sh [OPTIONS] -- PHENO1 PHENO2
+	diffMethAnalysisToBed.sh [OPTIONS] PHENO1 PHENO2
 
 This function makes BED files for the differential methylation analysis results obtained after running informME\_run.sh for two given phenotypes PHENO1 and PHENO2. By default, the input files (both analysis files) are expected to be located in INTERDIR/chr#/PHENO1\_analysis.mat and INTERDIR/chr#/PHENO2\_analysis.mat respectively. In addition, the output files are stored in FINALDIR and have the following names and content:
 

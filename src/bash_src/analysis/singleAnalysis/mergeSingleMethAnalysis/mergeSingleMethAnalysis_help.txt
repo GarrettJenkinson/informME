@@ -2,7 +2,7 @@ Description:
     This function merges the output of singleMethAnalysis into a single hashtable.
 
 Usage:
-    mergeSingleMethAnalysis.sh [options] -- PREFIX CHR_NUM TOTAL_PROC
+    mergeSingleMethAnalysis.sh [options] PHENO CHR_NUM TOTAL_PROC
 
 Options:
     -h|--help           help
@@ -16,7 +16,7 @@ Options:
     --MSI               do computation of methylation sensivity index (MSI)
 
 Examples:
-    mergeSingleMethAnalysis.sh -d out --MC --ESI --MSI -- normal 1 1
+    mergeSingleMethAnalysis.sh -d out --MC --ESI --MSI normal 1 1
 
 Output:
     MATLAB .mat files containing information about the analysis for an entire chormosome. 
