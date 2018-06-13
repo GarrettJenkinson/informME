@@ -42,11 +42,13 @@ if [ $# -eq 0 ]
 fi
 
 # Getopt command
-TEMP="$(getopt -o hl: -l help,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hl: -l help,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo "Terminating..." >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  cat "$script_absdir"/${script_name}_help.txt
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -71,14 +73,22 @@ do
       shift
       break
       ;;  
-    *)  
-      echo "$script_name.sh:Internal error!"
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      cat "$script_absdir"/${script_name}_help.txt
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
 
-# Get inputs
+# Check number of arguments and copy them
+if [ "$#" -ne 3 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   cat "$script_absdir"/${script_name}_help.txt
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
 eigen_path="$1"
 mpfr_inc_path="$2"
 mpfr_lib_path="$3"

@@ -22,7 +22,6 @@
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
 %%%%%%%%                   mergeEstParams.m                        %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%               Last Modified: 12/01/2016                   %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function merges the output of EstParamsForChr.m into a single

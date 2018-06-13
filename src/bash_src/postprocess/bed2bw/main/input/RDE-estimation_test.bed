@@ -1,4 +1,0 @@
-track type=bedGraph visibility=full windowingFunction=mean autoScale=on alwaysZero=on name=RDE-estimation_test
-chr1            0          149 46.757738
-chr1          150          299 48.974047
-chr1          300          390 45.647971

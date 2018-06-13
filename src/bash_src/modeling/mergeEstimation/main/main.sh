@@ -27,17 +27,17 @@ cp -r ../../estimation/main/out/ input
 # Execute command for normal toy
 echo "Processing normal..."
 seq 5 | xargs -I {X} \
-bash -c '../mergeEstimation.sh -r ../../../parseBamFile/fastaToCpg/main/ -m ../../../parseBamFile/mergeMatrices/main/out/ -e input/ -d out/ -- toy_normal_pe toy_normal {X} 4' 1>/dev/null
+bash -c '../mergeEstimation.sh -r ../../../parseBamFile/fastaToCpg/main/ -m ../../../parseBamFile/mergeMatrices/main/out/ -e input/ -d out/ toy_normal_pe toy_normal {X} 4' 1>/dev/null
 
 # Execute command for cancer toy
 echo "Processing cancer..."
 seq 5 | xargs -I {X} \
-bash -c '../mergeEstimation.sh -r ../../../parseBamFile/fastaToCpg/main/ -m ../../../parseBamFile/mergeMatrices/main/out/ -e input/ -d out/ -- toy_cancer_pe toy_cancer {X} 4' 1>/dev/null
+bash -c '../mergeEstimation.sh -r ../../../parseBamFile/fastaToCpg/main/ -m ../../../parseBamFile/mergeMatrices/main/out/ -e input/ -d out/ toy_cancer_pe toy_cancer {X} 4' 1>/dev/null
 
 # Execute command for pooled toy
 echo "Processing pooled..."
 seq 5 | xargs -I {X} \
-bash -c '../mergeEstimation.sh -r ../../../parseBamFile/fastaToCpg/main/ -m ../../../parseBamFile/mergeMatrices/main/out/ -e input/ -d out/ -- toy_normal_pe,toy_cancer_pe toy_pooled {X} 4' 1>/dev/null
+bash -c '../mergeEstimation.sh -r ../../../parseBamFile/fastaToCpg/main/ -m ../../../parseBamFile/mergeMatrices/main/out/ -e input/ -d out/ toy_normal_pe,toy_cancer_pe toy_pooled {X} 4' 1>/dev/null
 
 # Remove input
 rm -rf input

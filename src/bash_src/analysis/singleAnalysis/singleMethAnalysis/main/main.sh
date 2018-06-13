@@ -26,15 +26,15 @@ rm -rf out
 # Execute command for normal toy
 echo "Processing normal..."
 for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
-bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI -- toy_normal $1 4 $2' argv0 1>/dev/null
+bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI --MSI toy_normal $1 4 $2' argv0 1>/dev/null
 
 # Execute command for cancer toy
 echo "Processing cancer..."
 for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
-bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI -- toy_cancer $1 4 $2' argv0 1>/dev/null
+bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI --MSI toy_cancer $1 4 $2' argv0 1>/dev/null
 
 # Execute command for pooled toy
 echo "Processing pooled..."
 for chr in {1..5};do for proc in {1..4};do echo -e "${chr} ${proc}";done;done | xargs -n 2 --max-proc 8 \
-bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI -- toy_pooled $1 4 $2' argv0 1>/dev/null
+bash -c '../singleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -d out/ --MC --ESI --MSI toy_pooled $1 4 $2' argv0 1>/dev/null
 

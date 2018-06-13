@@ -4,7 +4,7 @@
 
 ## An information-theoretic pipeline for methylation analysis of WGBS data
 
-### LATEST RELEASE: v0.3.1
+### LATEST RELEASE: v0.3.2
 -----------------------------------------------------------------
 
 This directory contains the MATLAB, C++ and R software that implements informME, as well as the BASH wrappers and example submission scripts used to run informME on a Sun Grid Engine (SGE) cluster or a SLURM computer cluster. 
@@ -82,7 +82,7 @@ Run the informME software using the following steps in the indicated order (type
 D.1. REFERENCE GENOME ANALYSIS:
 -------------------------------
 	
-        fastaToCpg.sh [OPTIONS] -- FASTA_FILE
+        fastaToCpg.sh [OPTIONS] FASTA_FILE
 
 This step analyzes the reference genome FASTA\_FILE (in FASTA format) and produces a MATLAB MAT file CpGlocationChr#.mat for each chromosome, which is stored by default in REFGENEDIR, and contains the following information:
 
@@ -103,7 +103,7 @@ NOTE2: At this time the statistical model of informME has been designed to work 
 D.2. METHYLATION DATA MATRIX GENERATION: 
 ----------------------------------------
 	
-        getMatrices.sh [OPTIONS]  -- BAM_FILE CHR_NUM
+        getMatrices.sh [OPTIONS] BAM_FILE CHR_NUM
 
 This step takes the BAM file BAM\_FILE as input and generates the methylation data matrix for chromosome number CHR\_NUM. By default, the file BAM\_FILE and its associated index file (with extension .bai) is expected to be in BAMDIR, and the output file produced by this step is stored in a subdirectory in INTERDIR named after the chromosome number CHR\_NUM. The output file preserves the prefix from the file BAM\_FILE and the suffix '\_matrices.mat' is appended to it (e.g. if BAM\_FILE is normal\_sample.bam and CHR\_NUM is 10, then the output file is saved as INTERDIR/chr10/normal\_sample\_matrices.mat). The file produced contains the following information for each genomic region, which is subsequently used for model estimation:
 
@@ -118,7 +118,7 @@ NOTE2: See reference [1], "Online Methods: Quality control and alignment" for ou
 D.3. MODEL ESTIMATION & ANALYSIS:
 ---------------------------------
 
-        informME_run.sh [OPTIONS] -- MAT_FILES PHENO CHR_NUM
+        informME_run.sh [OPTIONS] MAT_FILES PHENO CHR_NUM
 
 This step is comprised of two phases. During the first phase, informME learns the parameters of the Ising probability distribution by combining the methylation data matrices provided through the argument MAT\_FILES (comma-separated list) for chromosome number CHR\_NUM. By default, the MAT\_FILES are expected to be in a subdirectory named after CHR\_NUM in INTERDIR. The output generated during this phase is also stored in a subdirectory in INTERDIR named after chromosome number CHR\_NUM. The output file has as prefix PHENO and the suffix '\_fit.mat' appended to it (e.g. if 'normal' is the PHENO, and CHR\_NUM is 10, then the output is stored as INTERDIR/chr10/normal\_fit.mat). The file produced contains the following information:
 
@@ -134,7 +134,7 @@ This step is comprised of two phases. During the first phase, informME learns th
 
 * the log partition function of the estimated Ising model
 
-The second phase of this step consists in analyzing the model learned by computing a number of statistical summaries of the methylation state, including probability distributions of methylation levels, mean methylation levels, and normalized methylation entropies, as well as mean and entropy based classifications. If desired, this step also computes entropic sensitivity indices, as well information-theoretic quantities associated with methylation channels, such as turnover ratios, channel capacities, and relative dissipated energies. The output generated during this phase is stored in the same directory as the output generated during the first phase, using the same prefix as before. However, the suffix is now '\_analysis.mat' (e.g. following the previous example, the output file of this phase is stored as INTERDIR/chr10/normal\_analysis.mat). This file contains the following information:
+The second phase of this step consists in analyzing the model learned by computing a number of statistical summaries of the methylation state, including probability distributions of methylation levels, mean methylation levels, and normalized methylation entropies, as well as mean and entropy based classifications. This step also computes entropic sensitivity indices, methylation sensitivity indices, as well information-theoretic quantities associated with methylation channels, such as turnover ratios, channel capacities, and relative dissipated energies. The output generated during this phase is stored in the same directory as the output generated during the first phase, using the same prefix as before. However, the suffix is now '\_analysis.mat' (e.g. following the previous example, the output file of this phase is stored as INTERDIR/chr10/normal\_analysis.mat). This file contains the following information:
 
 * the locations of the CpG sites within the genomic region
 
@@ -152,20 +152,22 @@ The second phase of this step consists in analyzing the model learned by computi
 
 * normalized methylation entropies
 
-* entropic sensitivity indices (if ESIflag = 1)
+* entropic sensitivity indices 
 
-* turnover ratios (if MCflag = 1)
+* methylation sensitivity indices
 
-* channel capacities (if MCflag = 1)
+* turnover ratios
 
-* relative dissipated energies (if MCflag = 1)
+* channel capacities
+
+* relative dissipated energies
 
 NOTE: We recommend taking advantage of the array feature available in SGE and SLURM based clusters to submit an individual job for each chromosome.
 
 D.4. GENERATE BED FILES FOR SINGLE ANALYSIS:
 ------------------------------------------
 
-        singleMethAnalysisToBed.sh [OPTIONS] -- PHENO
+        singleMethAnalysisToBed.sh [OPTIONS] PHENO
 
 This function makes BED files from the methylation analysis results obtained after running informME\_run.sh for a given phenotype PHENO. By default, the input file (analysis file) is expected to be located in INTERDIR/chr#/PHENO\_analysis.mat. In addition, the output files are stored in FINALDIR and have the following names and content:
 
@@ -179,19 +181,21 @@ This function makes BED files from the methylation analysis results obtained aft
     
 * ENTR-PHENO.bed: entropy-based classification
     
-* ESI-PHENO.bed (if ESIflag = 1): entropic sensitivity indices
+* ESI-PHENO.bed (if --ESI flag passed): entropic sensitivity indices
+
+* MSI-PHENO.bed (if --MSI flag passed): methylation sensitivity indices
     
-* TURN-PHENO.bed (if MCflag = 1): turnover ratios
+* TURN-PHENO.bed (if --MC flag passed): turnover ratios
     
-* CAP-PHENO.bed (if MCflag = 1): channel capacities
+* CAP-PHENO.bed (if --MC flag passed): channel capacities
     
-* RDE-PHENO.bed (if MCflag = 1): relative dissipated energies  
+* RDE-PHENO.bed (if --MC flag passed): relative dissipated energies  
 
 
 D.5. GENERATE BED FILES FOR DIFFERENTIAL ANALYSIS:
 ------------------------------------------------
 
-	diffMethAnalysisToBed.sh [OPTIONS] -- PHENO1 PHENO2
+	diffMethAnalysisToBed.sh [OPTIONS] PHENO1 PHENO2
 
 This function makes BED files for the differential methylation analysis results obtained after running informME\_run.sh for two given phenotypes PHENO1 and PHENO2. By default, the input files (both analysis files) are expected to be located in INTERDIR/chr#/PHENO1\_analysis.mat and INTERDIR/chr#/PHENO2\_analysis.mat respectively. In addition, the output files are stored in FINALDIR and have the following names and content:
 
@@ -205,11 +209,13 @@ This function makes BED files for the differential methylation analysis results 
        
 * JSD-PHENO1-VS-PHENO2.bed: Jensen-Shannon distances
        
-* dESI-PHENO1-VS-PHENO2.bed (if ESIflag = 1): differences in entropic sensitivity indices
+* dESI-PHENO1-VS-PHENO2.bed (if --ESI flag passed): differences in entropic sensitivity indices
+
+* dMSI-PHENO1-VS-PHENO2.bed (if --MSI flag passed): differences in methylation sensitivity indices
        
-* dCAP-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in channel capacities
+* dCAP-PHENO1-VS-PHENO2.bed (if --MC flag passed): differences in channel capacities
        
-* dRDE-PHENO1-VS-PHENO2.bed (if MCflag = 1): differences in relative dissipated energies
+* dRDE-PHENO1-VS-PHENO2.bed (if --MC flag passed): differences in relative dissipated energies
 
 
 D.6. POST-PROCESSING
@@ -336,15 +342,15 @@ See [our wiki](https://github.com/GarrettJenkinson/informME/wiki) for additional
 VERSION HISTORY
 ---------------
 
-current (master) - Improved checking of user inputs to catch errors early. Tabulate output bedGraph files. Documentation improvements.
+v0.3.2 - Added methylation sensitivity index (MSI) to output. Improved checking of user inputs to catch errors early. Tabulate output bedGraph files. Documentation improvements.
 
 v0.3.1 - More informative error messages. Fix UI to expose ability to model single-ended sequencing reads. Documentation improvements.
 
 v0.3.0 - Code reorganized into a source and bin directory structure. Wrapper shell scripts added to all user callable functions. I/O directories no longer inside code directories. General UI improvements for easier usage.
 
-v0.2.2 -    Minor updates in gene ranking and small updates getting ready for the next major reorganization release.
+v0.2.2 - Minor updates in gene ranking and small updates getting ready for the next major reorganization release.
 
-v0.2.1 -   	Added R utilities for DMR detection and gene ranking using the Jensen-Shannon distance (JSD). Various documentation improvements.
+v0.2.1 - Added R utilities for DMR detection and gene ranking using the Jensen-Shannon distance (JSD). Various documentation improvements.
 
 v0.2.0 - Code reorganized into more specialized directories, streamlined, and general SGE submission scripts provided as a guide. Updated README's. Variable names changed to reflect published notation.
 

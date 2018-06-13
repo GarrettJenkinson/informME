@@ -52,11 +52,13 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="$script_name"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:d:t:c:p:l:q: -l help,refdir:,bamdir:,tmpdir:,outdir:,trim:,chr_string:,paired_ends:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hr:b:d:t:c:p:l:q: -l help,refdir:,bamdir:,tmpdir:,outdir:,trim:,chr_string:,paired_ends:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo -e "[$(date)]: \e[31mError in getting inputs. Terminating...\e[0m" >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  cat "$script_absdir"/${script_name}_help.txt
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -140,21 +142,34 @@ do
       shift
       break
       ;;  
-    *)  
-      echo -e "[$(date)]:\e[31m $script_name.sh:Internal error!\e[0m"
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      cat "$script_absdir"/${script_name}_help.txt
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
 
-# Get inputs
+# Check number of arguments and copy them
+if [ "$#" -ne 2 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   cat "$script_absdir"/${script_name}_help.txt
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
 bam_file="$1"
 chr_num="$2"
 
 # Get BAM file
 bam_prefix="$(basename "$bam_file" .bam)"
 
-# Output directory
+# Check valid outdir
+if [ -z "$outdir" ];then
+   echo -e "[$(date)]: \e[31mERROR: Output directory is empty string ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
 

@@ -22,7 +22,6 @@
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
 %%%%%%%%                makeBEDsForMethAnalysis.m                  %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 12/08/2016                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function makes BED files for the methylation analysis results 
@@ -80,6 +79,13 @@
 %               1: allow ESI computation.
 %               Default value: 0
 %
+% MSIflag
+%               Flag that determines whether this function performs 
+%               computation of the methylation sensitivity index (MSI). 
+%               0: no MSI computation. 
+%               1: allow MSI computation.
+%               Default value: 0
+%
 % MCflag
 %               Flag that determines whether this function performs 
 %               computation of turnover ratios, CpG entropies, capacities, 
@@ -129,6 +135,8 @@ addParameter(p,'maxChrNum',22,@(x)validateattributes(x,{'numeric'},...
 		{'nonempty','integer','positive','scalar'}))
 addParameter(p,'ESIflag',0,@(x)validateattributes(x,{'numeric'},...
 		{'nonempty','scalar'}))
+addParameter(p,'MSIflag',0,@(x)validateattributes(x,{'numeric'},...
+		{'nonempty','scalar'}))
 addParameter(p,'MCflag',0,@(x)validateattributes(x,{'numeric'},...
 		{'nonempty','scalar'}))
 addParameter(p,'thresh',0.4,@(x)validateattributes(x,{'numeric'},...
@@ -144,6 +152,7 @@ minChrNum       = p.Results.minChrNum;
 maxChrNum       = p.Results.maxChrNum;
 outdir          = p.Results.outdir;
 ESIflag         = p.Results.ESIflag;
+MSIflag         = p.Results.MSIflag;
 MCflag          = p.Results.MCflag;
 thresh          = p.Results.thresh;
 regionSize      = p.Results.regionSize;
@@ -179,6 +188,11 @@ hardCodedOptionsENTR = 'track type=bedGraph visibility=dense windowingFunction=m
 if ESIflag
 	% ESI
 	hardCodedOptionsESI = 'track type=bedGraph visibility=full windowingFunction=mean autoScale=on alwaysZero=on name=ESI-';
+end
+
+if MSIflag
+	% MSI
+	hardCodedOptionsMSI = 'track type=bedGraph visibility=full windowingFunction=mean autoScale=on alwaysZero=on name=MSI-';
 end
 
 if MCflag
@@ -218,7 +232,11 @@ if ESIflag
 	bedFileNameESI = [outdir 'ESI-' prefix '.bed'];
 	bedFileIDESI   = fopen(bedFileNameESI,'w'); 
 end
-
+% MSI
+if MSIflag
+	bedFileNameMSI = [outdir 'MSI-' prefix '.bed'];
+	bedFileIDMSI   = fopen(bedFileNameMSI,'w'); 
+end
 % MC
 if MCflag   
     % TURN
@@ -243,12 +261,14 @@ fprintf(bedFileIDMETH,'%s%s\n',hardCodedOptionsMETH,prefix);
 fprintf(bedFileIDVAR,'%s%s\n',hardCodedOptionsVAR,prefix);
 % ENTR
 fprintf(bedFileIDENTR,'%s%s\n',hardCodedOptionsENTR,prefix);
-
 % ESI
 if ESIflag
 	fprintf(bedFileIDESI,'%s%s\n',hardCodedOptionsESI,prefix);    
 end
-
+% MSI
+if MSIflag
+	fprintf(bedFileIDMSI,'%s%s\n',hardCodedOptionsMSI,prefix);    
+end
 % MC
 if MCflag
   	% TURN
@@ -308,13 +328,41 @@ for chrNum = minChrNum:maxChrNum
                     if ESIflag
                         ESI = regionStruct.ESI;
                         if isempty(ESI)
-                            fprintf(2,'Error: ESIflag = 1, but the previous methylation analysis step was run with ESIflag = 0.\n');
-                            fprintf(2,'Rerun this MATLAB function with ESIflag = 0 or rerun the previous methylation analysis step with ESIflag = 1.\n');
+                            fprintf(2,'Error: ESIflag = 1, but informME_run was run with ESIflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain ESI delete file:\n');
+			    fprintf(2,analysis_file); 
+                            fprintf(2,'Error: and run informME_run again with --ESI flag.\n');
                             fclose(bedFileIDMML);
                             fclose(bedFileIDNME);
                             fclose(bedFileIDMETH);
                             fclose(bedFileIDVAR);
                             fclose(bedFileIDENTR);
+                            fclose(bedFileIDESI);
+                            if MSIflag
+                                fclose(bedFileIDMSI);
+                            end
+                            if MCflag
+                                fclose(bedFileIDTURN);
+                                fclose(bedFileIDCAP);
+                                fclose(bedFileIDRDE);
+                            end
+                            return;
+                        end
+                    end
+                    
+                    if MSIflag
+                        MSI = regionStruct.MSI;
+                        if isempty(MSI)
+                            fprintf(2,'Error: MSIflag = 1, but informME_run was run with MSIflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain MSI delete file:\n');
+			    fprintf(2,analysis_file); 
+                            fprintf(2,'Error: and run informME_run again with --MSI flag.\n');
+                            fclose(bedFileIDMML);
+                            fclose(bedFileIDNME);
+                            fclose(bedFileIDMETH);
+                            fclose(bedFileIDVAR);
+                            fclose(bedFileIDENTR);
+                            fclose(bedFileIDMSI);
                             if ESIflag
                                 fclose(bedFileIDESI);
                             end
@@ -326,26 +374,29 @@ for chrNum = minChrNum:maxChrNum
                             return;
                         end
                     end
-                    
+
                     if MCflag
                         TURN = regionStruct.TURN;
                         CAP  = regionStruct.CAP;
                         RDE  = regionStruct.RDE;
                         if isempty(CAP) || isempty(RDE) || isempty(TURN)
-                            fprintf(2,'Error: MCflag = 1, but the previous methylation analysis step was run with MCflag = 0.\n');
-                            fprintf(2,'Rerun this MATLAB function with MCflag = 0 or rerun the previous methylationm analysis step with MCflag = 1.\n');
+                            fprintf(2,'Error: MCflag = 1, but informME_run was run with MCflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain MC delete file:\n');
+			    fprintf(2,analysis_file); 
+                            fprintf(2,'Error: and run informME_run again with --MC flag.\n');
                             fclose(bedFileIDMML);
                             fclose(bedFileIDNME);
                             fclose(bedFileIDMETH);
                             fclose(bedFileIDVAR);
                             fclose(bedFileIDENTR);
+                            fclose(bedFileIDTURN);
+                            fclose(bedFileIDCAP);
+                            fclose(bedFileIDRDE);
                             if ESIflag
                                 fclose(bedFileIDESI);
                             end
-                            if MCflag
-                                fclose(bedFileIDTURN);
-                                fclose(bedFileIDCAP);
-                                fclose(bedFileIDRDE);
+                            if MSIflag
+                                fclose(bedFileIDMSI);
                             end
                             return;
                         end
@@ -382,6 +433,10 @@ for chrNum = minChrNum:maxChrNum
                             if ESIflag
                                 ESIregion = ESI(subRegCount);
                             end
+
+                            if MSIflag
+                                MSIregion = MSI(subRegCount);
+                            end
                             
                             if MCflag
                                 TURNregion = TURN(subRegCount);
@@ -389,7 +444,7 @@ for chrNum = minChrNum:maxChrNum
                                 RDEregion  = RDE(subRegCount); 
                             end
                             
-                            % Print MML, ESI, TURN, CAP, and RDE.
+                            % Print MML, ESI, MSI, TURN, CAP, and RDE.
                             if MMLregion<inf
                                 fprintf(bedFileIDMML,formatSpec,...
                                              chr_str,int64(subStartBP-1),...
@@ -402,6 +457,12 @@ for chrNum = minChrNum:maxChrNum
                                               int64(subEndBP-1),ESIregion);
                             end
                             
+                            if  MSIflag && MSIregion<inf
+                                fprintf(bedFileIDMSI,formatSpec,...
+                                              chr_str,int64(subStartBP-1),...
+                                              int64(subEndBP-1),MSIregion);
+                            end
+
                             if MCflag && TURNregion<inf
                                 fprintf(bedFileIDTURN,formatSpec,...
                                               chr_str,int64(subStartBP-1),...
@@ -542,6 +603,10 @@ fclose(bedFileIDENTR);
 
 if ESIflag
 	fclose(bedFileIDESI);
+end
+
+if MSIflag
+	fclose(bedFileIDMSI);
 end
 
 if MCflag

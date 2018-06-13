@@ -22,7 +22,6 @@
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
 %%%%%%%%                 MethAnalysisForRegion.m                   %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 08/15/2017                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function performs methylation analysis of a genomic region used 
@@ -38,7 +37,7 @@
 % USAGE:
 %
 % regionStruct = MethAnalysisForRegion(localEstStruct,CpGlocs_local,...
-%                              startBP,endBP,subregionSize,ESIflag,MCflag)
+% 	startBP,endBP,subregionSize,ESIflag,MSIflag,MCflag)
 %
 % INPUTS:
 %
@@ -72,6 +71,13 @@
 %               1: allow ESI computation.
 %               Default value: 0
 %
+% MSIflag
+%               Flag that determines whether this function performs 
+%               computation of the methylation sensitivity index (MSI). 
+%               0: no MSI computation. 
+%               1: allow MSI computation.
+%               Default value: 0
+%
 % MCflag
 %               Flag that determines whether this function performs 
 %               computation of turnover ratios, CpG entropies, capacities, 
@@ -80,7 +86,6 @@
 %               0: no MC computations. 
 %               1: allow MC computations. 
 %               Default value: 0
-%
 % OUTPUT:
 %
 % regionStruct
@@ -95,50 +100,70 @@
 %               o Mean methylation levels.
 %               o Normalized methylation entropies.
 %               o Entropic sensitivity indices (if ESIflag = 1).
+%               o Methylation sensitivity indices (if MSIflag = 1).
 %               o Turnover ratios (if MCflag = 1).
 %               o Channel capacities (if MCflag = 1).
 %               o Relative dissipated energies (if MCflag = 1).
 %
 
 function regionStruct = MethAnalysisForRegion(localEstStruct,CpGlocs_local,...
-							   startBP,endBP,subregionSize,ESIflag,MCflag)
+	startBP,endBP,subregionSize,ESIflag,MSIflag,MCflag)
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Initialization.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Start base pairs for analysis subregions.
 subRegStartBPlist = startBP:subregionSize:endBP; 
-                              % Start base pairs for analysis subregions.
+
+% Number of analysis subregions.
 numSubRegions     = length(subRegStartBPlist); 
-                              % Number of analysis subregions.
+
+% Vector of 1's and 0's indicating whether a subregion is modeled (1) or not 
+% modeled (0).
 isModeled         = zeros(numSubRegions,1); 
-                              % Vector of 1's and 0's indicating whether a 
-                              % subregion is modeled (1) or not modeled (0).
+
+% Thresholds for determing coarse methylation level probabilities.
 thresh            = [0,0.25,0.5,0.75,1]; 
-                              % Thresholds for determing coarse methylation 
-                              % level probabilities.
+
+% Coarse methylation level probabilities.
 cLProbs           = zeros(numSubRegions,length(thresh)-1); 
-                              % Coarse methylation level probabilities.
+
+% Number of CpGs in each analysis subregion.
 Ncg               = zeros(numSubRegions,1); 
-                              % Number of CpGs in each analysis subregion.
+
+% Mean methylation level.
 MML               = zeros(numSubRegions,1); 
-                              % Mean methylation level.
+
+% Normalized methylation entropy.                
 NME               = zeros(numSubRegions,1); 
-                              % Normalized methylation entropy.
-                     
+                              
+% Entropic sensitivity index.                    
 if ESIflag
-	ESI = zeros(numSubRegions,1); % Entropic sensitivity index.
+	ESI = zeros(numSubRegions,1); 
 else
 	ESI = [];
 end
 
+% Methylation sensitivity index.
+if MSIflag
+	MSI = zeros(numSubRegions,1); 
+else
+	MSI = [];
+end
+
+% MC quantities
 if MCflag
-    TURN = zeros(numSubRegions,1); % Turnover ratio.
-    CAP  = zeros(numSubRegions,1); % Channel capacity.
-	RDE  = zeros(numSubRegions,1); % Relative dissipated energy.
+	% Turnover ratio.
+    	TURN = zeros(numSubRegions,1); 
+	% Channel capacity.
+    	CAP  = zeros(numSubRegions,1); 
+	% Relative dissipated energy.
+	RDE  = zeros(numSubRegions,1); 
 else
     TURN = [];
 	CAP  = [];
 	RDE  = [];
-
 end
 
 % Sparse matrix parameters. Used to store methylation level 
@@ -159,20 +184,20 @@ transProbs      = localEstStruct.transProbs;
 margProbs(margProbs<0) = 0;
 margProbs(margProbs>1) = 1;
 
-if ESIflag % Solve "differential" models for sensitivity analysis.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Solve "differential" models for sensitivity analysis.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if ESIflag || MSIflag
 	
 	epsilon = 0.01;
 	N = length(CpGlocs_local);
-
 	[Ana,Cna] = computeAnCn(densityInRegion,DistInRegion(1:(end-1)), ...
-							thetabest*(1+epsilon));
-
+		thetabest*(1+epsilon));
 	[logZ1a,logZ0a,logZa] = computeZ(Ana,Cna); 
 	[logZ1tildea,logZ0tildea,~] = computeZtilde(Ana,Cna); 
 	[p0a,transProbsa] = computeMCtransProbs(Ana,Cna,logZ1a,logZ0a,logZa); 
 
 	% Compute 1D marginal probabilities.
-    
 	margProbsa    = zeros(N,1); % Pr[X_n=1]
 	margProbsa(1) = 1-p0a;
 
@@ -183,7 +208,6 @@ if ESIflag % Solve "differential" models for sensitivity analysis.
 	end
 
 	% Correct numerical errors,
-    
 	margProbsa(margProbsa>(1-eps))   = 1-eps;
 	margProbsa(margProbsa<eps)       = eps;
 	transProbsa(transProbsa>(1-eps)) = 1-eps;
@@ -191,10 +215,10 @@ if ESIflag % Solve "differential" models for sensitivity analysis.
     
 end % End ESIflag.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Loop through analysis subregions.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 subRegCount = 0;
-
 for subRegStartBP = subRegStartBPlist
     
     subRegCount = subRegCount+1;
@@ -202,27 +226,24 @@ for subRegStartBP = subRegStartBPlist
     
     % Find CpG sites. 
     
-    [lower_index,upper_index] = findSortedIndices(CpGlocs_local,...
-											subRegStartBP,subRegEndBP);
+    [lower_index,upper_index] = findSortedIndices(CpGlocs_local,subRegStartBP,...
+	subRegEndBP);
     CpGlocs          = CpGlocs_local(lower_index:upper_index);
     Ncg(subRegCount) = length(CpGlocs);
     
     % Calculate methylation level probabilities in subregion. 
-    
     if Ncg(subRegCount) > 0
         
         isModeled(subRegCount) = 1; % Set flag - this subregion is modeled.
         
         % Compute mean methylation level within subregion.
-        
         MML(subRegCount) = mean(margProbs(lower_index:upper_index));
        
         % Compute normalized methylation entropy.
-
         if Ncg(subRegCount) >= 2 % Two or more CpGs.
            
             [LProbs,LVals,NMETemp] = computeLstats(margProbs(lower_index),...
-								transProbs(lower_index:(upper_index-1),:));
+	    	transProbs(lower_index:(upper_index-1),:));
             
             if sum(isnan(LProbs)) > 0
                 isModeled(subRegCount) = 0;
@@ -233,7 +254,6 @@ for subRegStartBP = subRegStartBPlist
             
             % Add probabilities to sparse matrix 
             % fullLProbs(subRegCount,1:length(LProbs)) = LProbs. 
-      
             for indexNum=1:length(LProbs)
                 vals(sparseIndex) = LProbs(indexNum);
                 rows(sparseIndex) = subRegCount;
@@ -242,7 +262,6 @@ for subRegStartBP = subRegStartBPlist
             end
 
             % Compute coarse methylation level probabilities. 
-            
             if ~isempty(LProbs(LVals==thresh(3)))
                 correction = (LProbs(LVals==thresh(3))/2);
             else
@@ -250,38 +269,48 @@ for subRegStartBP = subRegStartBPlist
             end
 
             % Pr[0 <= L <= 0.25]
-            cLProbs(subRegCount,1) = sum(LProbs((thresh(1)<=LVals)&...
-									       (LVals<=thresh(2))));
-			% Pr[0.25 < L < 0.5] + 0.5*Pr[L = 0.5]
-            cLProbs(subRegCount,2) = sum(LProbs((thresh(2)<LVals)&...
-									       (LVals<thresh(3)))) + correction; 
-			% 0.5*Pr[L = 0.5] + Pr[0.5 < L < 0.75]
-            cLProbs(subRegCount,3) = sum(LProbs((thresh(3)<LVals)&...
-									       (LVals<thresh(4)))) + correction; 
-			% Pr[0.75 <= L <= 1] 
-            cLProbs(subRegCount,4) = sum(LProbs((thresh(4)<=LVals)&...
-                                           (LVals<=thresh(5))));
+            cLProbs(subRegCount,1) = sum(LProbs((thresh(1)<=LVals)&(LVals<=thresh(2))));
+
+	    % Pr[0.25 < L < 0.5] + 0.5*Pr[L = 0.5]
+            cLProbs(subRegCount,2) = sum(LProbs((thresh(2)<LVals)&(LVals<thresh(3)))) + ...
+	    	correction; 
+
+	    % 0.5*Pr[L = 0.5] + Pr[0.5 < L < 0.75]
+            cLProbs(subRegCount,3) = sum(LProbs((thresh(3)<LVals)&(LVals<thresh(4)))) + ...
+	    	correction; 
+
+	    % Pr[0.75 <= L <= 1] 
+            cLProbs(subRegCount,4) = sum(LProbs((thresh(4)<=LVals)&(LVals<=thresh(5))));
                                        
+	    % Do sensitivity calculations
+            if ESIflag || MSIflag
+                [LProbsa,~,NMEa] = computeLstats(margProbsa(lower_index),...
+			transProbsa(lower_index:(upper_index-1),:));
+            end
+
+	    % ESI calculations.
             if ESIflag
-                % Do sensitivity calculation.
-                
-                [~,~,NMEa] = computeLstats(margProbsa(lower_index),...
-							   transProbsa(lower_index:(upper_index-1),:));
-		                    
                 if sum(isnan(NMEa))==0
                     Da = abs(NMEa-NME(subRegCount))*log2(Ncg(subRegCount)+1);
                     ESI(subRegCount) = Da/epsilon;
                 end
-                
+            end
+
+	    % MSI calculations. 
+            if MSIflag
+              	Dpqa =  sqrt(sum(LProbs(LProbs>0).*log2(2.*LProbs(LProbs>0)./...
+			(LProbs(LProbs>0)+LProbsa(LProbs>0))))/2 ...
+                	+ sum(LProbsa(LProbsa>0).*log2(2.*LProbsa(LProbsa>0)./...
+			(LProbs(LProbsa>0)+LProbsa(LProbsa>0))))/2);
+		MSI(subRegCount) = Dpqa / epsilon;
+		%fprintf(2,[num2str(subRegCount) ':' num2str(MSI(subRegCount)) '\n']);
             end
               
         else % Ncg(subRegCount) == 1
             
             % Just use exact marginal probabilities.
-            
             cLProbs(subRegCount,1) = 1-margProbs(lower_index);
             cLProbs(subRegCount,4) = margProbs(lower_index);
-            
             NME(subRegCount) = ...
                 -margProbs(lower_index).*log2(margProbs(lower_index))...
                 -(1-margProbs(lower_index)).*log2(1-margProbs(lower_index));
@@ -289,38 +318,43 @@ for subRegStartBP = subRegStartBPlist
             % Add methylation level probabilities to sparse matrix 
             % fullLProbs(subRegCount,1:2) = 
             %            [1-margProbs(lower_index),margProbs(lower_index)];
-          
-            vals(sparseIndex)   = 1-margProbs(lower_index);
+            vals(sparseIndex)   = 1 - margProbs(lower_index);
             vals(sparseIndex+1) = margProbs(lower_index);
             rows(sparseIndex)   = subRegCount;
             rows(sparseIndex+1) = subRegCount;
             cols(sparseIndex)   = 1;
             cols(sparseIndex+1) = 2;
-            sparseIndex=sparseIndex+2;
+            sparseIndex		= sparseIndex + 2;
             
-            if ESIflag
-                
-                % Do sensitivity calculation.
-                
+            % Do sensitivity calculations.
+            if ESIflag || MSIflag
+                LProbs = [1-margProbs(lower_index);margProbs(lower_index)];
                 LProbsa = [1-margProbsa(lower_index);margProbsa(lower_index)];
+	    end
+	    % ESI calculations.
+	    if ESIflag
                 NMEa    = -LProbsa'*log2(LProbsa);
                 Da      = abs(NMEa-NME(subRegCount));
                 ESI(subRegCount) = Da/epsilon;
-                
             end
-                
+	    % MSI calculations.
+	    if MSIflag
+              	Dpqa =  sqrt(sum(LProbs(LProbs>0).*log2(2.*LProbs(LProbs>0)./...
+			(LProbs(LProbs>0)+LProbsa(LProbs>0))))/2 ...
+                	+ sum(LProbsa(LProbsa>0).*log2(2.*LProbsa(LProbsa>0)./...
+			(LProbs(LProbsa>0)+LProbsa(LProbsa>0))))/2);
+		MSI(subRegCount) = Dpqa / epsilon;
+		%fprintf(2,[num2str(subRegCount) ':' num2str(MSI(subRegCount)) '\n']);
+            end
         end % End if Ncg(subRegCount) >= 2.
         
         if MCflag
-            
             % Compute average turnover ratio within subregion.
-            
             lambdaVals = margProbs(lower_index:upper_index)...
                              ./(1-margProbs(lower_index:upper_index));
             TURN(subRegCount) = mean(log2(lambdaVals));
             
             % Compute average capacity within subregion.
-            
             CAPvals = zeros(size(lambdaVals));
             CAPvals(lambdaVals>=1) = 1-0.52.*h_func(lambdaVals(lambdaVals>=1)...
               ./(1+lambdaVals(lambdaVals>=1)))./(1+lambdaVals(lambdaVals>=1));
@@ -330,7 +364,6 @@ for subRegStartBP = subRegStartBPlist
             CAP(subRegCount) = mean(CAPvals);
             
             % Compute average relative dissipated energy within subregion.
-            
             RDEvals = zeros(size(lambdaVals));
             RDEvals(lambdaVals<1) = log2((1+lambdaVals(lambdaVals<1))...
                                     ./(2*lambdaVals(lambdaVals<1))) + 4.76;
@@ -346,14 +379,12 @@ end % End loop over analysis subregions.
  
 % Create sparse matrix fullProbs with rows containing the probability
 % distribution of L. 
-
 sparseIndex = sparseIndex-1;
 fullLProbs  = sparse(rows(1:sparseIndex),cols(1:sparseIndex),...
-                           vals(1:sparseIndex),numSubRegions,...
-                           max(cols(1:sparseIndex)));
+	vals(1:sparseIndex),numSubRegions,...
+	max(cols(1:sparseIndex)));
 
 % Save all results into a structure. 
-
 regionStruct = struct('CpGlocs_local',CpGlocs_local,...
                       'Ncg',double(Ncg),...
                       'isModeled',double(isModeled),...
@@ -363,8 +394,9 @@ regionStruct = struct('CpGlocs_local',CpGlocs_local,...
                       'MML',MML,...
                       'NME',double(NME),...
                       'ESI',ESI,...
+                      'MSI',MSI,...
                       'TURN',TURN,...
-					  'CAP',CAP,...
-					  'RDE',RDE);
+		      'CAP',CAP,...
+		      'RDE',RDE);
 
 end

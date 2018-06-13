@@ -1,4 +1,0 @@
-track type=bedGraph visibility=dense windowingFunction=mean autoScale=off viewLimits=-2.0:2.0 name=METH-estimation_test
-chr1            0          149 2.000000
-chr1          150          299 2.000000
-chr1          300          390 2.000000

@@ -16,5 +16,5 @@
 max_proc=4
 
 # Run
-getMatrices.sh -c 1 -t 10 -q "$max_proc" -- toy_normal_pe "${SGE_TASK_ID}"
-getMatrices.sh -c 1 -t 10 -q "$max_proc" -- toy_cancer_pe "${SGE_TASK_ID}"
+getMatrices.sh -c 1 -t 10 -q "$max_proc" toy_normal_pe "${SGE_TASK_ID}"
+getMatrices.sh -c 1 -t 10 -q "$max_proc" toy_cancer_pe "${SGE_TASK_ID}"

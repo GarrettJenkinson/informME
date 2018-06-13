@@ -52,11 +52,13 @@ matlab_library="${aux}/matlab_src/"
 matlab_function="mergeMethAnalysis"
 
 # Getopt command
-TEMP="$(getopt -o hr:b:m:e:a:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,outdir:,ESI,MC,MATLICENSE: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hr:b:m:e:a:d:l: -l help,refdir:,bamdir:,matdir:,estdir:,analdir:,outdir:,ESI,MSI,MC,MATLICENSE: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo "Terminating..." >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  cat "$script_absdir"/${script_name}_help.txt
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -71,6 +73,7 @@ estdir="$INTERDIR"
 analdir="$INTERDIR"
 outdir="$INTERDIR"
 ESI=0
+MSI=0
 MC=0
 
 # Options
@@ -109,6 +112,10 @@ do
       ESI=1
       shift 1
       ;;  
+    --MSI)
+      MSI=1
+      shift 1
+      ;;  
     --MC)
       MC=1
       shift 1
@@ -121,12 +128,25 @@ do
       shift
       break
       ;;  
-    *)  
-      echo "$script_name.sh:Internal error!"
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      cat "$script_absdir"/${script_name}_help.txt
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
+
+# Check number of arguments and copy them
+if [ "$#" -ne 3 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   cat "$script_absdir"/${script_name}_help.txt
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
+prefix="$1"
+chr_num="$2"
+total_proc="$3"
 
 # Check valid outdir
 if [ -z "$outdir" ];then
@@ -146,11 +166,6 @@ then
    exit -1
 fi
 
-# Get inputs
-prefix="$1"
-chr_num="$2"
-total_proc="$3"
-
 # Output directory
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
@@ -164,10 +179,11 @@ echo "[$(date)]: Processing chromosome: ${chr_num}"
 echo "[$(date)]: Reference found in: ${refdir}" 
 echo "[$(date)]: Model found in: ${estpath}" 
 echo "[$(date)]: ESI flag: ${ESI}" 
+echo "[$(date)]: MSI flag: ${MSI}" 
 echo "[$(date)]: MC flag: ${MC}" 
 
 # Generate command and options
-cmd="${matlab_function}('$analdir','$prefix','$chr_num','$refdir','$estdir','outdir','$outdir','ESI',$ESI,'MC',$MC,'totalProcessors',$total_proc)"
+cmd="${matlab_function}('$analdir','$prefix','$chr_num','$refdir','$estdir','outdir','$outdir','ESI',$ESI,'MSI',$MSI,'MC',$MC,'totalProcessors',$total_proc)"
 options="-nodesktop -singleCompThread -nojvm -nosplash -nodisplay "
 
 # Add license in case it is provided

@@ -47,11 +47,13 @@ else
 fi
 
 # Getopt command
-TEMP="$(getopt -o hr:m:e:d:l:q: -l help,refdir:,matdir:,estdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
+TEMP="$(getopt -q -o hr:m:e:d:l:q: -l help,refdir:,matdir:,estdir:,tmpdir:,outdir:,MATLICENSE:,threads:,time_limit:,total_part: -n "$script_name.sh" -- "$@")"
 
-if [ $? -ne 0 ] 
+if [ $? -ne 0 ]
 then
-  echo -e "[$(date)]:\e[31m Error in input args. Terminating...\e[0m" >&2
+  echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+  cat "$script_absdir"/${script_name}_help.txt
+  echo "[$(date)]: Terminating" >&2
   exit -1
 fi
 
@@ -115,19 +117,32 @@ do
       shift
       break
       ;;  
-    *)  
-      echo -e "\e[31m $script_name.sh:Internal error parsing args. Terminating...\e[0m" >&2
+    *)
+      echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+      cat "$script_absdir"/${script_name}_help.txt
+      echo "[$(date)]: Terminating" >&2
       exit -1
-      ;;  
+      ;;
   esac
 done
 
-# Get inputs
+# Check number of arguments and copy them
+if [ "$#" -ne 3 ]; then
+   echo -e "[$(date)]: \e[31mERROR: Command not valid. Check usage ...\e[0m" >&2
+   cat "$script_absdir"/${script_name}_help.txt
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
 mat_files="$1"
 prefix="$2"
 chr_num="$3"
 
-# Output directory
+# Check valid outdir
+if [ -z "$outdir" ];then
+   echo -e "[$(date)]: \e[31mERROR: Output directory is empty string ...\e[0m" >&2
+   echo "[$(date)]: Terminating" >&2
+   exit -1
+fi
 mkdir -p "$outdir"
 mkdir -p "${outdir}/chr${chr_num}"
 
@@ -176,7 +191,7 @@ fi
 SECONDS=0
 echo "[$(date)]: Call: singleMethAnalysis.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$tmpdir' --MC --ESI -- '$prefix' '$chr_num' '$total_part' {X}"
+seq "$total_part" | xargs -I {X} --max-proc "$threads" bash -c "timeout --signal=SIGINT '$time_limit'm singleMethAnalysis.sh -r '$refdir' -m '$matdir' -e '$estdir' -d '$tmpdir' --MC --ESI --MSI -- '$prefix' '$chr_num' '$total_part' {X}"
 
 # Check if everything OK
 EXITCODE="$?"
@@ -194,7 +209,7 @@ fi
 # Merge analysis blocks
 echo "[$(date)]: Call: mergeSingleMethAnalysis.sh ..." 
 echo "[$(date)]: Processing chromosome: ${chr_num}" 
-mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" --MC --ESI -- "$prefix" "$chr_num" "$total_part"
+mergeSingleMethAnalysis.sh -r "$refdir" -e "$estdir" -a "$tmpdir" -d "$outdir" --MC --ESI --MSI -- "$prefix" "$chr_num" "$total_part"
 
 # Check if everything OK
 if [ $? -ne 0 ] 

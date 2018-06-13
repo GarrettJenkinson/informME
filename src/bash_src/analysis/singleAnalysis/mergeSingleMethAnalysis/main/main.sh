@@ -27,17 +27,17 @@ cp -r ../../singleMethAnalysis/main/out/ input
 # Execute command for normal toy
 echo "Processing normal..."
 seq 5 | xargs -I {X} \
-bash -c '../mergeSingleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -a input/ -d out/ --MC --ESI -- toy_normal {X} 4' 1>/dev/null
+bash -c '../mergeSingleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -a input/ -d out/ --MC --ESI --MSI toy_normal {X} 4' 1>/dev/null
 
 # Execute command for cancer toy
 echo "Processing cancer..."
 seq 5 | xargs -I {X} \
-bash -c '../mergeSingleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -a input/ -d out/ --MC --ESI -- toy_cancer {X} 4' 1>/dev/null
+bash -c '../mergeSingleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -a input/ -d out/ --MC --ESI --MSI toy_cancer {X} 4' 1>/dev/null
 
 # Execute command for pooled toy
 echo "Processing pooled..."
 seq 5 | xargs -I {X} \
-bash -c '../mergeSingleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -a input/ -d out/ --MC --ESI -- toy_pooled {X} 4' 1>/dev/null
+bash -c '../mergeSingleMethAnalysis.sh -r ../../../../parseBamFile/fastaToCpg/main/ -e ../../../../modeling/mergeEstimation/main/out/ -a input/ -d out/ --MC --ESI --MSI toy_pooled {X} 4' 1>/dev/null
 
 # Remove input
 rm -rf input

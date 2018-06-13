@@ -2,20 +2,21 @@ Description:
     This function merges the output of singleMethAnalysis into a single hashtable.
 
 Usage:
-    mergeSingleMethAnalysis.sh [options] -- PREFIX CHR_NUM TOTAL_PROC
+    mergeSingleMethAnalysis.sh [options] PHENO CHR_NUM TOTAL_PROC
 
 Options:
-    -h|--help           Help.
-    -r|--refdir         Reference genome directory. Default: $REFGENEDIR.
-    -e|--estdir         Estimation directory. Default: $INTERDIR.
-    -a|--analdir        Analysis directory. Default: $INTERDIR.
-    -d|--outdir         Output directory. Default: $INTERDIR.
-    -l|--MATLICENSE     Path to MATLAB's License. Default: <NA>.
-    --MC                Computation of information theory metrics. Default: 0.
-    --ESI               Computation of entropic sensivity index (ESI). Default: 0.
+    -h|--help           help
+    -r|--refdir         reference genome directory (default: $REFGENEDIR)
+    -e|--estdir         estimation directory (default: $INTERDIR)
+    -a|--analdir        analysis directory (default: $INTERDIR)
+    -d|--outdir         output directory (default: $INTERDIR)
+    -l|--MATLICENSE     path to MATLAB's License (default: <NA>)
+    --MC                do computation of information theory metrics
+    --ESI               do computation of entropic sensivity index (ESI)
+    --MSI               do computation of methylation sensivity index (MSI)
 
 Examples:
-    mergeSingleMethAnalysis.sh -d out --MC --ESI -- normal 1 1
+    mergeSingleMethAnalysis.sh -d out --MC --ESI --MSI normal 1 1
 
 Output:
     MATLAB .mat files containing information about the analysis for an entire chormosome. 

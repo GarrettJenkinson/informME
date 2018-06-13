@@ -22,7 +22,6 @@
 %%%%%%%%  informME: Information-Theoretic analysis of Methylation  %%%%%%%%
 %%%%%%%%                   methAnalysisForChr.m                    %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 12/08/2016                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function performs methylation analysis of a given chromosome in a 
@@ -92,6 +91,13 @@
 %               1: allow ESI computation.
 %               Default value: 1
 %
+% MSIflag
+%               Flag that determines whether this function performs
+%               computation of the methylation sensitivity index (MSI).
+%               0: no MSI computation.
+%               1: allow MSI computation.
+%               Default value: 0
+%
 % MCflag
 %               Flag that determines whether this function performs 
 %               computation of turnover ratios, CpG entropies, capacities, 
@@ -129,6 +135,8 @@ addParameter(p,'outdir',['.' filesep 'results' filesep],...
                	@(x)validateattributes(x,{'char'},{'nonempty'}))
 addParameter(p,'ESIflag',0,...
                	@(x)validateattributes(x,{'numeric'},{'nonempty','scalar'}))
+addParameter(p,'MSIflag',0,...
+               	@(x)validateattributes(x,{'numeric'},{'nonempty','scalar'}))
 addParameter(p,'MCflag',0,...
                	@(x)validateattributes(x,{'numeric'},{'nonempty','scalar'}))
 addParameter(p,'totalProcessors',1,@(x)validateattributes(x,{'numeric'},...
@@ -146,6 +154,7 @@ totalProcessors     = p.Results.totalProcessors;
 processorNum        = p.Results.processorNum;
 outdir              = p.Results.outdir;
 ESIflag             = p.Results.ESIflag;
+MSIflag             = p.Results.MSIflag;
 MCflag              = p.Results.MCflag;
 regionSize          = p.Results.regionSize;
 subregionSize       = p.Results.subregionSize;
@@ -219,7 +228,7 @@ for startBP = thisProcessorStartBPs
 
             % Estimate parameters for this region.
             FDregionStruct = methAnalysisForRegion(localEstStruct,CpGlocs_local,...
-						startBP,endBP,subregionSize,ESIflag,MCflag);
+						startBP,endBP,subregionSize,ESIflag,MSIflag,MCflag);
             mapObjTemp(locationPathName) = FDregionStruct;
         end
     catch ME

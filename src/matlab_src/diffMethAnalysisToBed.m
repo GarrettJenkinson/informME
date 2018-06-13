@@ -22,7 +22,6 @@
 %%%%%%%%  informME: Information-Theoretic Analysis of Methylation  %%%%%%%%
 %%%%%%%%               makeBEDsForDiffMethAnalysis.m               %%%%%%%%
 %%%%%%%%          Code written by: W. Garrett Jenkinson            %%%%%%%%
-%%%%%%%%                Last Modified: 12/09/2016                  %%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function makes BED files for the differential version of the 
@@ -79,6 +78,13 @@
 %               computation of the entropic sensitivity index (ESI). 
 %               0: no ESI computation. 
 %               1: allow ESI computation.
+%               Default value: 0
+%
+% MSIflag
+%               Flag that determines whether this function performs 
+%               computation of the methylation sensitivity index (MSI). 
+%               0: no MSI computation. 
+%               1: allow MSI computation.
 %               Default value: 0
 %
 % MCflag
@@ -148,6 +154,7 @@ addParameter(p,'minChrNum',1,@(x)validateattributes(x,{'numeric'},...
 addParameter(p,'maxChrNum',22,@(x)validateattributes(x,{'numeric'},...
 		{'nonempty','integer','positive','scalar'}))
 addParameter(p,'ESIflag',0,@(x)validateattributes(x,{'numeric'},{'nonempty','scalar'}))
+addParameter(p,'MSIflag',0,@(x)validateattributes(x,{'numeric'},{'nonempty','scalar'}))
 addParameter(p,'MCflag',0,@(x)validateattributes(x,{'numeric'},{'nonempty','scalar'}))
 addParameter(p,'regionSize',int64(3000),@(x)validateattributes(x,{'numeric'},...
 		{'nonempty','integer','positive','scalar'}))
@@ -168,6 +175,7 @@ minChrNum       = p.Results.minChrNum;
 maxChrNum       = p.Results.maxChrNum;
 outdir          = p.Results.outdir;
 ESIflag         = p.Results.ESIflag;
+MSIflag         = p.Results.MSIflag;
 MCflag          = p.Results.MCflag;
 regionSize      = p.Results.regionSize;
 subregionSize   = p.Results.subregionSize;
@@ -215,6 +223,11 @@ if ESIflag
 	hardCodedOptionsdESI = 'track type=bedGraph visibility=full windowingFunction=mean autoScale=on name=dESI-';
 end
 
+if MSIflag
+	% dMSI
+	hardCodedOptionsdMSI = 'track type=bedGraph visibility=full windowingFunction=mean autoScale=on name=dMSI-';
+end
+
 if MCflag
 	% dCAP
 	hardCodedOptionsdCAP = 'track type=bedGraph visibility=full windowingFunction=mean autoScale=off viewLimits=-1.0:1.0 name=dCAP-';
@@ -257,6 +270,12 @@ if ESIflag
 	bedFileIDdESI   = fopen(bedFileNamedESI,'w');
 end
 
+if MSIflag
+    % dMSI
+	bedFileNamedMSI = [outdir 'dMSI-' prefix_1 '-VS-' prefix_2 '.bed'];
+	bedFileIDdMSI   = fopen(bedFileNamedMSI,'w');
+end
+
 if MCflag
 	% dCAP
 	bedFileNamedCAP = [outdir 'dCAP-' prefix_1 '-VS-' prefix_2 '.bed'];
@@ -287,6 +306,11 @@ fprintf(bedFileIDJSD,'%s%s-VS-%s\n',hardCodedOptionsJSD,prefix_1,prefix_2);
 if ESIflag
 	% dESI
 	fprintf(bedFileIDdESI,'%s%s-VS-%s\n',hardCodedOptionsdESI,prefix_1,prefix_2);
+end
+
+if MSIflag
+	% dMSI
+	fprintf(bedFileIDdMSI,'%s%s-VS-%s\n',hardCodedOptionsdMSI,prefix_1,prefix_2);
 end
 
 if MCflag
@@ -365,14 +389,43 @@ for chrNum = minChrNum:maxChrNum
                     if ESIflag
                         ESI1 = regionStruct1.ESI;
                         if isempty(ESI1)
-                            fprintf(2,'Error: ESIflag = 1, but the previous methylation analysis step was run with ESIflag = 0.\n');
-                            fprintf(2,'Rerun this MATLAB function with ESIflag = 0 or rerun the previous methylation analysis step with ESIflag = 1.\n');
+                            fprintf(2,'Error: ESIflag = 1, but informME_run was run with ESIflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain ESI delete file:\n');
+                            fprintf(2,analysis_file_1);
+                            fprintf(2,'Error: and run informME_run again with --ESI flag.\n');
                             fclose(bedFileIDdMML);
                             fclose(bedFileIDDMU);
                             fclose(bedFileIDdNME);
                             fclose(bedFileIDDEU);
                             fclose(bedFileIDJSD);
                             fclose(bedFileIDdESI);
+                            if MSIflag
+                                fclose(bedFileIDdMSI);
+                            end
+                            if MCflag
+                                fclose(bedFileIDdCAP);
+                                fclose(bedFileIDdRDE);
+                            end
+                            return;
+                        end
+                    end
+
+                    if MSIflag
+                        MSI1 = regionStruct1.MSI;
+                        if isempty(MSI1)
+                            fprintf(2,'Error: MSIflag = 1, but informME_run was run with MSIflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain MSI delete file:\n');
+                            fprintf(2,analysis_file_1);
+                            fprintf(2,'Error: and run informME_run again with --MSI flag.\n');
+                            fclose(bedFileIDdMML);
+                            fclose(bedFileIDDMU);
+                            fclose(bedFileIDdNME);
+                            fclose(bedFileIDDEU);
+                            fclose(bedFileIDJSD);
+                            fclose(bedFileIDdMSI);
+                            if ESIflag
+                                fclose(bedFileIDdESI);
+                            end
                             if MCflag
                                 fclose(bedFileIDdCAP);
                                 fclose(bedFileIDdRDE);
@@ -385,18 +438,23 @@ for chrNum = minChrNum:maxChrNum
                         CAP1 = regionStruct1.CAP;
                         RDE1 = regionStruct1.RDE;
                         if isempty(CAP1) || isempty(RDE1)
-                            fprintf(2,'Error: MCflag = 1, but the previous methylation analysis step was run with MCflag = 0.\n');
-                            fprintf(2,'Rerun this MATLAB function with MCflag = 0 or rerun the previous methylation analysis step with MCflag = 1.\n');
+                            fprintf(2,'Error: MCflag = 1, but informME_run was run with MCflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain MC delete file:\n');
+                            fprintf(2,analysis_file_1);
+                            fprintf(2,'Error: and run informME_run again with --MC flag.\n');
                             fclose(bedFileIDdMML);
                             fclose(bedFileIDDMU);
                             fclose(bedFileIDdNME);
                             fclose(bedFileIDDEU);
                             fclose(bedFileIDJSD);
+                            fclose(bedFileIDdCAP);
+                            fclose(bedFileIDdRDE);
                             if ESIflag
                                 fclose(bedFileIDdESI);
                             end
-                            fclose(bedFileIDdCAP);
-                            fclose(bedFileIDdRDE);
+                            if MSIflag
+                                fclose(bedFileIDdMSI);
+                            end
                             return;
                         end
                     end
@@ -411,14 +469,43 @@ for chrNum = minChrNum:maxChrNum
                     if ESIflag
                         ESI2 = regionStruct2.ESI;
                         if isempty(ESI2)
-                            fprintf(2,'Error: ESIflag = 1, but the previous methylation analysis step was run with ESIflag = 0.\n');
-                            fprintf(2,'Rerun this MATLAB function with ESIflag = 0 or rerun the previous methylation analysis step with ESIflag = 1.\n');
+                            fprintf(2,'Error: ESIflag = 1, but informME_run was run with ESIflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain ESI delete file:\n');
+                            fprintf(2,analysis_file_2);
+                            fprintf(2,'Error: and run informME_run again with --ESI flag.\n');
                             fclose(bedFileIDdMML);
                             fclose(bedFileIDDMU);
                             fclose(bedFileIDdNME);
                             fclose(bedFileIDDEU);
                             fclose(bedFileIDJSD);
                             fclose(bedFileIDdESI);
+                            if MSIflag
+                                fclose(bedFileIDdMSI);
+                            end
+                            if MCflag
+                                fclose(bedFileIDdCAP);
+                                fclose(bedFileIDdRDE);
+                            end
+                            return;
+                        end
+                    end
+
+                    if MSIflag
+                        MSI2 = regionStruct2.MSI;
+                        if isempty(MSI2)
+                            fprintf(2,'Error: MSIflag = 1, but informME_run was run with MSIflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain MSI delete file:\n');
+                            fprintf(2,analysis_file_2);
+                            fprintf(2,'Error: and run informME_run again with --MSI flag.\n');
+                            fclose(bedFileIDdMML);
+                            fclose(bedFileIDDMU);
+                            fclose(bedFileIDdNME);
+                            fclose(bedFileIDDEU);
+                            fclose(bedFileIDJSD);
+                            fclose(bedFileIDdMSI);
+                            if ESIflag
+                                fclose(bedFileIDdESI);
+                            end
                             if MCflag
                                 fclose(bedFileIDdCAP);
                                 fclose(bedFileIDdRDE);
@@ -431,33 +518,40 @@ for chrNum = minChrNum:maxChrNum
                         CAP2 = regionStruct2.CAP;
                         RDE2 = regionStruct2.RDE;
                         if isempty(CAP2) || isempty(RDE2)
-                            fprintf(2,'Error: MCflag = 1, but the previous methylation analysis step was run with MCflag = 0.\n');
-                            fprintf(2,'Rerun this MATLAB function with MCflag = 0 or rerun the previous methylation analysis step with MCflag = 1.\n');
+                            fprintf(2,'Error: MCflag = 1, but informME_run was run with MCflag = 0.\n');
+                            fprintf(2,'Error: In order to obtain MC delete file:\n');
+                            fprintf(2,analysis_file_2);
+                            fprintf(2,'Error: and run informME_run again with --MC flag.\n');
                             fclose(bedFileIDdMML);
                             fclose(bedFileIDDMU);
                             fclose(bedFileIDdNME);
                             fclose(bedFileIDDEU);
                             fclose(bedFileIDJSD);
+                            fclose(bedFileIDdCAP);
+                            fclose(bedFileIDdRDE);
                             if ESIflag
                                 fclose(bedFileIDdESI);
                             end
-                            fclose(bedFileIDdCAP);
-                            fclose(bedFileIDdRDE);
+                            if MSIflag
+                                fclose(bedFileIDdMSI);
+                            end
                             return;
                         end
                     end
 
                     if sum(Ncg1~=Ncg2)
                         fprintf(2,'ERROR: number of CpG sites are different in the two phenotypes\n');
-                        ME = MException('VerifyOutput:OutOfBounds', ...
-                                    'Results are outside allowable limits');
-					              fclose(bedFileIDdMML);
+                        ME = MException('VerifyOutput:OutOfBounds','Results are outside allowable limits');
+			fclose(bedFileIDdMML);
                         fclose(bedFileIDDMU);
-						            fclose(bedFileIDdNME);
-						            fclose(bedFileIDDEU);
-						            fclose(bedFileIDJSD);
+			fclose(bedFileIDdNME);
+			fclose(bedFileIDDEU);
+			fclose(bedFileIDJSD);
                         if ESIflag
                             fclose(bedFileIDdESI);
+                        end
+                        if MSIflag
+                            fclose(bedFileIDdMSI);
                         end
                         if MCflag
                             fclose(bedFileIDdCAP);
@@ -495,7 +589,7 @@ for chrNum = minChrNum:maxChrNum
                                 continue; % Move onto next subregion.
                             end
 
-                            % Print dNME, dESI, dCAP, dRDE
+                            % Print dNME, dESI, dMSI, dCAP, dRDE
                             
                             dNMERegion = NME1(subRegCount)-NME2(subRegCount);
                             
@@ -511,6 +605,15 @@ for chrNum = minChrNum:maxChrNum
                                     fprintf(bedFileIDdESI,formatSpec,...
                                         chr_str,int64(subStartBP-1),...
                                         int64(subEndBP-1),dESI);
+                                end
+                            end
+
+                            if MSIflag
+                                dMSI = MSI1(subRegCount)-MSI2(subRegCount);
+                                if dMSI < inf
+                                    fprintf(bedFileIDdMSI,formatSpec,...
+                                        chr_str,int64(subStartBP-1),...
+                                        int64(subEndBP-1),dMSI);
                                 end
                             end
                                    
@@ -738,6 +841,9 @@ fclose(bedFileIDDEU);
 fclose(bedFileIDJSD);
 if ESIflag
 	fclose(bedFileIDdESI);
+end
+if MSIflag
+	fclose(bedFileIDdMSI);
 end
 if MCflag
 	fclose(bedFileIDdCAP);

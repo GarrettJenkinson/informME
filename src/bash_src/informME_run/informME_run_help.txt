@@ -21,13 +21,14 @@ Description:
     o coarse methylation level probabilities
     o mean methylation levels
     o normalized methylation entropies
-    o entropic sensitivity indices (if ESIflag = 1)
-    o turnover ratios (if MCflag = 1)
-    o channel capacities (if MCflag = 1)
-    o relative dissipated energies (if MCflag = 1)
+    o entropic sensitivity indices
+    o methylation sensitivity indices
+    o turnover ratios
+    o channel capacities
+    o relative dissipated energies
 
 Usage:
-    informME_run.sh  [OPTIONS]  -- MAT_FILES PHENO CHR_NUM
+    informME_run.sh  [OPTIONS]  MAT_FILES PHENO CHR_NUM
 
 Mandatory arguments:
     o MAT_FILES: list of methylation matrices to be modeled
@@ -47,9 +48,9 @@ Options:
 
 Example:
     * Running informME on chromosome 1 using 5 threads:
-    	informME_run.sh -q 5 -- sample1 pheno_1 1
+    	informME_run.sh -q 5 sample1 pheno_1 1
     * Running informME on chromosome 1 using 5 threads and 3 samples pooled into one model:
-    	informME_run.sh -q 5 -- sample2,sample3,sample4 pheno_2 1
+    	informME_run.sh -q 5 sample2,sample3,sample4 pheno_2 1
 
 Output:
     MATLAB .mat file

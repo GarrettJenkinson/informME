@@ -2,7 +2,7 @@ Description:
     Compile all .cpp source files and generates .mex binary files to be called by MATLAB.
 
 Usage:
-    mexSource.sh  [options]  -- EIGEN_PATH MPFR_INCLUDE MPFR_LIB
+    mexSource.sh  [options]  EIGEN_PATH MPFR_INCLUDE MPFR_LIB
 
 Options:
     -h|--help           Help.
