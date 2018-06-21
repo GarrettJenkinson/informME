@@ -1,6 +1,6 @@
 %
 % Permission was provided by the author, Ali Mahammad-Djafari, 
-% to modify and distribute this MATLAB code with the informME 
+% to modify and distribute this code with the informME 
 % package. Contact the original author directly for use outside 
 % this package.
 %
