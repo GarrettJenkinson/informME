@@ -7,6 +7,9 @@
 % Author's website:
 % http://djafari.free.fr/index.htm
 % 
+% Author's paper with source code:
+% Mohammad-Djafari A. (1992) A Matlab Program to Calculate the Maximum Entropy Distributions. In: Smith C.R., Erickson G.J., Neudorfer P.O. (eds) Maximum Entropy and Bayesian Methods. Fundamental Theories of Physics (An International Book Series on The Fundamental Theories of Physics: Their Clarification, Development and Application), vol 50. Springer, Dordrecht
+%
 
 function [lambda,p,entr] = maxent(mu,x,lambda0)
 %
