@@ -261,8 +261,7 @@ where
 
 usage (when no replicate reference data is available) 
 
-    setwd("/path/to/informME/src/R_src/")
-    source("jsDMR.R") 
+    source("/path/to/informME/src/R_src/jsDMR.R") 
     runNoReplicateDMR(JSDfile,inFolder,outFolder)
 
 where
@@ -280,12 +279,11 @@ NOTE 2: For this utilities, the following tools must be installed in R: rtrackla
 D.6.3. GENE RANKING
 -------------------
 
-The user can use a provided utility to rank all Human genes in the Bioconductor library TxDb.Hsapiens.UCSC.hg19.knownGene using the Jensen-Shannon distance (JSD) based on the method described in [2]. This utility must be run within an R session.
+The user can use a provided utility to rank all Human genes in the Bioconductor library TxDb.Hsapiens.UCSC.hg19.knownGene using the average mutual information based on the method described in [3]. This utility must be run within an R session.
 
 usage (when replicate reference data is available):
 
-    setwd("path/to/informME/src/R_src/")
-    source("jsGrank.R")
+    source("/path/to/informME/src/R_src/jsGrank.R")
     rankGenes(refVrefFiles,testVrefFiles,inFolder,outFolder,tName,rName)
 
 where 
@@ -302,9 +300,9 @@ where
 
 * rName is a string providing a name for the reference phenotype
 
-In this case, the function generates the file gRank-JSD-tName-VS-rName.xlsx.
+In this case, the function generates the file gRank-JSD-tName-VS-rName.tsv.
 
-usage (when no replicate reference data is available):  
+usage (when no replicate reference data is available and rankings will be done by average promoter JSD):  
 
     setwd("path/to/informME/src/R_src/")
     source("jsGrank.R")
@@ -321,11 +319,46 @@ outFolder is the directory used to write the result in an .xlsx file
 
 * rName is a string providing a name for the reference phenotype
 
-In this case, the function generates the file gRankRRD-JSD-tName-VS-rName.xlsx.
+In this case, the function generates the file gRankProms-JSD-tName-VS-rName.tsv.
 
 NOTE 1: More information about this utility can be found in informME/src/R\_src/postprocess/README.txt
 
-NOTE 2: For this utility, the following tools must be installed in R: GenomicFeatures, GenomicRanges, Homo.sapiens, rtracklayer, TxDb.Hsapiens.UCSC.hg19.knownGene, XLConnect
+NOTE 2: For this utility, the following tools must be installed in R: GenomicFeatures, GenomicRanges, rtracklayer, TxDb.Hsapiens.UCSC.hg19.knownGene, gamlss, Homo.sapiens
+
+D.6.4. REGION RANKING
+---------------------
+
+The user can use a provided utility to rank all regions in a BED file using the average mutual information based on the method described in [3]. This utility must be run within an R session.
+
+usage (replicate reference data is required):
+
+    source("/path/to/informME/src/R_src/jsGrank.R")
+    rankRegions(refVrefFiles,testVrefFiles,regionsFile,regionsName,inFolder,outFolder,tName,rName)
+
+where 
+
+* refVrefFiles is a vector of BIGWIG files that contain the JSD values of a test/reference comparison
+
+* testVrefFiles is a vector of BIGWIG files that contain the JSD values of available test/reference comparisons
+
+* regionsFile is a BED file (or other rtracklayer-importable file type) containing the regions to rank
+
+* regionsName is a string providing the name for the regions being ranked
+
+* inFolder is the directory that contains the JSD files and the annotRegions file
+
+* outFolder is the directory used to write the result in an .xlsx file
+
+* tName is a string providing a name for the test phenotype
+
+* rName is a string providing a name for the reference phenotype
+
+In this case, the function generates the file regionRankings-tName-VS-rName.tsv.
+
+NOTE 1: More information about this utility can be found in informME/src/R\_src/postprocess/README.txt
+
+NOTE 2: For this utility, the following tools must be installed in R: GenomicFeatures, GenomicRanges, rtracklayer, TxDb.Hsapiens.UCSC.hg19.knownGene, gamlss, Homo.sapiens
+
 
 REFERENCES
 ----------
@@ -333,6 +366,8 @@ REFERENCES
 [1] Jenkinson, G., Pujadas, E., Goutsias, J., and Feinberg, A.P. (2017), Potential energy landscapes identify the information-theoretic nature of the epigenome, Nature Genetics, 49: 719-729.
 
 [2] Jenkinson, G., Abante, J., Feinberg, A.P., and Goutsias, J. (2018), An information-theoretic approach to the modeling and analysis of whole-genome bisulfite sequencing data, BMC Bioinformatics, 19:87, https://doi.org/10.1186/s12859-018-2086-5.
+
+[3] Jenkinson, G., Abante, J., Koldobskiy, M., Feinberg, A.P., and Goutsias, J. (2019). Ranking genomic features using an information-theoretic measure of epigenetic discordance, BMC Bioinformatics (Accepted).
 
 WIKI
 ---------------

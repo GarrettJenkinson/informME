@@ -135,13 +135,13 @@ be run within an R session.
      - ggplot2
 
 
-jsGrank.R
----------
+jsGrank.R rankGenes function
+----------------------------
 
-This is an R script that ranks all Human genes in the 
+This is an R function that ranks all Human genes in the 
 Bioconductor library TxDb.Hsapiens.UCSC.hg19.knownGene using 
-the Jensen-Shannon distance (JSD) based on the method described 
-in [1]. It should be run within an R session.
+the average mutual information based on the method described 
+in [2]. It should be run within an R session.
 
   default usage (replicate reference data is available):
 
@@ -179,7 +179,7 @@ in [1]. It should be run within an R session.
    #
    # inFolder is the directory that contains the JSD files
    # outFolder is the directory used to write the result  
-   # (a .xlsx file).
+   # (a .tsv file).
    # 
    # For example:
    # 
@@ -216,7 +216,7 @@ in [1]. It should be run within an R session.
    #
    # inFolder is the directory that contains the JSD files
    # outFolder is the directory used to write the result 
-   # (a .xlsx file).
+   # (a .tsv file).
    # 
    # For example:
    # 
@@ -239,16 +239,93 @@ in [1]. It should be run within an R session.
    - Homo.sapiens
    - rtracklayer
    - TxDb.Hsapiens.UCSC.hg19.knownGene
-   - XLConnect
+
+jsGrank.R rankRegions function
+----------------------------
+
+This is an R function that ranks all regions in a BED file using 
+the average mutual information based on the method described 
+in [2]. It should be run within an R session.
+
+  default usage (replicate reference data is available):
+
+   source("jsGrank.R")
+   rankRegions(refVrefFiles,testVrefFiles,regionsFile,regionsName,
+               inFolder,outFolder,tName,rName)
+
+   # refVrefFiles is a vector of BIGWIG files that contain the
+   # JSD values of a test/reference comparison. 
+   # For example: if
+   #
+   # JSD-lungnormal-1-VS-lungnormal-2.bw 
+   # JSD-lungcancer-3-VS-lungnormal-1.bw 
+   # JSD-lungnormal-3-VS-lungnormal-2.bw
+   # 
+   # are available, then set 
+   # 
+   # textVrefFiles <- c("JSD-lungnormal-1-VS-lungnormal-2.bw",
+   #                    "JSD-lungnormal-3-VS-lungnormal-1.bw",
+   #                    "JSD-lungnormal-3-VS-lungnormal-2.bw")
+   #
+   # testVrefFiles is a vector of BIGWIG files that contain the  
+   # JSD values of available test/reference comparisons. 
+   # For example: if 
+   #
+   # JSD-lungcancer-1-VS-lungnormal-1.bw  
+   # JSD-lungcancer-2-VS-lungnormal-2.bw 
+   # JSD-lungcancer-3-VS-lungnormal-3.bw 
+   # 
+   # are available, then set 
+   # 
+   # textVrefFiles <- c("JSD-lungcancer-1-VS-lungnormal-1.bw",
+   #                    "JSD-lungcancer-2-VS-lungnormal-2.bw",
+   #                    "JSD-lungcancer-3-VS-lungnormal-3.bw")
+   #
+   # regionsFile is a string containing the name of the bed file
+   # with regions that you want ranked. 
+   # For example: if you have the following file with regions
+   #
+   # bivalentDomains.bed
+   #
+   # then set
+   #
+   # regionsFile <- "bivalentDomains.bed"
+   #
+   # regionsName is a short string used to nickname the regions.
+   # For example with the above file you might set:
+   # 
+   # regionsName <- "bivDom"
+   #
+   # inFolder is the directory that contains the JSD files
+   # and the regionsFile
+   #
+   # outFolder is the directory used to write the result  
+   # (a .tsv file).
+   # 
+   # For example:
+   # 
+   # inFolder  <- "/path/to/in-folder/"
+   # outFolder <- "/path/to/out-folder/"
+   #
+   # tName and rName are strings providing names for the 
+   # test and reference phenotypes.
+   #
+   # For example: 
+   #
+   # tName <- "lungcancer"
+   # rName <- "lungnormal"
 
 
 REFERENCES
 ----------
 
 [1] Jenkninson, G., Abante, J., Feinberg, A.P., and 
-    Goutsias, J. (2018) An information-theoretic approach 
+    Goutsias, J. (2018). An information-theoretic approach 
     to the modeling and analysis of whole-genome bisulfite 
     sequencing data, BMC Bioinformatics, 19:87, 
     https://doi.org/10.1186/s12859-018-2086-5.
 
-
+[2] Jenkinson, G., Abante, J., Koldobskiy, M., Feinberg, A.P., 
+    and Goutsias, J. (2019). Ranking genomic features using 
+    an information-theoretic measure of epigenetic discordance, 
+    BMC Bioinformatics (Accepted).
