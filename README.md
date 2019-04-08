@@ -367,7 +367,7 @@ REFERENCES
 
 [2] Jenkinson, G., Abante, J., Feinberg, A.P., and Goutsias, J. (2018), An information-theoretic approach to the modeling and analysis of whole-genome bisulfite sequencing data, BMC Bioinformatics, 19:87, https://doi.org/10.1186/s12859-018-2086-5.
 
-[3] Jenkinson, G., Abante, J., Koldobskiy, M., Feinberg, A.P., and Goutsias, J. (2019). Ranking genomic features using an information-theoretic measure of epigenetic discordance, BMC Bioinformatics (Accepted).
+[3] Jenkinson, G., Abante, J., Koldobskiy, M., Feinberg, A.P., and Goutsias, J. (2019), Ranking genomic features using an information-theoretic measure of epigenetic discordance, BMC Bioinformatics, 20:175, https://doi.org/10.1186/s12859-019-2777-6.
 
 WIKI
 ---------------
