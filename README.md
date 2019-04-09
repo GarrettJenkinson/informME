@@ -4,7 +4,7 @@
 
 ## An information-theoretic pipeline for methylation analysis of WGBS data
 
-### LATEST RELEASE: v0.3.2
+### LATEST RELEASE: v0.3.3
 -----------------------------------------------------------------
 
 This directory contains the MATLAB, C++ and R software that implements informME, as well as the BASH wrappers and example submission scripts used to run informME on a Sun Grid Engine (SGE) cluster or a SLURM computer cluster. 
@@ -376,6 +376,8 @@ See [our wiki](https://github.com/GarrettJenkinson/informME/wiki) for additional
 
 VERSION HISTORY
 ---------------
+
+v0.3.3 - Added ranking capabilities for promoters, gene bodies, and arbitrary genomic intervals, based on mutual information (see [3] for details).
 
 v0.3.2 - Added methylation sensitivity index (MSI) to output. Improved checking of user inputs to catch errors early. Tabulate output bedGraph files. Documentation improvements.
 
